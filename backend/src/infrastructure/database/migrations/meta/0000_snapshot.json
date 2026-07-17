@@ -1,0 +1,695 @@
+{
+  "id": "64d810fa-eb28-4d8d-b003-239a299dfc89",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.archives": {
+      "name": "archives",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "courrier_id": {
+          "name": "courrier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_archivage": {
+          "name": "date_archivage",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duree_conservation": {
+          "name": "duree_conservation",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "emplacement": {
+          "name": "emplacement",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "archives_courrier_id_courriers_id_fk": {
+          "name": "archives_courrier_id_courriers_id_fk",
+          "tableFrom": "archives",
+          "tableTo": "courriers",
+          "columnsFrom": [
+            "courrier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.audit_logs": {
+      "name": "audit_logs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "utilisateur_id": {
+          "name": "utilisateur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "action": {
+          "name": "action",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entite_type": {
+          "name": "entite_type",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entite_id": {
+          "name": "entite_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "details": {
+          "name": "details",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ip": {
+          "name": "ip",
+          "type": "varchar(45)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.courriers": {
+      "name": "courriers",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "reference": {
+          "name": "reference",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "objet": {
+          "name": "objet",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "corps": {
+          "name": "corps",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type_courrier": {
+          "name": "type_courrier",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "statut": {
+          "name": "statut",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'brouillon'"
+        },
+        "emetteur_id": {
+          "name": "emetteur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "direction_emetteur_id": {
+          "name": "direction_emetteur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "direction_courrier_emetteur_id": {
+          "name": "direction_courrier_emetteur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "destinataire_direction_id": {
+          "name": "destinataire_direction_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ministere_destinataire_id": {
+          "name": "ministere_destinataire_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_envoi": {
+          "name": "date_envoi",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_reception": {
+          "name": "date_reception",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ia_suggestions": {
+          "name": "ia_suggestions",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "courriers_emetteur_id_utilisateurs_id_fk": {
+          "name": "courriers_emetteur_id_utilisateurs_id_fk",
+          "tableFrom": "courriers",
+          "tableTo": "utilisateurs",
+          "columnsFrom": [
+            "emetteur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "courriers_direction_emetteur_id_directions_id_fk": {
+          "name": "courriers_direction_emetteur_id_directions_id_fk",
+          "tableFrom": "courriers",
+          "tableTo": "directions",
+          "columnsFrom": [
+            "direction_emetteur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "courriers_direction_courrier_emetteur_id_directions_id_fk": {
+          "name": "courriers_direction_courrier_emetteur_id_directions_id_fk",
+          "tableFrom": "courriers",
+          "tableTo": "directions",
+          "columnsFrom": [
+            "direction_courrier_emetteur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "courriers_destinataire_direction_id_directions_id_fk": {
+          "name": "courriers_destinataire_direction_id_directions_id_fk",
+          "tableFrom": "courriers",
+          "tableTo": "directions",
+          "columnsFrom": [
+            "destinataire_direction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "courriers_ministere_destinataire_id_ministeres_id_fk": {
+          "name": "courriers_ministere_destinataire_id_ministeres_id_fk",
+          "tableFrom": "courriers",
+          "tableTo": "ministeres",
+          "columnsFrom": [
+            "ministere_destinataire_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "courriers_reference_unique": {
+          "name": "courriers_reference_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "reference"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.directions": {
+      "name": "directions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ministere_id": {
+          "name": "ministere_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nom": {
+          "name": "nom",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "directions_ministere_id_ministeres_id_fk": {
+          "name": "directions_ministere_id_ministeres_id_fk",
+          "tableFrom": "directions",
+          "tableTo": "ministeres",
+          "columnsFrom": [
+            "ministere_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.flux_etapes": {
+      "name": "flux_etapes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "courrier_id": {
+          "name": "courrier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "direction_id": {
+          "name": "direction_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "action": {
+          "name": "action",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "utilisateur_id": {
+          "name": "utilisateur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "commentaire": {
+          "name": "commentaire",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_action": {
+          "name": "date_action",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "flux_etapes_courrier_id_courriers_id_fk": {
+          "name": "flux_etapes_courrier_id_courriers_id_fk",
+          "tableFrom": "flux_etapes",
+          "tableTo": "courriers",
+          "columnsFrom": [
+            "courrier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "flux_etapes_direction_id_directions_id_fk": {
+          "name": "flux_etapes_direction_id_directions_id_fk",
+          "tableFrom": "flux_etapes",
+          "tableTo": "directions",
+          "columnsFrom": [
+            "direction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "flux_etapes_utilisateur_id_utilisateurs_id_fk": {
+          "name": "flux_etapes_utilisateur_id_utilisateurs_id_fk",
+          "tableFrom": "flux_etapes",
+          "tableTo": "utilisateurs",
+          "columnsFrom": [
+            "utilisateur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ministeres": {
+      "name": "ministeres",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nom": {
+          "name": "nom",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "ministeres_nom_unique": {
+          "name": "ministeres_nom_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "nom"
+          ]
+        },
+        "ministeres_code_unique": {
+          "name": "ministeres_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "code"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pieces_jointes": {
+      "name": "pieces_jointes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "courrier_id": {
+          "name": "courrier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nom_fichier": {
+          "name": "nom_fichier",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "chemin_minio": {
+          "name": "chemin_minio",
+          "type": "varchar(512)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type_mime": {
+          "name": "type_mime",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "taille_bytes": {
+          "name": "taille_bytes",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hash_sha256": {
+          "name": "hash_sha256",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata_ia": {
+          "name": "metadata_ia",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "pieces_jointes_courrier_id_courriers_id_fk": {
+          "name": "pieces_jointes_courrier_id_courriers_id_fk",
+          "tableFrom": "pieces_jointes",
+          "tableTo": "courriers",
+          "columnsFrom": [
+            "courrier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.utilisateurs": {
+      "name": "utilisateurs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "direction_id": {
+          "name": "direction_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nom": {
+          "name": "nom",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "prenom": {
+          "name": "prenom",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "permissions": {
+          "name": "permissions",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mot_de_passe": {
+          "name": "mot_de_passe",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "utilisateurs_direction_id_directions_id_fk": {
+          "name": "utilisateurs_direction_id_directions_id_fk",
+          "tableFrom": "utilisateurs",
+          "tableTo": "directions",
+          "columnsFrom": [
+            "direction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "utilisateurs_email_unique": {
+          "name": "utilisateurs_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

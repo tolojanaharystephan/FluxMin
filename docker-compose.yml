@@ -1,0 +1,196 @@
+# ============================================
+# FluxMin – Docker Compose (Development)
+# ============================================
+# Usage: docker compose up -d
+# Access: http://localhost:3000 (Frontend)
+#         http://localhost:3001 (Backend API)
+#         http://localhost:8000 (IA Service)
+#         http://localhost:9001 (MinIO Console)
+#         http://localhost:7233 (Temporal UI)
+
+services:
+  # ──────────────────────────────────────────
+  # PostgreSQL 16
+  # ──────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: fluxmin-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fluxmin_secret_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-fluxmin}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fluxmin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fluxmin-network
+
+  # ──────────────────────────────────────────
+  # Redis 7
+  # ──────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: fluxmin-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fluxmin-network
+
+  # ──────────────────────────────────────────
+  # MinIO (S3-compatible file storage)
+  # ──────────────────────────────────────────
+  minio:
+    image: minio/minio:latest
+    container_name: fluxmin-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - fluxmin-network
+
+  # ──────────────────────────────────────────
+  # Temporal (Workflow Engine)
+  # ──────────────────────────────────────────
+  temporal:
+    image: temporalio/auto-setup:1.23
+    container_name: fluxmin-temporal
+    restart: unless-stopped
+    ports:
+      - "7233:7233"
+      - "7234:7234"
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PWD=${POSTGRES_PASSWORD:-fluxmin_secret_2026}
+      - POSTGRES_SEEDS=postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fluxmin-network
+
+  # ──────────────────────────────────────────
+  # Backend NestJS
+  # ──────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fluxmin-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:-fluxmin_secret_2026}@postgres:5432/fluxmin
+      JWT_SECRET: ${JWT_SECRET:-fluxmin-jwt-secret-key-super-secure-2026}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-fluxmin-jwt-refresh-secret-key-super-secure-2026}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-15m}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-7d}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_BUCKET: ${MINIO_BUCKET:-fluxmin-bucket}
+      MINIO_USE_SSL: "false"
+      TEMPORAL_HOST: temporal:7233
+      IA_SERVICE_URL: http://ia-service:8000
+      PORT: 3000
+    ports:
+      - "3001:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fluxmin-network
+
+  # ──────────────────────────────────────────
+  # Frontend Next.js
+  # ──────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fluxmin-frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_IA_SERVICE_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - fluxmin-network
+
+  # ──────────────────────────────────────────
+  # IA Service (Python FastAPI)
+  # ──────────────────────────────────────────
+  ia-service:
+    build:
+      context: ./ia-service
+      dockerfile: Dockerfile
+    container_name: fluxmin-ia-service
+    restart: unless-stopped
+    environment:
+      - PROJECT_NAME=FluxMin AI Service
+      - API_V1_STR=/api/v1
+    ports:
+      - "8000:8000"
+    networks:
+      - fluxmin-network
+
+  # ──────────────────────────────────────────
+  # Temporal UI
+  # ──────────────────────────────────────────
+  temporal-ui:
+    image: temporalio/ui:latest
+    container_name: fluxmin-temporal-ui
+    restart: unless-stopped
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
+    ports:
+      - "8080:8080"
+    depends_on:
+      - temporal
+    networks:
+      - fluxmin-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+
+networks:
+  fluxmin-network:
+    driver: bridge

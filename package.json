@@ -1,0 +1,20 @@
+{
+  "name": "fluxmin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FluxMin – Plateforme de Gestion et d'Automatisation Intelligente des Courriers Ministériels",
+  "scripts": {
+    "dev": "docker compose up -d",
+    "dev:build": "docker compose up -d --build",
+    "dev:stop": "docker compose down",
+    "dev:logs": "docker compose logs -f",
+    "db:migrate": "cd backend && npm run db:migrate",
+    "db:generate": "cd backend && npm run db:generate",
+    "db:seed": "cd backend && npm run db:seed",
+    "backend:dev": "cd backend && npm run start:dev",
+    "frontend:dev": "cd frontend && npm run dev",
+    "ia:dev": "cd ia-service && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "lint": "cd frontend && npm run lint && cd ../backend && npm run lint",
+    "test": "cd backend && npm run test"
+  }
+}

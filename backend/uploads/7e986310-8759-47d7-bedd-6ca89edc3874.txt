@@ -1,0 +1,18 @@
+Script relançant le test du projet courrier:
+powershell -ExecutionPolicy Bypass -File scripts/smoke-test.ps1
+
+# 1. Migrations
+cd backend
+copy .env.example .env
+$env:DATABASE_URL="postgresql://postgres:postgres@localhost:5432/courrier_db"
+npm run db:migrate
+npm run dev
+
+# 2. IA
+cd ..\ai-service
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --port 8000 --reload
+
+# 3. Frontend
+cd ..\frontend
+copy .env.example .env
+npm run dev
