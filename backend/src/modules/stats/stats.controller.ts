@@ -1,8 +1,11 @@
 import { Controller, Get, Query, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { StatsService } from './stats.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { RequirePermissions, Permission } from '../../common/types/roles';
 
+@ApiTags('Stats')
+@ApiBearerAuth('JWT')
 @Controller('stats')
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}

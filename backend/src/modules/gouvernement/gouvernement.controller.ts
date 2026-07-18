@@ -16,6 +16,7 @@ import {
   SetMetadata,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuid } from 'uuid';
@@ -57,6 +58,8 @@ const publicationMulterOptions = {
 
 ensureUploadDirs();
 
+@ApiTags('Gouvernement')
+@ApiBearerAuth('JWT')
 @Controller('gouvernement')
 export class GouvernementController {
   constructor(

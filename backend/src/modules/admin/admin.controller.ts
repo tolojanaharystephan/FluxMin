@@ -10,6 +10,7 @@ import {
   UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import {
   CreateMinistereDto,
@@ -24,6 +25,8 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles, Permission } from '../../common/types/roles';
 import { RequirePermissions } from '../../common/types/roles';
 
+@ApiTags('Admin')
+@ApiBearerAuth('JWT')
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AdminController {

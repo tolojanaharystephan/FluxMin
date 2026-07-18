@@ -51,6 +51,7 @@
 | 18 juil. | Étendre au Gouvernement | Module **MG** : rôle `gouvernement` ; posts publics/ciblés ; AR/réponses par **directeur de ministère** uniquement. |
 | 18 juil. | Directeur sans direction | `directeur_ministere` rattaché au **ministère** (`ministereId`) uniquement, pas à une direction. |
 | 18 juil. | Hyperautomation M7 | **Livré** : MinIO PJ ; Temporal relances/escalades ; process mining Analytics. |
+| 18 juil. | M8 sans Docker | Socle : Swagger, rate limit, helmet, health, tests critiques (local OK). |
 | 17 juil. | Que signifie finaliser notifs in-app ? | Toast, JWT WS, filtres, marquage lu. `message_discussion` = type de notif (icône bulle). |
 | 17 juil. | Rôle de l’IA avant M6 | **Assistant documentaire local** : OCR, résumé, routage, suggestions. **Validation humaine obligatoire** — pas de décision autonome. |
 | 17 juil. | Ne pas restreindre le périmètre IA | Périmètre complet (OCR + résumé + routage + suggestions + rédaction assistée), contrôle humain, scores, audit. |
@@ -99,7 +100,7 @@
 | **M6 IA** | ✅ | Nest ↔ FastAPI ; OCR local ; résumé LLM ; multi-PJ ; validation humaine |
 | **MG Communications Gouvernement** | ✅ | Actualités publiques/ciblées ; notifs ; AR + réponses (directeur ministère) |
 | **M7 Hyperautomation** | ✅ | MinIO (PJ) ; Temporal relances/escalades ; process mining Analytics |
-| **M8 Durcissement** | ⏳ | Tests critiques, Swagger, rate limit, monitoring |
+| **M8 Durcissement** | ✅ | Socle local : Swagger, rate limit, helmet, health, tests critiques |
 
 **Non priorisé immédiatement :** SSO/MFA fort, process mining avancé externe, K8s/Prometheus prod.
 
@@ -177,7 +178,7 @@ PDF, png/jpg/jpeg/gif/webp, txt/csv/rtf, Word (doc/docx), Excel (xls/xlsx), Powe
 7. **Pilotage par rôle** — parcours distincts admin / agent / auditeur.
 8. **UX professionnelle** — design SaaS 2026 (teal, drag & drop).
 9. **Règles métier réalistes** — flux interne/externe, transmission encadrée.
-10. **Feuille de route claire** — M7 livré ; M8 (durcissement prod) ensuite.
+10. **Feuille de route claire** — M1–M8 socle livrés ; monitoring Prometheus / suite e2e élargie ensuite.
 
 ---
 

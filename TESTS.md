@@ -228,6 +228,18 @@
 
 ---
 
+## 10. Durcissement M8 (local, sans Docker)
+
+| # | Action | Résultat attendu | ☐ |
+|---|--------|------------------|---|
+| 10.1 | Ouvrir `http://localhost:3001/api/docs` | Swagger UI FluxMin ; Authorize JWT | ☐ |
+| 10.2 | `GET /api/health` (sans token) | 200 `{ status: "ok", database: "up" }` | ☐ |
+| 10.3 | Spam login (>10/min) | 429 Too Many Requests | ☐ |
+| 10.4 | `cd backend && npm test -- src/app.controller.spec.ts src/common/guards/roles.guard.spec.ts` | Suites vertes | ☐ |
+| 10.5 | `npm run test:e2e` (Postgres local) | Health 200 + login invalide 401 (skip si DB down) | ☐ |
+
+---
+
 ## Comptes de test
 
 | Rôle | Email | Mot de passe |

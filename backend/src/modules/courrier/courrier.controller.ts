@@ -17,6 +17,7 @@ import {
   StreamableFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuid } from 'uuid';
@@ -46,6 +47,8 @@ const SkipAudit = () => SetMetadata(SKIP_AUDIT_KEY, true);
 
 ensureUploadDirs();
 
+@ApiTags('Courriers')
+@ApiBearerAuth('JWT')
 @Controller('courriers')
 export class CourrierController {
   constructor(

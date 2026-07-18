@@ -1,7 +1,7 @@
 # FluxMin – Plateforme de Gestion et d'Automatisation Intelligente des Courriers Ministériels
 
 ## Version du document : 2.0
-## Dernière mise à jour : 18 juillet 2026 — M1–M6 ✅ · MG ✅ · M7 Hyperautomation ✅
+## Dernière mise à jour : 18 juillet 2026 — M1–M7 ✅ · MG ✅ · M8 Durcissement (socle local) ✅
 
 ---
 
@@ -17,8 +17,16 @@
 | **M5 Notifications produit** | ✅ | In-app : WS JWT, toast, filtres, messages discussion ; pas de SaaS email tiers (SMTP interne optionnel plus tard) |
 | **M6 IA bout-en-bout** | ✅ | Nest→FastAPI ; OCR local ; résumé/infos clés LLM multi-fournisseurs ; validation humaine |
 | **MG Communications Gouvernement** | ✅ | Rôle `gouvernement` ; posts publics/ciblés ; PJ ; notifs ; AR/réponses par **directeur de ministère** uniquement |
-| **M7 Hyperautomation** | ✅ | **M7a** MinIO (PJ courriers/messages/publications, dual-read disque) · **M7b** Temporal (relances/escalades) · **M7c** process mining (Analytics) |
-| M8 Durcissement (tests, Swagger, rate limit) | ⏳ | — |
+| **M7 Hyperautomation** | ✅ | **M7a** MinIO · **M7b** Temporal · **M7c** process mining |
+| **M8 Durcissement** | ✅ | Socle local : Swagger `/api/docs`, rate limit, helmet, `GET /api/health`, tests critiques |
+
+### M8 — Durcissement (socle local, sans Docker)
+
+- Swagger UI : `http://localhost:3001/api/docs` (désactivable en prod sauf `SWAGGER_ENABLED=true`)
+- Rate limit global 60 req/min ; login/register 10 req/min
+- Helmet + CORS (`FRONTEND_URL`)
+- Health public : `GET /api/health` (ping Postgres)
+- Tests Jest : health, RolesGuard, auth login invalide, throttler config
 
 ### M7 — Hyperautomation (livré)
 
@@ -256,10 +264,10 @@ Services :
 - [x] API + UI audit search / reports / anomalies (M4)
 
 ### Phase 6 : Tests, Sécurité, Optimisations, Documentation
-- [ ] Tests unitaires + intégration
-- [ ] Sécurité (rate limiting, CORS, validation uploads)
-- [ ] Documentation API (Swagger)
-- [ ] Optimisations performance
+- [x] Tests unitaires + E2E critiques (health, auth, guards) — M8
+- [x] Sécurité (rate limiting, helmet, CORS, validation uploads) — M8
+- [x] Documentation API (Swagger `/api/docs`) — M8
+- [ ] Optimisations performance / Prometheus — hors socle M8 local
 
 ---
 

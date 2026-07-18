@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { HealthService } from './health.service';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { StorageModule } from './infrastructure/storage/storage.module';
 import { TemporalModule } from './infrastructure/temporal/temporal.module';
@@ -19,8 +21,18 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 
+const throttleTtl = Number(process.env.THROTTLE_TTL) || 60_000;
+const throttleLimit = Number(process.env.THROTTLE_LIMIT) || 60;
+
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: throttleTtl,
+        limit: throttleLimit,
+      },
+    ]),
     DatabaseModule,
     StorageModule,
     AuthModule,
@@ -38,18 +50,19 @@ import { AuditInterceptor } from './common/interceptors/audit.interceptor';
   controllers: [AppController],
   providers: [
     AppService,
-    // Global JWT guard – tous les endpoints sont protégés par défaut
-    // Utiliser @Public() pour les routes publiques
+    HealthService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
-    // Global RBAC guard
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    // Global audit interceptor
     {
       provide: APP_INTERCEPTOR,
       useClass: AuditInterceptor,
