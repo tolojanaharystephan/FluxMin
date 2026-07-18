@@ -225,6 +225,9 @@ export function AttachmentsPanel({
     if (accepted.length && onUpload) await onUpload(accepted);
   };
 
+  const showAnalyzeAll = Boolean(onAnalyzeAll && attachments.length > 0);
+  const showActions = showAnalyzeAll || Boolean(canUpload);
+
   return (
     <div
       className={cn(
@@ -232,68 +235,90 @@ export function AttachmentsPanel({
         className
       )}
     >
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border/60 gap-2">
-        <div className="min-w-0">
-          <p className="text-sm font-semibold">Pièces jointes</p>
-          <p className="text-[11px] text-muted-foreground">
-            {attachments.length} fichier{attachments.length !== 1 ? "s" : ""}
-          </p>
+      {canUpload && (
+        <input
+          ref={inputRef}
+          type="file"
+          multiple
+          className="hidden"
+          accept={ACCEPT}
+          onChange={async (e) => {
+            if (e.target.files?.length) await handleIncoming(e.target.files);
+            e.target.value = "";
+          }}
+        />
+      )}
+
+      <div className="space-y-3 px-4 py-3 border-b border-border/60">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary border border-border/50">
+            <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold leading-tight">Pièces jointes</p>
+            <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
+              {attachments.length === 0
+                ? "Aucun fichier"
+                : `${attachments.length} fichier${attachments.length > 1 ? "s" : ""}`}
+            </p>
+          </div>
+          <span className="shrink-0 inline-flex h-6 min-w-6 items-center justify-center rounded-md bg-secondary px-2 text-[11px] font-semibold tabular-nums text-muted-foreground">
+            {attachments.length}
+          </span>
         </div>
-        <div className="flex items-center gap-1.5 shrink-0">
-          {onAnalyzeAll && attachments.length > 0 && (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              disabled={analyzingAll || analyzingId != null}
-              onClick={onAnalyzeAll}
-              className="rounded-xl text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/10"
-              title="Analyser toutes les PJ et leurs correspondances"
-            >
-              {analyzingAll ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
-              ) : (
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-              )}
-              Analyser tout
-            </Button>
-          )}
-          {canUpload && (
-            <>
-              <input
-                ref={inputRef}
-                type="file"
-                multiple
-                className="hidden"
-                accept={ACCEPT}
-                onChange={async (e) => {
-                  if (e.target.files?.length) await handleIncoming(e.target.files);
-                  e.target.value = "";
-                }}
-              />
+
+        {showActions && (
+          <div
+            className={cn(
+              "grid gap-2",
+              showAnalyzeAll && canUpload ? "grid-cols-2" : "grid-cols-1"
+            )}
+          >
+            {showAnalyzeAll && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={analyzingAll || analyzingId != null}
+                onClick={onAnalyzeAll}
+                className="w-full rounded-xl text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/10"
+                title="Analyser toutes les PJ et leurs correspondances"
+              >
+                {analyzingAll ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5 shrink-0" />
+                ) : (
+                  <Sparkles className="h-3.5 w-3.5 mr-1.5 shrink-0" />
+                )}
+                <span className="truncate">Analyser tout</span>
+              </Button>
+            )}
+            {canUpload && (
               <Button
                 type="button"
                 size="sm"
                 variant="outline"
                 disabled={uploading}
                 onClick={() => inputRef.current?.click()}
-                className="rounded-xl"
+                className="w-full rounded-xl"
               >
                 {uploading ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5 shrink-0" />
                 ) : (
-                  <Paperclip className="h-3.5 w-3.5 mr-1.5" />
+                  <Upload className="h-3.5 w-3.5 mr-1.5 shrink-0" />
                 )}
-                Ajouter
+                <span className="truncate">Ajouter</span>
               </Button>
-            </>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="p-3 space-y-2">
         {canUpload && (
-          <div
+          <button
+            type="button"
+            disabled={uploading}
+            onClick={() => inputRef.current?.click()}
             onDragOver={(e) => {
               e.preventDefault();
               setDragOver(true);
@@ -305,12 +330,15 @@ export function AttachmentsPanel({
               if (e.dataTransfer.files?.length) await handleIncoming(e.dataTransfer.files);
             }}
             className={cn(
-              "rounded-xl border border-dashed px-3 py-4 text-center text-xs text-muted-foreground transition-colors",
-              dragOver ? "border-primary bg-primary/5" : "border-border/70"
+              "w-full rounded-xl border border-dashed px-3 py-3.5 text-center text-xs transition-colors",
+              dragOver
+                ? "border-primary bg-primary/5 text-foreground"
+                : "border-border/70 text-muted-foreground hover:border-primary/35 hover:bg-secondary/30",
+              uploading && "opacity-50 pointer-events-none"
             )}
           >
-            Déposez des fichiers pour les joindre
-          </div>
+            Glissez-déposez ici, ou cliquez pour parcourir
+          </button>
         )}
 
         {error && (
@@ -319,7 +347,7 @@ export function AttachmentsPanel({
           </p>
         )}
 
-        {attachments.length === 0 && (
+        {attachments.length === 0 && !canUpload && (
           <p className="text-xs text-muted-foreground text-center py-6">
             Aucune pièce jointe pour le moment.
           </p>
@@ -339,14 +367,14 @@ export function AttachmentsPanel({
                 <p className="text-sm font-medium truncate">{pj.nomFichier}</p>
                 <p className="text-[11px] text-muted-foreground">{formatFileSize(pj.tailleBytes)}</p>
               </div>
-              <div className="flex items-center gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-0.5 shrink-0">
                 {onAnalyze && (
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 text-cyan-400"
-                    disabled={analyzingId === pj.id}
+                    disabled={analyzingId === pj.id || analyzingAll}
                     onClick={() => onAnalyze(pj.id)}
                     title="Analyser avec l'IA"
                   >

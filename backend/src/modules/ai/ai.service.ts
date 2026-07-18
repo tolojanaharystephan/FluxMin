@@ -5,6 +5,8 @@ import {
   ForbiddenException,
   BadRequestException,
   ServiceUnavailableException,
+  Logger,
+  OnModuleInit,
 } from '@nestjs/common';
 import { readFileSync, existsSync } from 'fs';
 import { extname } from 'path';
@@ -20,6 +22,7 @@ import {
   ALLOWED_UPLOAD_EXTENSIONS,
   resolveStoredFilePath,
 } from '../../common/files/storage.util';
+import { ensureDemoUploadPdfs } from '../../common/files/demo-uploads.util';
 import { StatutCourrier } from '../courrier/dto/courrier.dto';
 import { AuditService } from '../audit/audit.service';
 import { AnalyzeTextDto, DraftDto } from './dto/ai.dto';
@@ -28,12 +31,61 @@ const IA_URL = (process.env.IA_SERVICE_URL || 'http://localhost:8000').replace(/
 const ANALYZABLE_EXTS = new Set<string>(ALLOWED_UPLOAD_EXTENSIONS);
 
 @Injectable()
-export class AiService {
+export class AiService implements OnModuleInit {
+  private readonly logger = new Logger(AiService.name);
+
   constructor(
     @Inject(DATABASE_CONNECTION) private db: DrizzleDB,
     private auditService: AuditService,
   ) {}
 
+  async onModuleInit() {
+    try {
+      const { created } = ensureDemoUploadPdfs();
+      if (created.length) {
+        this.logger.log(`PDF démo créés dans uploads/ : ${created.join(', ')}`);
+      }
+    } catch (err: any) {
+      this.logger.warn(`Impossible de préparer les PDF démo : ${err?.message || err}`);
+    }
+
+    const health = await this.health();
+    if (health.status !== 'ok') {
+      this.logger.warn(
+        `Service IA injoignable (${IA_URL}). Les analyses PJ échoueront jusqu'au démarrage de ia-service ` +
+          `(cd ia-service && python -m uvicorn app.main:app --port 8000).`,
+      );
+    } else {
+      this.logger.log(`Service IA OK → ${IA_URL}`);
+    }
+  }
+
+  private async assertIaReady() {
+    const health = await this.health();
+    if (health.status !== 'ok') {
+      throw new ServiceUnavailableException(
+        `Service IA injoignable (${IA_URL}). ` +
+          `Démarrez-le avant toute analyse : cd ia-service && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000. ` +
+          `En Docker : docker compose up -d ia-service.`,
+      );
+    }
+  }
+
+  private extractTexteFromAnalysis(analysis: any): string {
+    return (
+      analysis?.ocrResult?.texteExtrait?.texteBrut ||
+      analysis?.ocrResult?.resumeStructure?.accroche ||
+      analysis?.ocrResult?.resumeAI ||
+      ''
+    )
+      .toString()
+      .trim();
+  }
+
+  private errMessage(err: any): string {
+    const msg = err?.response?.message || err?.message || 'Échec analyse';
+    return Array.isArray(msg) ? msg.join(' ') : String(msg);
+  }
   private async callIaAnalyzeFile(buffer: Buffer, filename: string) {
     const form = new FormData();
     const bytes = new Uint8Array(buffer);
@@ -110,15 +162,18 @@ export class AiService {
   }
 
   async analyzeText(dto: AnalyzeTextDto) {
+    await this.assertIaReady();
     return this.callIaAnalyzeText(dto.texte, dto.objet);
   }
 
   async draft(dto: DraftDto) {
+    await this.assertIaReady();
     return this.callIaDraft(dto);
   }
 
   async analyzeUpload(file: Express.Multer.File) {
     if (!file) throw new BadRequestException('Fichier requis');
+    await this.assertIaReady();
     const ext = extname(file.originalname || '').toLowerCase();
     if (!ANALYZABLE_EXTS.has(ext)) {
       throw new BadRequestException(
@@ -184,6 +239,7 @@ export class AiService {
 
   async analyzePieceJointe(courrierId: number, pjId: number, userId: number) {
     await this.assertCourrierAccess(courrierId, userId);
+    await this.assertIaReady();
 
     const [pj] = await this.db
       .select()
@@ -195,11 +251,15 @@ export class AiService {
 
     const path = resolveStoredFilePath(pj.cheminMinio);
     if (!path || !existsSync(path)) {
-      throw new NotFoundException('Fichier introuvable sur le disque');
+      throw new NotFoundException(
+        `Fichier introuvable sur le disque (${pj.cheminMinio || 'chemin vide'}). ` +
+          `Ré-uploadez la pièce jointe.`,
+      );
     }
 
     const buffer = readFileSync(path);
-    const ext = extname(pj.nomFichier || '').toLowerCase();
+    const nomFichier = pj.nomFichier?.trim() || `document-${pj.id}`;
+    const ext = extname(nomFichier).toLowerCase();
 
     if (!ANALYZABLE_EXTS.has(ext)) {
       throw new BadRequestException(
@@ -208,10 +268,14 @@ export class AiService {
       );
     }
 
-    const analysis = await this.callIaAnalyzeFile(
-      buffer,
-      pj.nomFichier || `document${ext || '.bin'}`,
-    );
+    const analysis = await this.callIaAnalyzeFile(buffer, nomFichier);
+    const texte = this.extractTexteFromAnalysis(analysis);
+    if (!texte) {
+      throw new BadRequestException(
+        `Aucun texte extractible de « ${nomFichier} ». ` +
+          `Document scanné illisible, OCR indisponible, ou fichier vide.`,
+      );
+    }
 
     await this.auditService.log({
       utilisateurId: userId,
@@ -220,7 +284,7 @@ export class AiService {
       entiteId: courrierId,
       details: {
         pjId,
-        nomFichier: pj.nomFichier,
+        nomFichier,
         priorite: analysis?.prioriteDetecte,
         topDirection: analysis?.recommandations?.[0]?.directionPropose,
       },
@@ -229,7 +293,7 @@ export class AiService {
     return {
       courrierId,
       pieceJointeId: pjId,
-      nomFichier: pj.nomFichier,
+      nomFichier,
       analysis,
     };
   }
@@ -237,6 +301,7 @@ export class AiService {
   /** Analyse toutes les PJ d'un courrier + correspondances croisées */
   async analyzeAllPiecesJointes(courrierId: number, userId: number) {
     const { courrier } = await this.assertCourrierAccess(courrierId, userId);
+    await this.assertIaReady();
 
     const pjs = await this.db
       .select()
@@ -256,66 +321,100 @@ export class AiService {
       analysis?: any;
     }> = [];
 
+    // Ancrage dossier : objet/corps toujours disponibles même si une PJ échoue
+    const metaParts = [courrier.objet, courrier.corps].filter(
+      (x): x is string => typeof x === 'string' && x.trim().length > 0,
+    );
+    if (metaParts.length) {
+      documents.push({
+        nomFichier: '[Fiche courrier]',
+        texte: metaParts.join('\n\n'),
+      });
+    }
+
     for (const pj of pjs) {
+      const nomFichier = pj.nomFichier?.trim() || `document-${pj.id}`;
       const path = resolveStoredFilePath(pj.cheminMinio);
-      const ext = extname(pj.nomFichier || '').toLowerCase();
+      const ext = extname(nomFichier).toLowerCase();
       if (!path || !existsSync(path)) {
         details.push({
           pieceJointeId: pj.id,
-          nomFichier: pj.nomFichier,
+          nomFichier,
           ok: false,
-          error: 'Fichier introuvable sur le disque',
+          error: `Fichier introuvable (${pj.cheminMinio || 'chemin vide'})`,
         });
-        documents.push({ nomFichier: pj.nomFichier, texte: '' });
         continue;
       }
       if (!ANALYZABLE_EXTS.has(ext)) {
         details.push({
           pieceJointeId: pj.id,
-          nomFichier: pj.nomFichier,
+          nomFichier,
           ok: false,
           error: `Format non analysable (${ext})`,
         });
-        documents.push({ nomFichier: pj.nomFichier, texte: '' });
         continue;
       }
 
       try {
         const buffer = readFileSync(path);
-        const analysis = await this.callIaAnalyzeFile(
-          buffer,
-          pj.nomFichier || `document${ext}`,
-        );
-        const texte =
-          analysis?.ocrResult?.texteExtrait?.texteBrut ||
-          analysis?.ocrResult?.resumeStructure?.accroche ||
-          '';
-        documents.push({ nomFichier: pj.nomFichier, texte });
+        const analysis = await this.callIaAnalyzeFile(buffer, nomFichier);
+        const texte = this.extractTexteFromAnalysis(analysis);
+        if (!texte) {
+          details.push({
+            pieceJointeId: pj.id,
+            nomFichier,
+            ok: false,
+            error: 'Aucun texte extractible (OCR vide ou document illisible)',
+            analysis,
+          });
+          continue;
+        }
+        documents.push({ nomFichier, texte });
         details.push({
           pieceJointeId: pj.id,
-          nomFichier: pj.nomFichier,
+          nomFichier,
           ok: true,
           analysis,
         });
       } catch (err: any) {
         details.push({
           pieceJointeId: pj.id,
-          nomFichier: pj.nomFichier,
+          nomFichier,
           ok: false,
-          error: err?.message || 'Échec analyse',
+          error: this.errMessage(err),
         });
-        documents.push({ nomFichier: pj.nomFichier, texte: '' });
       }
     }
 
+    const pjOk = details.filter((d) => d.ok).length;
     const withText = documents.filter((d) => (d.texte || '').trim().length > 0);
+
     if (!withText.length) {
+      const lines = details.map((d) => `• ${d.nomFichier}: ${d.error || 'échec'}`);
       throw new BadRequestException(
-        'Aucun texte extractible des pièces jointes. Vérifiez OCR (Tesseract/RapidOCR) et les formats.',
+        [
+          'Aucun texte extractible des pièces jointes ni de la fiche courrier.',
+          'Vérifiez les fichiers sur disque et l’OCR (ia-service/vendor/tesseract).',
+          '',
+          ...lines,
+        ].join('\n'),
       );
     }
 
+    // Au moins la fiche courrier ou une PJ : on continue (analyse partielle OK)
     const analysis = await this.callIaBundle(documents, courrier.objet);
+
+    if (pjOk < pjs.length) {
+      const fails = details
+        .filter((d) => !d.ok)
+        .map((d) => `${d.nomFichier}: ${d.error}`)
+        .join(' | ');
+      const alertes = Array.isArray(analysis.alertes) ? analysis.alertes : [];
+      analysis.alertes = [
+        ...alertes,
+        `Analyse partielle : ${pjOk}/${pjs.length} PJ lue(s). ${fails}`,
+      ];
+    }
 
     await this.auditService.log({
       utilisateurId: userId,
@@ -324,7 +423,7 @@ export class AiService {
       entiteId: courrierId,
       details: {
         nbPieces: pjs.length,
-        okCount: details.filter((d) => d.ok).length,
+        okCount: pjOk,
         coherenceScore: analysis?.coherenceScore,
         alertes: analysis?.alertes,
       },
@@ -333,6 +432,8 @@ export class AiService {
     return {
       courrierId,
       nbPieces: pjs.length,
+      okCount: pjOk,
+      partial: pjOk < pjs.length,
       pieces: details,
       analysis,
     };

@@ -31,10 +31,22 @@ export interface Message {
 export function useMessages(courrierId: number | null) {
   const { accessToken, user } = useAuthStore();
   const socketRef = useRef<Socket | null>(null);
+  const peerIdsRef = useRef<number[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [connected, setConnected] = useState(false);
+  const [peerOnline, setPeerOnline] = useState(false);
   const [total, setTotal] = useState(0);
+
+  const applyOnlinePeers = useCallback((onlineIds: number[]) => {
+    const peers = peerIdsRef.current;
+    if (!peers.length) {
+      setPeerOnline(false);
+      return;
+    }
+    const onlineSet = new Set(onlineIds.map(Number));
+    setPeerOnline(peers.some((id) => onlineSet.has(id)));
+  }, []);
 
   const fetchMessages = useCallback(async () => {
     if (!accessToken || !courrierId) return;
@@ -44,8 +56,21 @@ export function useMessages(courrierId: number | null) {
       setMessages(res.data || []);
       setTotal(res.pagination?.total || 0);
     } catch {
+      /* ignore */
     } finally {
       setLoading(false);
+    }
+  }, [accessToken, courrierId]);
+
+  const fetchPresence = useCallback(async () => {
+    if (!accessToken || !courrierId) return;
+    try {
+      const res: any = await api.getMessagePresence(accessToken, courrierId);
+      peerIdsRef.current = Array.isArray(res.peerIds) ? res.peerIds.map(Number) : [];
+      setPeerOnline(Boolean(res.anyPeerOnline));
+      socketRef.current?.emit("presence:query", { userIds: peerIdsRef.current });
+    } catch {
+      /* ignore */
     }
   }, [accessToken, courrierId]);
 
@@ -57,7 +82,7 @@ export function useMessages(courrierId: number | null) {
     if (!accessToken || !user?.id || !courrierId) return;
 
     const socket = io(API_BASE, {
-      query: { userId: user.id },
+      auth: { token: accessToken },
       transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionDelay: 3000,
@@ -65,8 +90,26 @@ export function useMessages(courrierId: number | null) {
 
     socketRef.current = socket;
 
-    socket.on("connect", () => setConnected(true));
+    socket.on("connect", () => {
+      setConnected(true);
+      void fetchPresence();
+    });
     socket.on("disconnect", () => setConnected(false));
+
+    socket.on("presence:snapshot", (data: { online?: number[] }) => {
+      applyOnlinePeers(data?.online || []);
+    });
+
+    socket.on("presence:update", (data: { userId?: number; online?: boolean }) => {
+      const uid = Number(data?.userId);
+      if (!Number.isFinite(uid) || !peerIdsRef.current.includes(uid)) return;
+      setPeerOnline((prev) => {
+        if (data.online) return true;
+        // Un pair est parti : re-vérifier via query
+        socket.emit("presence:query", { userIds: peerIdsRef.current });
+        return prev;
+      });
+    });
 
     socket.on("message:new", (raw: Message & { utilisateur?: { nom?: string; prenom?: string } }) => {
       if (raw.courrierId === courrierId) {
@@ -97,11 +140,16 @@ export function useMessages(courrierId: number | null) {
       );
     });
 
+    void fetchPresence();
+
     return () => {
       socket.disconnect();
       socketRef.current = null;
+      setConnected(false);
+      setPeerOnline(false);
+      peerIdsRef.current = [];
     };
-  }, [accessToken, user?.id, courrierId]);
+  }, [accessToken, user?.id, courrierId, fetchPresence, applyOnlinePeers]);
 
   const sendMessage = useCallback(
     async (contenu: string, files?: File[]) => {
@@ -113,7 +161,6 @@ export function useMessages(courrierId: number | null) {
         throw new Error("Aucun contenu à envoyer.");
       }
 
-      // Contenu visible si fichier seul (évite un message "invisible" + validation DTO)
       const messageContent =
         trimmed ||
         (files && files.length === 1
@@ -140,7 +187,12 @@ export function useMessages(courrierId: number | null) {
       if (files && files.length > 0) {
         for (const file of files) {
           try {
-            const pj: any = await api.uploadMessageAttachment(accessToken, courrierId, message.id, file);
+            const pj: any = await api.uploadMessageAttachment(
+              accessToken,
+              courrierId,
+              message.id,
+              file
+            );
             setMessages((prev) =>
               prev.map((m) => {
                 if (m.id === message.id) {
@@ -153,13 +205,13 @@ export function useMessages(courrierId: number | null) {
             );
           } catch (err: any) {
             console.error("Erreur upload fichier:", err);
-            uploadErrors.push(`${file.name}: ${err.message || 'Erreur inconnue'}`);
+            uploadErrors.push(`${file.name}: ${err.message || "Erreur inconnue"}`);
           }
         }
       }
 
       if (uploadErrors.length > 0) {
-        throw new Error(`Échec de l'envoi des fichiers:\n${uploadErrors.join('\n')}`);
+        throw new Error(`Échec de l'envoi des fichiers:\n${uploadErrors.join("\n")}`);
       }
 
       return message;
@@ -167,5 +219,13 @@ export function useMessages(courrierId: number | null) {
     [accessToken, courrierId]
   );
 
-  return { messages, loading, connected, total, sendMessage, refetch: fetchMessages };
+  return {
+    messages,
+    loading,
+    connected,
+    peerOnline,
+    total,
+    sendMessage,
+    refetch: fetchMessages,
+  };
 }

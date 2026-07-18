@@ -32,6 +32,8 @@ export interface ResumeStructure {
   };
   texteAffichage?: string;
   texteCourt?: string;
+  provider?: string;
+  model?: string;
 }
 
 export interface AiAnalysisPayload {
@@ -57,6 +59,17 @@ export interface AiAnalysisPayload {
   }>;
   objetPropose?: string | null;
   avertissement?: string;
+  /** "llm" | "local" */
+  resumeSource?: string | null;
+  llm?: {
+    enabled?: boolean;
+    configured?: boolean;
+    model?: string;
+    baseUrl?: string;
+    strategy?: string;
+    count?: number;
+    last?: { id?: string; name?: string; model?: string; ok?: boolean } | null;
+  } | null;
   /** Bundle / multi-PJ */
   nbPieces?: number;
   coherenceScore?: number;
@@ -193,7 +206,7 @@ export function AiAnalysisDialog({
               ? filename
               : isBundle
                 ? `${analysis?.nbPieces || "—"} pièce(s) jointe(s)`
-                : "Résultat de l’analyse locale"}
+                : "Résultat de l’analyse assistée"}
             {" — "}validation humaine obligatoire
           </DialogDescription>
         </DialogHeader>
@@ -235,6 +248,17 @@ export function AiAnalysisDialog({
                   Cohérence {analysis.coherenceScore}%
                 </Badge>
               )}
+              {analysis.resumeSource === "llm" ? (
+                <Badge variant="outline" className="border-cyan-500/40 text-cyan-300">
+                  Résumé LLM
+                  {structure?.provider ? ` · ${structure.provider}` : ""}
+                  {structure?.model ? ` · ${structure.model}` : ""}
+                </Badge>
+              ) : analysis.resumeSource === "none" ? (
+                <Badge variant="outline" className="border-amber-500/40 text-amber-300">
+                  LLM indisponible
+                </Badge>
+              ) : null}
             </div>
 
             {analysis.avertissement && (

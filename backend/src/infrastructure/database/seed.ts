@@ -4,6 +4,7 @@ import * as schema from './schema';
 import * as bcrypt from 'bcryptjs';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { ensureDemoUploadPdfs } from '../../common/files/demo-uploads.util';
 
 dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 
@@ -386,8 +387,12 @@ const runSeed = async () => {
     },
   ]);
 
-  // 7. Pièces jointes de démo
+  // 7. Pièces jointes de démo (fichiers réels dans uploads/)
   console.log('Inserting pieces jointes...');
+  const demoFiles = ensureDemoUploadPdfs();
+  if (demoFiles.created.length) {
+    console.log('PDF démo créés:', demoFiles.created.join(', '));
+  }
   await db.insert(schema.piecesJointes).values([
     {
       courrierId: courrier1.id,

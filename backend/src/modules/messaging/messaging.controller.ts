@@ -48,6 +48,15 @@ export class MessagingController {
     return this.messagingService.findByCourrier(id, userId, page ? Number(page) : 1, limit ? Number(limit) : 50);
   }
 
+  @Get(':id/messages/presence')
+  @SkipAudit()
+  getPresence(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('id') userId: number,
+  ) {
+    return this.messagingService.getPresence(id, userId);
+  }
+
   @Post(':id/messages')
   sendMessage(
     @Param('id', ParseIntPipe) id: number,

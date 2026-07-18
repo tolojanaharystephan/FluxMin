@@ -1,7 +1,7 @@
 # FluxMin – Plateforme de Gestion et d'Automatisation Intelligente des Courriers Ministériels
 
-## Version du document : 1.8
-## Dernière mise à jour : 17 juillet 2026 — M1–M6 : … · Notifications · IA locale ✅
+## Version du document : 1.9
+## Dernière mise à jour : 18 juillet 2026 — M1–M6 ✅ · LLM résumé (optionnel) + OCR local
 
 ---
 
@@ -15,7 +15,7 @@
 | **M3 Archivage complet** | ✅ | Scopes accès, dialogue durée/emplacement, rétention (expire bientôt/expiré), désarchivage détail + liste |
 | **M4 Audit lecture** (search / reports / anomalies) | ✅ | APIs réelles + UI branchée ; logs interceptor ; rapports générés ; anomalies délai/workflow |
 | **M5 Notifications produit** | ✅ | In-app : WS JWT, toast, filtres, messages discussion ; pas de SaaS email tiers (SMTP interne optionnel plus tard) |
-| **M6 IA bout-en-bout** | ✅ | Nest→FastAPI local ; OCR Tesseract(+RapidOCR) ; résumé structuré ; analyse multi-PJ/correspondances ; suggestions ; rédaction assistée ; validation humaine |
+| **M6 IA bout-en-bout** | ✅ | Nest→FastAPI ; OCR local ; résumé/infos clés via LLM OpenAI-compatible (si clé) sinon NLP local ; grounding anti-hallucination ; validation humaine |
 | M7 Temporal / MinIO réel | ⏳ | Conteneurs Compose seulement |
 | M8 Durcissement (tests, Swagger, rate limit) | ⏳ | — |
 
@@ -92,7 +92,7 @@ Développer une plateforme web sécurisée de gestion des courriers et documents
 | Frontend | Next.js 15 (App Router) + TypeScript + Tailwind CSS + shadcn/ui + TanStack Query + Zustand |
 | Backend | NestJS + TypeScript |
 | Base de données | PostgreSQL 16 + Drizzle ORM |
-| IA / ML | Python FastAPI + Tesseract OCR (vendor/ projet ou Docker) + RapidOCR fallback + NLP |
+| IA / ML | Python FastAPI + Tesseract OCR + RapidOCR + NLP local ; LLM OpenAI-compatible optionnel (résumé) |
 | Workflow | Temporal.io |
 | Stockage fichiers | MinIO (S3 compatible) |
 | Cache / Queues | Redis + BullMQ |
@@ -276,7 +276,7 @@ Services :
 1. **Sécurité** : Chiffrement des données sensibles, JWT sécurisés, RBAC strict
 2. **Performance** : < 2s chargement courriers, cache Redis
 3. **Scalabilité** : Architecture microservices, conteneurs Docker
-4. **Conformité** : RGPD, archivage public, souveraineté des données
+4. **Conformité** : RGPD, archivage ; IA : OCR/extraction restent locaux ; résumé LLM optionnel avec validation humaine (exigence souveraineté assouplie pour la qualité du résumé)
 5. **Traçabilité** : Audit log sur toutes les actions sensibles
 
 ---
@@ -377,6 +377,11 @@ npm install
 npm run dev
 # → http://localhost:3000
 ```
+#### Étape 7 : Lancer le service IA
+```bash
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+# → http://localhost:8000
+```
 
 ### 11.5 Comptes de Démo (après seed)
 
@@ -464,5 +469,14 @@ taskkill /PID <PID> /F
 Vérifier que PostgreSQL est en cours d'exécution et que le `.env` est correct.
 
 
-Sur un autre PC, pour l'acces au tesseract: 
+Sur un autre PC, pour l'accès au tesseract :
+```powershell
 powershell -ExecutionPolicy Bypass -File .\ia-service\scripts\setup-tesseract.ps1
+```
+
+**LLM (résumé / infos clés)** — cascade multi-fournisseurs, **sans NLP local** :
+1. Clés dans `ia-service/.env` : **Groq** ([console](https://console.groq.com/keys)), OpenAI, OpenRouter, Claude, xAI, Gemini, Mistral
+2. `LLM_STRATEGY=max` : meilleur modèle d’abord (Groq prioritaire) ; bascule auto si 429 / quota / erreur
+3. Sans clé / cascade épuisée : message d’erreur clair (pas de résumé local)
+4. OCR / extraction fichiers restent locaux ; grounding + validation humaine
+5. **Ne jamais committer** `.env` / clés API

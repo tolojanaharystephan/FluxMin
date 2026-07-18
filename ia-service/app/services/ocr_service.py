@@ -1,29 +1,38 @@
 import io
 from typing import Dict, Any, List
 
-from PIL import Image
+from PIL import Image, ImageOps
 from pdf2image import convert_from_bytes
 
 from app.services.ocr_engine import run_ocr_on_image
+from app.services.ocr_quality import PLACEHOLDER_PREFIX, is_usable_ocr_text
+
+EMPTY_IMAGE_PLACEHOLDER = (
+    f"{PLACEHOLDER_PREFIX} aucun texte lisible détecté automatiquement "
+    "(logo, photo floue ou scan de trop faible qualité). "
+    "Compléter manuellement ou fournir un PDF/Office textuel.]"
+)
 
 
 def _prepare_image(img: Image.Image) -> Image.Image:
+    img = ImageOps.exif_transpose(img)
     if getattr(img, "n_frames", 1) > 1:
         img.seek(0)
-    if img.mode not in ("RGB", "L"):
+    if img.mode in ("RGBA", "P"):
+        # Fond blanc sous transparence (évite OCR noir sur noir)
+        background = Image.new("RGB", img.size, (255, 255, 255))
+        rgba = img.convert("RGBA")
+        background.paste(rgba, mask=rgba.split()[3])
+        img = background
+    elif img.mode not in ("RGB", "L"):
         img = img.convert("RGB")
-    # Agrandir les petites images (captures / scans légers) pour améliorer OCR
-    w, h = img.size
-    if max(w, h) < 900:
-        scale = 900 / max(w, h)
-        img = img.resize((int(w * scale), int(h * scale)), Image.Resampling.LANCZOS)
     return img
 
 
 def perform_ocr(file_bytes: bytes, filename: str) -> Dict[str, Any]:
     """
     OCR image ou PDF (page par page).
-    Utilise Tesseract si présent, sinon RapidOCR.
+    Ne lève plus d'erreur fatale si aucun texte : placeholder + score bas.
     """
     full_text = ""
     pages_data: List[Dict[str, Any]] = []
@@ -33,7 +42,7 @@ def perform_ocr(file_bytes: bytes, filename: str) -> Dict[str, Any]:
         lower = (filename or "").lower()
         if lower.endswith(".pdf"):
             try:
-                images = convert_from_bytes(file_bytes)
+                images = convert_from_bytes(file_bytes, dpi=250)
             except Exception as pdf_err:
                 raise RuntimeError(
                     f"Erreur conversion PDF : {pdf_err}. "
@@ -56,15 +65,24 @@ def perform_ocr(file_bytes: bytes, filename: str) -> Dict[str, Any]:
             full_text = text
 
         cleaned = full_text.strip()
-        if not cleaned:
-            raise RuntimeError(
-                "Aucun texte détecté dans l'image/PDF. "
-                "Vérifiez la netteté du document ou fournissez un fichier texte/Office."
-            )
+        # Bruit OCR (logo) traité comme vide
+        if cleaned and not is_usable_ocr_text(cleaned, min_score=45.0):
+            cleaned = ""
+        empty = not cleaned
+        if empty:
+            cleaned = EMPTY_IMAGE_PLACEHOLDER
+            pages_data = [{"page": 1, "text": cleaned}]
 
-        # Confiance indicative selon moteur
         primary = engines[0] if engines else "unknown"
-        score = 90.0 if primary == "tesseract" else 82.0
+        if empty:
+            score = 25.0
+            primary = "none"
+        elif primary == "tesseract":
+            score = 90.0
+        elif primary == "rapidocr":
+            score = 82.0
+        else:
+            score = 60.0
 
         return {
             "texteExtrait": {
@@ -74,6 +92,7 @@ def perform_ocr(file_bytes: bytes, filename: str) -> Dict[str, Any]:
             "langue": "fr",
             "scoreConfiance": score,
             "moteurOcr": primary,
+            "texteVide": empty,
         }
     except RuntimeError:
         raise

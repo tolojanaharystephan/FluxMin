@@ -57,7 +57,7 @@ function getFileIcon(typeMime: string | null) {
 
 export function MessagePanel({ courrierId, statut }: MessagePanelProps) {
   const { user, accessToken } = useAuthStore();
-  const { messages, loading, connected, sendMessage } = useMessages(courrierId);
+  const { messages, loading, connected, peerOnline, sendMessage } = useMessages(courrierId);
   const [input, setInput] = useState("");
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [sending, setSending] = useState(false);
@@ -149,17 +149,31 @@ export function MessagePanel({ courrierId, statut }: MessagePanelProps) {
         <CardTitle className="text-base flex items-center gap-2">
           <MessageSquare className="h-4 w-4" />
           Conversation
-          <span className="ml-auto flex items-center gap-1.5 text-xs font-normal text-muted-foreground">
-            {connected ? (
-              <>
-                <Wifi className="h-3 w-3 text-green-500" />
-                En ligne
-              </>
-            ) : (
-              <>
-                <WifiOff className="h-3 w-3 text-muted-foreground" />
-                Hors ligne
-              </>
+          <span
+            className="ml-auto flex flex-col items-end gap-0.5 text-xs font-normal text-muted-foreground"
+            title={
+              connected
+                ? peerOnline
+                  ? "Un interlocuteur est connecté"
+                  : "Aucun interlocuteur connecté pour le moment"
+                : "Votre connexion temps réel est coupée"
+            }
+          >
+            <span className="flex items-center gap-1.5">
+              {peerOnline ? (
+                <>
+                  <Wifi className="h-3 w-3 text-green-500" />
+                  <span className="text-green-500">Interlocuteur en ligne</span>
+                </>
+              ) : (
+                <>
+                  <WifiOff className="h-3 w-3 text-muted-foreground" />
+                  Interlocuteur hors ligne
+                </>
+              )}
+            </span>
+            {!connected && (
+              <span className="text-[10px] text-amber-400/90">Temps réel déconnecté</span>
             )}
           </span>
         </CardTitle>

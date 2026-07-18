@@ -222,6 +222,17 @@ export class MessagingService {
     return pj;
   }
 
+  async getPresence(courrierId: number, userId: number) {
+    await this.verifyAccess(courrierId, userId);
+    const peerIds = (await this.getParticipantIds(courrierId)).filter((id) => id !== userId);
+    const onlinePeerIds = this.gateway.getOnlineAmong(peerIds);
+    return {
+      peerIds,
+      onlinePeerIds,
+      anyPeerOnline: onlinePeerIds.length > 0,
+    };
+  }
+
   private async getParticipantIds(courrierId: number): Promise<number[]> {
     const [courrier] = await this.db
       .select({ emetteurId: courriers.emetteurId, destinataireDirectionId: courriers.destinataireDirectionId })

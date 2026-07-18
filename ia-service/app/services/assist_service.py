@@ -1,6 +1,7 @@
 import re
 from typing import List, Dict, Any
 
+
 def detect_priority(text: str) -> Dict[str, Any]:
     """Détecte une priorité indicative à partir du vocabulaire administratif."""
     if not text:
@@ -100,18 +101,32 @@ def draft_reply(objet: str, resume: str, destinataire: str | None = None) -> Dic
 
 def extract_objet_candidate(text: str, resume: str) -> str:
     """Propose un objet court à partir du résumé (accroche) ou des premières lignes."""
+    from app.services.ocr_quality import is_usable_ocr_text, is_placeholder_text
+
     source = (resume or text or "").strip()
-    if not source:
+    if not source or is_placeholder_text(source):
         return ""
-    # Ignorer les titres de section du résumé formaté
+    if not is_usable_ocr_text(source, min_score=55.0):
+        return ""
     for line in source.splitlines():
         line = line.strip()
-        if not line or line.lower() in {"synthèse", "synthese", "points clés", "points cles", "repères", "reperes"}:
+        if not line or line.lower() in {
+            "synthèse",
+            "synthese",
+            "points clés",
+            "points cles",
+            "repères",
+            "reperes",
+        }:
             continue
         if line.startswith("•") or line.startswith("-"):
             line = line.lstrip("•- ").strip()
+        if "aucun texte" in line.lower() or "ocr n'a" in line.lower() or "ocr n’a" in line.lower():
+            return ""
         first = re.split(r"[.\n]", line)[0].strip()
-        if len(first) < 8:
+        if len(first) < 12:
+            continue
+        if not is_usable_ocr_text(first, min_score=50.0):
             continue
         if len(first) > 120:
             first = first[:117] + "…"

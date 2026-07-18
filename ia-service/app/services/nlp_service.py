@@ -35,6 +35,8 @@ def clean_extracted_text(text: str) -> str:
         return ""
     t = text.replace("\r\n", "\n").replace("\r", "\n")
     t = re.sub(r"(?m)^\s*---\s*PAGE\s+\d+\s*---\s*$", "\n", t)
+    # Leaders de sommaire PDF (................) — faussent le score qualité
+    t = re.sub(r"[.\u2022·•…]{3,}", " ", t)
     t = re.sub(r"[ \t]+\n", "\n", t)
     t = re.sub(r"\n{3,}", "\n\n", t)
     # Relier les césures OCR typiques "mot-\nmot"
@@ -82,7 +84,7 @@ def _score_sentence(sentence: str, word_frequencies: Dict[str, float]) -> float:
     return score
 
 
-def _extract_entities(text: str) -> Dict[str, List[str]]:
+def extract_entities(text: str) -> Dict[str, List[str]]:
     refs = [m.group(1).strip() for m in REF_PATTERNS[0].finditer(text)]
     refs += [m.group(1).strip() for m in REF_PATTERNS[1].finditer(text)]
     dates = [m.group(1).strip() for m in DATE_PATTERN.finditer(text)]
@@ -168,7 +170,7 @@ def build_structured_summary(text: str, num_points: int = 4) -> Dict[str, Any]:
             if compact not in points_cles:
                 points_cles.append(compact)
 
-    entites = _extract_entities(cleaned)
+    entites = extract_entities(cleaned)
 
     lines = ["Synthèse", accroche, ""]
     if points_cles:

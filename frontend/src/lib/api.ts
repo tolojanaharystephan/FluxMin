@@ -469,6 +469,10 @@ class ApiClient {
     return this.request(`/courriers/${courrierId}/messages${qs}`, { token });
   }
 
+  async getMessagePresence(token: string, courrierId: number) {
+    return this.request(`/courriers/${courrierId}/messages/presence`, { token });
+  }
+
   async sendMessage(token: string, courrierId: number, contenu: string) {
     return this.request(`/courriers/${courrierId}/messages`, {
       method: 'POST',

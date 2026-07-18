@@ -13,7 +13,7 @@
     "db:seed": "cd backend && npm run db:seed",
     "backend:dev": "cd backend && npm run start:dev",
     "frontend:dev": "cd frontend && npm run dev",
-    "ia:dev": "cd ia-service && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "ia:dev": "powershell -ExecutionPolicy Bypass -File ./scripts/start-ia.ps1",
     "lint": "cd frontend && npm run lint && cd ../backend && npm run lint",
     "test": "cd backend && npm run test"
   }

@@ -6,7 +6,8 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Set
 
-from app.services.nlp_service import build_structured_summary, clean_extracted_text, STOP_WORDS
+from app.services.nlp_service import clean_extracted_text, extract_entities, STOP_WORDS
+from app.services.llm_service import summarize_with_llm
 
 
 def _tokens(text: str) -> Set[str]:
@@ -22,6 +23,26 @@ def _jaccard(a: Set[str], b: Set[str]) -> float:
     return inter / union if union else 0.0
 
 
+def _resume_for_piece(texte: str, analysis: Any) -> Dict[str, Any]:
+    """Résumé LLM uniquement (réutilise l'analyse PJ si déjà présente)."""
+    struct = None
+    if isinstance(analysis, dict):
+        struct = (analysis.get("ocrResult") or {}).get("resumeStructure")
+    if isinstance(struct, dict) and struct.get("accroche"):
+        return struct
+    llm = summarize_with_llm(texte) if texte else None
+    if llm:
+        return llm
+    entites = extract_entities(texte)
+    return {
+        "accroche": "Résumé LLM indisponible pour cette pièce.",
+        "pointsCles": [],
+        "entites": entites,
+        "texteAffichage": "Résumé LLM indisponible pour cette pièce.",
+        "texteCourt": "Résumé LLM indisponible pour cette pièce.",
+    }
+
+
 def analyze_correspondences(pieces: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
     pieces: [{ nomFichier, texte, analysis? }]
@@ -29,14 +50,15 @@ def analyze_correspondences(pieces: List[Dict[str, Any]]) -> Dict[str, Any]:
     normalized: List[Dict[str, Any]] = []
     for p in pieces:
         texte = clean_extracted_text(p.get("texte") or "")
-        resume = build_structured_summary(texte)
+        resume = _resume_for_piece(texte, p.get("analysis"))
+        entites = resume.get("entites") or extract_entities(texte)
         normalized.append(
             {
                 "nomFichier": p.get("nomFichier") or "document",
                 "texte": texte,
                 "tokens": _tokens(texte),
                 "resume": resume,
-                "entites": resume["entites"],
+                "entites": entites,
                 "analysis": p.get("analysis"),
             }
         )

@@ -32,10 +32,11 @@
 | 0.18 | WebSocket sans userId query | Connexion avec JWT `auth.token` uniquement | ☐ |
 | 0.19 | Filtrer notifs (type / non lues) | Liste filtrée API | ☐ |
 | 0.20 | Clic toast / notif | Marquée lue + navigation courrier | ☐ |
-| 0.21 | Démarrer ia-service + GET /ai/health | status ok | ☐ |
+| 0.21 | Démarrer ia-service + GET /ai/health | status ok ; backend logue warning si IA down au boot | ☐ |
 | 0.22 | Analyser PJ (PDF, image, docx, xlsx, pptx, txt, odt…) | Résumé structuré (synthèse + points clés) + directions + actions | ☐ |
-| 0.22b | Analyser tout (multi-PJ) | Cohérence, correspondances, alertes, résumé dossier | ☐ |
-| 0.22c | OCR image (Tesseract installé) | Texte extrait sans erreur PATH | ☐ |
+| 0.22b | Analyser tout (multi-PJ) n’importe quel courrier | Cohérence / correspondances ; analyse partielle si 1 PJ échoue ; erreur claire si IA down | ☐ |
+| 0.22c | OCR image (Tesseract vendor ou RapidOCR) | Texte extrait sans erreur PATH machine | ☐ |
+| 0.22d | PDF démo seed absents | Recréés au `db:seed` et au démarrage Nest | ☐ |
 | 0.23 | Page Suggestions IA | Données réelles (pas de mocks) | ☐ |
 | 0.24 | Accepter suggestion | Entrée audit AI_SUGGESTION_ACCEPTED | ☐ |
 | 0.25 | Rédaction assistée | Brouillon gabarit local | ☐ |

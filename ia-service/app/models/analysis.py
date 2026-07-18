@@ -1,13 +1,20 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing import List, Dict, Any, Optional
 
 
 class ResumeStructureSchema(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
     accroche: str = ""
     pointsCles: List[str] = Field(default_factory=list)
     entites: Dict[str, List[str]] = Field(default_factory=dict)
     texteAffichage: str = ""
     texteCourt: str = ""
+    objetPropose: Optional[str] = None
+    citations: List[str] = Field(default_factory=list)
+    source: Optional[str] = None
+    verifie: Optional[bool] = None
+    exploitable: Optional[bool] = None
 
 
 class OCRResultSchema(BaseModel):
@@ -42,6 +49,8 @@ class AnalysisResult(BaseModel):
         "Suggestions générées localement — validation humaine obligatoire."
     )
     methodeExtraction: Optional[str] = None
+    resumeSource: Optional[str] = None  # "llm" | "local"
+    llm: Optional[Dict[str, Any]] = None
 
 
 class TextAnalyzeRequest(BaseModel):

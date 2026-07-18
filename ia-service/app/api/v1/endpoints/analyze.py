@@ -11,13 +11,19 @@ from app.models.analysis import (
     BundleAnalysisResult,
 )
 from app.services.document_extract_service import extract_document, SUPPORTED_EXTENSIONS
-from app.services.nlp_service import build_structured_summary, clean_extracted_text
+from app.services.nlp_service import clean_extracted_text
+from app.services.ocr_quality import (
+    is_usable_document_text,
+    is_placeholder_text,
+    ocr_quality_score,
+    unusable_summary,
+)
+from app.services.llm_service import summarize_with_llm, llm_status, llm_configured
 from app.services.routing_service import get_routing_recommendations
 from app.services.assist_service import (
     detect_priority,
     suggest_actions,
     draft_reply,
-    extract_objet_candidate,
 )
 from app.services.correspondence_service import analyze_correspondences
 from app.services.ocr_engine import ocr_backend_status
@@ -37,36 +43,170 @@ def _build_analysis(
     if cleaned and pages.get("texteBrut") != cleaned:
         pages = {**pages, "texteBrut": cleaned}
 
-    resume = build_structured_summary(cleaned, num_points=4)
-    recommendations = get_routing_recommendations(cleaned)
-    priority = detect_priority(cleaned)
-    top_dir = recommendations[0]["directionPropose"] if recommendations else None
-    actions = suggest_actions(cleaned, top_dir)
-    objet = extract_objet_candidate(cleaned, resume.get("accroche") or resume.get("texteCourt") or "")
+    unusable = is_placeholder_text(cleaned) or not is_usable_document_text(
+        cleaned, methode=methode, min_score=45.0
+    )
+    quality = ocr_quality_score(cleaned)
+    resume_source = "llm"
 
+    if unusable:
+        resume = unusable_summary()
+        recommendations = []
+        priority = {"priorite": "basse", "score": 0.0}
+        actions = [
+            {
+                "code": "lire_manuel",
+                "label": "Lecture manuelle du document",
+                "description": "Aucun texte fiable extrait — qualifier le courrier à partir de l'objet/corps ou d'une autre PJ.",
+                "confiance": 40.0,
+            }
+        ]
+        objet = None
+        score_confiance = min(float(score_confiance or 30), 30.0)
+        avertissement = (
+            "Aucun texte exploitable détecté dans ce fichier. "
+            "Ne pas utiliser ce résumé comme objet — validation humaine obligatoire."
+        )
+        resume_source = "none"
+    elif not llm_configured():
+        resume = {
+            "accroche": "Aucun fournisseur LLM configuré.",
+            "pointsCles": [
+                "Ajoutez au moins une clé API dans ia-service/.env (Groq, OpenAI, OpenRouter…).",
+                "Le résumé local NLP est désactivé — analyse LLM uniquement.",
+            ],
+            "entites": {"references": [], "dates": [], "montants": [], "emails": []},
+            "texteAffichage": (
+                "Synthèse\nAucun fournisseur LLM configuré.\n\n"
+                "Points clés\n"
+                "• Ajoutez au moins une clé API dans ia-service/.env (Groq, OpenAI, OpenRouter…).\n"
+                "• Le résumé local NLP est désactivé — analyse LLM uniquement."
+            ),
+            "texteCourt": "Aucun fournisseur LLM configuré.",
+        }
+        recommendations = []
+        priority = {"priorite": "basse", "score": 0.0}
+        actions = []
+        objet = None
+        score_confiance = 20.0
+        avertissement = "LLM requis : aucune clé configurée."
+        resume_source = "none"
+    else:
+        llm_resume = summarize_with_llm(cleaned)
+        if llm_resume is None:
+            resume = {
+                "accroche": "Tous les fournisseurs LLM ont échoué.",
+                "pointsCles": [
+                    "Saturation, quota ou erreur réseau sur toute la cascade.",
+                    "Réessayez dans quelques instants — pas de fallback NLP local.",
+                ],
+                "entites": {"references": [], "dates": [], "montants": [], "emails": []},
+                "texteAffichage": (
+                    "Synthèse\nTous les fournisseurs LLM ont échoué.\n\n"
+                    "Points clés\n"
+                    "• Saturation, quota ou erreur réseau sur toute la cascade.\n"
+                    "• Réessayez dans quelques instants — pas de fallback NLP local."
+                ),
+                "texteCourt": "Tous les fournisseurs LLM ont échoué.",
+            }
+            recommendations = []
+            priority = {"priorite": "basse", "score": 0.0}
+            actions = [
+                {
+                    "code": "lire_manuel",
+                    "label": "Lecture manuelle du document",
+                    "description": "Cascade LLM indisponible — traiter manuellement.",
+                    "confiance": 30.0,
+                }
+            ]
+            objet = None
+            score_confiance = 25.0
+            avertissement = (
+                "Cascade LLM épuisée (pas de résumé local). "
+                "Validation humaine obligatoire."
+            )
+            resume_source = "none"
+        else:
+            resume = llm_resume
+            resume_source = "llm"
+            if llm_resume.get("exploitable") is False:
+                recommendations = []
+                priority = {"priorite": "basse", "score": 0.0}
+                actions = [
+                    {
+                        "code": "lire_manuel",
+                        "label": "Lecture manuelle du document",
+                        "description": "Le LLM n'a pas trouvé de contenu fiable dans le texte extrait.",
+                        "confiance": 40.0,
+                    }
+                ]
+                objet = None
+                score_confiance = 30.0
+                avertissement = (
+                    "LLM : texte non exploitable pour un résumé factuel. "
+                    "Validation humaine obligatoire."
+                )
+                result = {
+                    "langue": langue,
+                    "scoreConfiance": score_confiance,
+                    "prioriteDetecte": priority["priorite"],
+                    "prioriteScore": priority["score"],
+                    "ocrResult": {
+                        "texteExtrait": {
+                            "pages": [{"page": 1, "text": resume["accroche"]}],
+                            "texteBrut": resume["accroche"],
+                        },
+                        "resumeAI": resume["texteAffichage"],
+                        "resumeStructure": resume,
+                    },
+                    "recommandations": recommendations,
+                    "actionsProposees": actions,
+                    "objetPropose": None,
+                    "avertissement": avertissement,
+                    "resumeSource": resume_source,
+                    "llm": llm_status(),
+                }
+                if methode:
+                    result["methodeExtraction"] = methode
+                return result
+
+            recommendations = get_routing_recommendations(cleaned)
+            priority = detect_priority(cleaned)
+            top_dir = recommendations[0]["directionPropose"] if recommendations else None
+            actions = suggest_actions(cleaned, top_dir)
+            objet = resume.get("objetPropose") or None
+            score_confiance = min(92.0, max(55.0, 50.0 + quality / 2))
+            avertissement = (
+                "Résumé LLM ancré sur le texte extrait (faits vérifiés contre la source). "
+                "Validation humaine obligatoire avant usage."
+            )
     result = {
         "langue": langue,
-        "scoreConfiance": score_confiance,
+        "scoreConfiance": round(score_confiance, 1),
         "prioriteDetecte": priority["priorite"],
         "prioriteScore": priority["score"],
         "ocrResult": {
-            "texteExtrait": pages,
+            "texteExtrait": pages if not unusable else {
+                "pages": [{"page": 1, "text": resume["accroche"]}],
+                "texteBrut": resume["accroche"],
+            },
             "resumeAI": resume["texteAffichage"],
             "resumeStructure": resume,
         },
         "recommandations": recommendations,
         "actionsProposees": actions,
         "objetPropose": objet or None,
-        "avertissement": "Suggestions générées localement — validation humaine obligatoire.",
+        "avertissement": avertissement,
+        "resumeSource": resume_source,
+        "llm": llm_status(),
     }
     if methode:
         result["methodeExtraction"] = methode
     return result
 
-
 @router.get("/ocr-status")
 def ocr_status():
-    return ocr_backend_status()
+    return {**ocr_backend_status(), "llm": llm_status()}
 
 
 @router.post("/", response_model=AnalysisResult)

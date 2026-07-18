@@ -3,6 +3,9 @@ import {
   WebSocketServer,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
+  MessageBody,
+  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Injectable, Logger } from '@nestjs/common';
@@ -34,10 +37,19 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
       }
 
       client.data.userId = userId;
+      const wasOffline = !this.isUserOnline(userId);
       if (!this.userSockets.has(userId)) {
         this.userSockets.set(userId, new Set());
       }
       this.userSockets.get(userId)!.add(client.id);
+
+      // Snapshot pour le client qui vient de se connecter
+      client.emit('presence:snapshot', { online: this.getOnlineUserIds() });
+
+      // Informer les autres si l'utilisateur passe hors → en ligne
+      if (wasOffline) {
+        this.server.emit('presence:update', { userId, online: true });
+      }
     } catch (err) {
       this.logger.warn(`WS connection rejected: ${(err as Error).message}`);
       client.disconnect(true);
@@ -50,6 +62,7 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
       this.userSockets.get(userId)!.delete(client.id);
       if (this.userSockets.get(userId)!.size === 0) {
         this.userSockets.delete(userId);
+        this.server.emit('presence:update', { userId, online: false });
       }
     }
   }
@@ -72,6 +85,31 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
 
     const userId = Number(payload.sub);
     return Number.isFinite(userId) && userId > 0 ? userId : null;
+  }
+
+  isUserOnline(userId: number): boolean {
+    return (this.userSockets.get(userId)?.size ?? 0) > 0;
+  }
+
+  getOnlineUserIds(): number[] {
+    return Array.from(this.userSockets.keys());
+  }
+
+  getOnlineAmong(userIds: number[]): number[] {
+    return userIds.filter((id) => this.isUserOnline(id));
+  }
+
+  @SubscribeMessage('presence:query')
+  handlePresenceQuery(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: { userIds?: number[] },
+  ) {
+    const ids = Array.isArray(body?.userIds)
+      ? body.userIds.map(Number).filter((n) => Number.isFinite(n) && n > 0)
+      : [];
+    const online = ids.length ? this.getOnlineAmong(ids) : this.getOnlineUserIds();
+    client.emit('presence:snapshot', { online });
+    return { online };
   }
 
   emitToUser(userId: number, event: string, data: any) {

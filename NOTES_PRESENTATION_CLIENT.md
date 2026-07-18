@@ -45,7 +45,9 @@
 | 17 juil. | Auditeur : clignotement dashboard/inbox | Boucle redirect. **Fix :** landing `/audit/search`. |
 | 17 juil. | Rapport téléchargeable seulement en JSON | Export **PDF** (+ CSV/JSON) puis **XLSX**. |
 | 17 juil. | Notification au destinataire (message discussion) | Notif persistante + badge + WebSocket ; ciblage émetteur ↔ direction destinataire. |
-| 17 juil. | Pas de services tiers pour la sécurité ? | **Accord.** Pas SendGrid / Mailgun / Firebase / OpenAI. Email = SMTP interne optionnel ; IA locale ; MinIO self-host (M7). |
+| 17 juil. | Pas de services tiers pour la sécurité ? | **Accord initial.** Pas SendGrid / Mailgun / Firebase. Email = SMTP interne optionnel ; MinIO self-host (M7). |
+| 18 juil. | Souveraineté IA trop contraignante | **Assoupli.** OCR/extraction restent locaux ; **LLM** pour résumé / infos clés, avec grounding + validation humaine. |
+| 18 juil. | LLM only + GroqCloud | Résumé **uniquement LLM** (plus de NLP local) ; cascade Groq / OpenAI / OpenRouter / Claude / xAI / Gemini / Mistral. |
 | 17 juil. | Que signifie finaliser notifs in-app ? | Toast, JWT WS, filtres, marquage lu. `message_discussion` = type de notif (icône bulle). |
 | 17 juil. | Rôle de l’IA avant M6 | **Assistant documentaire local** : OCR, résumé, routage, suggestions. **Validation humaine obligatoire** — pas de décision autonome. |
 | 17 juil. | Ne pas restreindre le périmètre IA | Périmètre complet (OCR + résumé + routage + suggestions + rédaction assistée), contrôle humain, scores, audit. |
@@ -60,7 +62,7 @@
 | Frontend | Next.js 15, TypeScript, Tailwind, shadcn/ui, TanStack Query, Zustand |
 | Backend | NestJS, TypeScript |
 | Base | PostgreSQL 16 + Drizzle ORM |
-| IA | Python FastAPI (`ia-service`) + Tesseract OCR + NLP local |
+| IA | Python FastAPI (`ia-service`) + Tesseract OCR + NLP local ; LLM optionnel (résumé) |
 | Temps réel | Socket.IO, auth **JWT** |
 | Fichiers | Disque local (`uploads/…`) ; MinIO prévu M7 |
 | Workflow | Temporal.io (prévu M7) |
@@ -73,7 +75,8 @@
 
 **Principes :**
 - Le frontend **ne parle pas** directement au Python en prod → **proxy Nest JWT**
-- Données sensibles **dans le périmètre** (pas de cloud IA / email tiers)
+- OCR / fichiers restent dans le périmètre ; résumé LLM cloud **optionnel** (clé dans `ia-service/.env`)
+- Pas d’email SaaS tiers ; validation humaine obligatoire sur toute suggestion IA
 - Monorepo : `backend/` · `frontend/` · `ia-service/`
 
 **UI :** inspirations FlexFlow (login split brand/form) + Enix (motion flottant / staggered) — teal, Outfit + Plus Jakarta Sans.
@@ -90,7 +93,7 @@
 | **M3 Archivage** | ✅ | Durée/emplacement, rétention, scopes, désarchivage |
 | **M4 Audit** | ✅ | Search, reports, anomalies ; export CSV / PDF / XLSX / JSON |
 | **M5 Notifications** | ✅ | WS JWT, toast, filtres, discussion ; pas d’email SaaS |
-| **M6 IA locale** | ✅ | Nest ↔ FastAPI ; suggestions ; analyse **tous formats PJ** ; validation humaine |
+| **M6 IA** | ✅ | Nest ↔ FastAPI ; OCR local ; résumé LLM ou local ; multi-PJ ; validation humaine |
 | **M7 Temporal / MinIO** | ⏳ | Workflows + stockage objet réel |
 | **M8 Durcissement** | ⏳ | Tests critiques, Swagger, rate limit, monitoring |
 
@@ -148,8 +151,10 @@
 PDF, png/jpg/jpeg/gif/webp, txt/csv/rtf, Word (doc/docx), Excel (xls/xlsx), PowerPoint (ppt/pptx), OpenDocument (odt/ods/odp).
 
 **OCR / déploiement IA :**
-- Dev local : Tesseract dans `ia-service/vendor/tesseract/` (chemin relatif, script `setup-tesseract.ps1`)
-- Prod / multi-utilisateurs : image Docker `ia-service` avec Tesseract inclus — tous les agents passent par le même service
+- Dev local : Tesseract dans `ia-service/vendor/tesseract/` (chemin relatif, script `setup-tesseract.ps1`) ; démarrer via `npm run ia:dev` ou `scripts/start-ia.ps1`
+- Au boot Nest : contrôle santé IA + régénération auto des PDF démo manquants dans `uploads/`
+- Analyse multi-PJ : préflight IA obligatoire ; analyse **partielle** si une PJ échoue (fiche courrier + PJ OK) ; message d’erreur explicite si IA down
+- Prod / multi-utilisateurs : image Docker `ia-service` avec Tesseract inclus
 - Fallback pip : RapidOCR si aucun binaire Tesseract
 
 
