@@ -14,6 +14,7 @@ import { eq, and, like, sql, desc, count, or, inArray } from 'drizzle-orm';
 import { StatutCourrier } from '../courrier/dto/courrier.dto';
 import { ArchiveCourrierDto, QueryArchiveDto } from './dto/archive.dto';
 import { NotificationService } from '../notification/notification.service';
+import { TemporalService } from '../../infrastructure/temporal/temporal.service';
 
 const EXPIRE_SOON_DAYS = 90;
 
@@ -46,6 +47,7 @@ export class ArchiveService {
   constructor(
     @Inject(DATABASE_CONNECTION) private db: DrizzleDB,
     private notificationService: NotificationService,
+    private temporal: TemporalService,
   ) {}
 
   private async getUserScope(userId: number) {
@@ -182,6 +184,8 @@ export class ArchiveService {
         courrierId,
       });
     }
+
+    await this.temporal.cancelCourrierSuivi(courrierId);
 
     return {
       ...archive,

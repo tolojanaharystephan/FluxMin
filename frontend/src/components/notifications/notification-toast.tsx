@@ -27,6 +27,8 @@ const typeConfig: Record<string, { icon: React.ElementType; color: string; bg: s
   publication_gouv: { icon: Newspaper, color: "text-fuchsia-400", bg: "bg-fuchsia-500/15" },
   publication_ar: { icon: CheckCircle2, color: "text-pink-400", bg: "bg-pink-500/15" },
   publication_message: { icon: Landmark, color: "text-rose-300", bg: "bg-rose-500/15" },
+  courrier_relance: { icon: Forward, color: "text-amber-400", bg: "bg-amber-500/15" },
+  courrier_escalade: { icon: Forward, color: "text-orange-400", bg: "bg-orange-500/15" },
 };
 
 const AUTO_DISMISS_MS = 8000;

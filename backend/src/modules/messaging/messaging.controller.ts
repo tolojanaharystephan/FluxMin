@@ -17,8 +17,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuid } from 'uuid';
-import { createReadStream, existsSync } from 'fs';
 import { MessagingService } from './messaging.service';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { CreateMessageDto } from './dto/messaging.dto';
 import { SKIP_AUDIT_KEY } from '../../common/interceptors/audit.interceptor';
@@ -27,7 +27,6 @@ import {
   MESSAGES_UPLOAD_DIR,
   ensureUploadDirs,
   isAllowedUpload,
-  resolveStoredFilePath,
 } from '../../common/files/storage.util';
 
 const SkipAudit = () => SetMetadata(SKIP_AUDIT_KEY, true);
@@ -36,7 +35,10 @@ ensureUploadDirs();
 
 @Controller('courriers')
 export class MessagingController {
-  constructor(private readonly messagingService: MessagingService) {}
+  constructor(
+    private readonly messagingService: MessagingService,
+    private readonly storage: StorageService,
+  ) {}
 
   @Get(':id/messages')
   getMessages(
@@ -107,20 +109,16 @@ export class MessagingController {
     @CurrentUser('id') userId: number,
   ) {
     const pj = await this.messagingService.getPieceJointe(messageId, attachmentId, userId);
-
-    const filePath = resolveStoredFilePath(pj.cheminFichier, MESSAGES_UPLOAD_DIR);
-
-    if (!filePath || !existsSync(filePath)) {
+    try {
+      const { stream } = await this.storage.openReadStream(pj.cheminFichier);
+      const filename = pj.nomFichier || 'document';
+      const encodedFilename = encodeURIComponent(filename);
+      return new StreamableFile(stream, {
+        type: pj.typeMime || 'application/octet-stream',
+        disposition: `attachment; filename="${encodedFilename}"; filename*=UTF-8''${encodedFilename}`,
+      });
+    } catch {
       throw new NotFoundException('Fichier non trouvé sur le serveur');
     }
-
-    const fileStream = createReadStream(filePath);
-    const filename = pj.nomFichier || 'document';
-    const encodedFilename = encodeURIComponent(filename);
-
-    return new StreamableFile(fileStream, {
-      type: pj.typeMime || 'application/octet-stream',
-      disposition: `attachment; filename="${encodedFilename}"; filename*=UTF-8''${encodedFilename}`,
-    });
   }
 }

@@ -20,9 +20,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuid } from 'uuid';
-import { createReadStream, existsSync } from 'fs';
 import { CourrierService } from './courrier.service';
 import { ArchiveService } from '../archive/archive.service';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { RequirePermissions } from '../../common/types/roles';
 import { Permission } from '../../common/types/roles';
@@ -40,8 +40,6 @@ import {
   UPLOADS_ROOT,
   ensureUploadDirs,
   isAllowedUpload,
-  relativeUploadPath,
-  resolveStoredFilePath,
 } from '../../common/files/storage.util';
 
 const SkipAudit = () => SetMetadata(SKIP_AUDIT_KEY, true);
@@ -53,6 +51,7 @@ export class CourrierController {
   constructor(
     private readonly courrierService: CourrierService,
     private readonly archiveService: ArchiveService,
+    private readonly storage: StorageService,
   ) {}
 
   @Post()
@@ -134,11 +133,12 @@ export class CourrierController {
       throw new BadRequestException('Aucun fichier fourni');
     }
 
+    const stored = await this.storage.persistMulterFile(file, 'courriers');
     return this.courrierService.addPieceJointe(id, userId, {
       nomFichier: file.originalname,
       typeMime: file.mimetype,
       tailleBytes: file.size,
-      cheminMinio: relativeUploadPath(file.filename, 'root'),
+      cheminMinio: stored.storedPath,
     });
   }
 
@@ -151,21 +151,17 @@ export class CourrierController {
     @CurrentUser('id') userId: number,
   ) {
     const pj = await this.courrierService.getPieceJointe(id, pjId, userId);
-
-    const filePath = resolveStoredFilePath(pj.cheminMinio, UPLOADS_ROOT);
-
-    if (!filePath || !existsSync(filePath)) {
+    try {
+      const { stream } = await this.storage.openReadStream(pj.cheminMinio);
+      const filename = pj.nomFichier || 'document';
+      const encodedFilename = encodeURIComponent(filename);
+      return new StreamableFile(stream, {
+        type: pj.typeMime || 'application/octet-stream',
+        disposition: `attachment; filename="${encodedFilename}"; filename*=UTF-8''${encodedFilename}`,
+      });
+    } catch {
       throw new NotFoundException('Fichier non trouvé sur le serveur');
     }
-
-    const fileStream = createReadStream(filePath);
-    const filename = pj.nomFichier || 'document';
-    const encodedFilename = encodeURIComponent(filename);
-
-    return new StreamableFile(fileStream, {
-      type: pj.typeMime || 'application/octet-stream',
-      disposition: `attachment; filename="${encodedFilename}"; filename*=UTF-8''${encodedFilename}`,
-    });
   }
 
   @Delete(':id/pieces-jointes/:pjId')

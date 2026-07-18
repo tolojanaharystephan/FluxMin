@@ -50,7 +50,7 @@
 | 18 juil. | LLM only + GroqCloud | Résumé **uniquement LLM** (plus de NLP local) ; cascade Groq / OpenAI / OpenRouter / Claude / xAI / Gemini / Mistral. |
 | 18 juil. | Étendre au Gouvernement | Module **MG** : rôle `gouvernement` ; posts publics/ciblés ; AR/réponses par **directeur de ministère** uniquement. |
 | 18 juil. | Directeur sans direction | `directeur_ministere` rattaché au **ministère** (`ministereId`) uniquement, pas à une direction. |
-| 18 juil. | Hyperautomation M7 | **Backlog** après MG : Temporal (relances/escalades/délais), MinIO, process mining. |
+| 18 juil. | Hyperautomation M7 | **Livré** : MinIO PJ ; Temporal relances/escalades ; process mining Analytics. |
 | 17 juil. | Que signifie finaliser notifs in-app ? | Toast, JWT WS, filtres, marquage lu. `message_discussion` = type de notif (icône bulle). |
 | 17 juil. | Rôle de l’IA avant M6 | **Assistant documentaire local** : OCR, résumé, routage, suggestions. **Validation humaine obligatoire** — pas de décision autonome. |
 | 17 juil. | Ne pas restreindre le périmètre IA | Périmètre complet (OCR + résumé + routage + suggestions + rédaction assistée), contrôle humain, scores, audit. |
@@ -67,8 +67,8 @@
 | Base | PostgreSQL 16 + Drizzle ORM |
 | IA | Python FastAPI (`ia-service`) + Tesseract OCR + NLP local ; LLM optionnel (résumé) |
 | Temps réel | Socket.IO, auth **JWT** |
-| Fichiers | Disque local (`uploads/…`) ; MinIO prévu M7 |
-| Workflow | Temporal.io (prévu M7) |
+| Fichiers | MinIO (S3) + fallback disque `uploads/…` |
+| Workflow | Temporal.io (relances / escalades courrier) |
 | Auth | JWT + refresh + RBAC |
 
 **URLs locales :**
@@ -98,10 +98,10 @@
 | **M5 Notifications** | ✅ | WS JWT, toast, filtres, discussion ; pas d’email SaaS |
 | **M6 IA** | ✅ | Nest ↔ FastAPI ; OCR local ; résumé LLM ; multi-PJ ; validation humaine |
 | **MG Communications Gouvernement** | ✅ | Actualités publiques/ciblées ; notifs ; AR + réponses (directeur ministère) |
-| **M7 Temporal / MinIO** | ⏳ | Backlog hyperautomation (après MG) |
+| **M7 Hyperautomation** | ✅ | MinIO (PJ) ; Temporal relances/escalades ; process mining Analytics |
 | **M8 Durcissement** | ⏳ | Tests critiques, Swagger, rate limit, monitoring |
 
-**Non priorisé immédiatement :** SSO/MFA fort, process mining avancé, K8s/Prometheus prod.
+**Non priorisé immédiatement :** SSO/MFA fort, process mining avancé externe, K8s/Prometheus prod.
 
 ---
 
@@ -144,7 +144,7 @@
 
 | Sujet | État |
 |-------|------|
-| Stockage fichiers | Disque local ; MinIO réel = M7 |
+| Stockage fichiers | MinIO + dual-read disque legacy |
 | Temporal / Redis / BullMQ | Non branchés métier |
 | Email | Pas de SaaS ; SMTP interne optionnel plus tard |
 | OCR Windows | Tesseract (+ Poppler pour PDF scannés) recommandé |
@@ -177,7 +177,7 @@ PDF, png/jpg/jpeg/gif/webp, txt/csv/rtf, Word (doc/docx), Excel (xls/xlsx), Powe
 7. **Pilotage par rôle** — parcours distincts admin / agent / auditeur.
 8. **UX professionnelle** — design SaaS 2026 (teal, drag & drop).
 9. **Règles métier réalistes** — flux interne/externe, transmission encadrée.
-10. **Feuille de route claire** — M7 (Temporal/MinIO), M8 (durcissement prod).
+10. **Feuille de route claire** — M7 livré ; M8 (durcissement prod) ensuite.
 
 ---
 

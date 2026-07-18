@@ -184,6 +184,10 @@ class ApiClient {
     return this.request(`/stats/analytics${qs}`, { token });
   }
 
+  async getProcessMiningStats(token: string) {
+    return this.request('/stats/process-mining', { token });
+  }
+
   // ─── Courriers ───
   async getCourriers(token: string, params?: {
     search?: string;

@@ -5,6 +5,7 @@ import { messages, messagePiecesJointes, courriers, utilisateurs } from '../../i
 import { eq, and, or, desc, count } from 'drizzle-orm';
 import { NotificationGateway } from '../notification/notification.gateway';
 import { NotificationService } from '../notification/notification.service';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 import { CreateMessageDto } from './dto/messaging.dto';
 
 @Injectable()
@@ -13,6 +14,7 @@ export class MessagingService {
     @Inject(DATABASE_CONNECTION) private db: DrizzleDB,
     private gateway: NotificationGateway,
     private notificationService: NotificationService,
+    private storage: StorageService,
   ) {}
 
   private async verifyAccess(courrierId: number, userId: number) {
@@ -179,16 +181,14 @@ export class MessagingService {
     if (!file) throw new BadRequestException('Aucun fichier fourni');
 
     const message = await this.verifyMessageAccess(messageId, userId);
-
-    // Store a cwd-relative path so download works on Windows/Linux (Multer's file.path is absolute).
-    const relativePath = `uploads/messages/${file.filename}`;
+    const stored = await this.storage.persistMulterFile(file, 'messages');
 
     const [pj] = await this.db
       .insert(messagePiecesJointes)
       .values({
         messageId,
         nomFichier: file.originalname,
-        cheminFichier: relativePath,
+        cheminFichier: stored.storedPath,
         typeMime: file.mimetype,
         tailleBytes: file.size,
       })

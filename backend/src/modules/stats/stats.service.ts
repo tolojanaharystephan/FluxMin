@@ -8,7 +8,7 @@ import {
   ministeres,
   fluxEtapes,
 } from '../../infrastructure/database/schema';
-import { eq, and, sql, desc, count, or, not, gte, lt, inArray } from 'drizzle-orm';
+import { eq, and, sql, desc, asc, count, or, not, gte, lt, inArray } from 'drizzle-orm';
 import { StatutCourrier } from '../courrier/dto/courrier.dto';
 
 type ScopeContext = {
@@ -415,6 +415,96 @@ export class StatsService {
       summary: { total, traites, enAttente, archives },
       monthly,
       topDirections,
+    };
+  }
+
+  /**
+   * Process mining v1 : volumes d’actions, délais moyens entre envoi→réception / envoi→archivage,
+   * transitions les plus fréquentes.
+   */
+  async getProcessMining(userId: number) {
+    const scope = await this.resolveScope(userId);
+    const scopeCond = this.scopeCondition(scope);
+
+    const actionRows = await this.db
+      .select({
+        action: fluxEtapes.action,
+        total: count(),
+      })
+      .from(fluxEtapes)
+      .innerJoin(courriers, eq(fluxEtapes.courrierId, courriers.id))
+      .where(scopeCond)
+      .groupBy(fluxEtapes.action)
+      .orderBy(desc(count()));
+
+    const byAction = actionRows.map((r) => ({
+      action: r.action || 'inconnu',
+      label: ACTION_LABELS[r.action || ''] || r.action || 'Inconnu',
+      total: Number(r.total),
+    }));
+
+    // Transitions A → B (même courrier, étapes consécutives)
+    const etapes = await this.db
+      .select({
+        courrierId: fluxEtapes.courrierId,
+        action: fluxEtapes.action,
+        dateAction: fluxEtapes.dateAction,
+      })
+      .from(fluxEtapes)
+      .innerJoin(courriers, eq(fluxEtapes.courrierId, courriers.id))
+      .where(scopeCond)
+      .orderBy(asc(fluxEtapes.courrierId), asc(fluxEtapes.dateAction));
+
+    const transitionMap = new Map<string, number>();
+    const byCourrier = new Map<number, Array<{ action: string; date: Date }>>();
+    for (const e of etapes) {
+      if (e.courrierId == null || !e.action || !e.dateAction) continue;
+      const list = byCourrier.get(e.courrierId) || [];
+      list.push({ action: e.action, date: e.dateAction });
+      byCourrier.set(e.courrierId, list);
+    }
+
+    const delaysEnvoiReception: number[] = [];
+    const delaysEnvoiArchive: number[] = [];
+
+    for (const steps of byCourrier.values()) {
+      for (let i = 0; i < steps.length - 1; i++) {
+        const key = `${steps[i].action}→${steps[i + 1].action}`;
+        transitionMap.set(key, (transitionMap.get(key) || 0) + 1);
+      }
+      const envoi = steps.find((s) => s.action === 'envoi');
+      const reception = steps.find((s) => s.action === 'reception');
+      const archivage = steps.find((s) => s.action === 'archivage');
+      if (envoi && reception) {
+        delaysEnvoiReception.push(
+          (reception.date.getTime() - envoi.date.getTime()) / 36e5,
+        );
+      }
+      if (envoi && archivage) {
+        delaysEnvoiArchive.push(
+          (archivage.date.getTime() - envoi.date.getTime()) / 36e5,
+        );
+      }
+    }
+
+    const avg = (arr: number[]) =>
+      arr.length ? Math.round((arr.reduce((a, b) => a + b, 0) / arr.length) * 10) / 10 : null;
+
+    const transitions = [...transitionMap.entries()]
+      .map(([transition, total]) => ({ transition, total }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 12);
+
+    return {
+      byAction,
+      transitions,
+      delays: {
+        envoiVersReceptionHeures: avg(delaysEnvoiReception),
+        envoiVersArchivageHeures: avg(delaysEnvoiArchive),
+        echantillonReception: delaysEnvoiReception.length,
+        echantillonArchivage: delaysEnvoiArchive.length,
+      },
+      courriersTraces: byCourrier.size,
     };
   }
 }

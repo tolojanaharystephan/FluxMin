@@ -212,6 +212,22 @@
 
 ---
 
+## 9. Hyperautomation M7 (MinIO / Temporal / Process mining)
+
+| # | Action | Résultat attendu | ☐ |
+|---|--------|------------------|---|
+| 9.1 | `docker compose up -d minio temporal temporal-ui` | MinIO `:9000/:9001`, Temporal `:7233` | ☐ |
+| 9.2 | Upload PDF sur un courrier (backend log « MinIO OK ») | `chemin_minio` = `courriers/…` ; download OK | ☐ |
+| 9.3 | Upload PJ publication gouvernement | Objet sous `publications/…` ; download OK | ☐ |
+| 9.4 | Arrêter MinIO puis upload | Fallback disque `uploads/…` ; download OK | ☐ |
+| 9.5 | Ancien fichier `uploads/…` encore en base | Download toujours OK (dual-read) | ☐ |
+| 9.6 | Envoyer un courrier | Workflow Temporal `courrier-suivi-{id}` visible UI | ☐ |
+| 9.7 | Demo délais courts (`TEMPORAL_RELANCES_DELAY=2 minutes`) | Notif `courrier_relance` puis `courrier_escalade` | ☐ |
+| 9.8 | Accuser réception / archiver | Workflow annulé ; plus de relance | ☐ |
+| 9.9 | Analytics → section Process mining | Volumes d’étapes, transitions, délais moyens | ☐ |
+
+---
+
 ## Comptes de test
 
 | Rôle | Email | Mot de passe |

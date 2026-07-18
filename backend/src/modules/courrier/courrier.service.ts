@@ -19,17 +19,16 @@ import {
   StatutCourrier,
 } from './dto/courrier.dto';
 import { NotificationService } from '../notification/notification.service';
-import {
-  resolveStoredFilePath,
-  UPLOADS_ROOT,
-  safeUnlink,
-} from '../../common/files/storage.util';
+import { StorageService } from '../../infrastructure/storage/storage.service';
+import { TemporalService } from '../../infrastructure/temporal/temporal.service';
 
 @Injectable()
 export class CourrierService {
   constructor(
     @Inject(DATABASE_CONNECTION) private db: DrizzleDB,
     private notificationService: NotificationService,
+    private storage: StorageService,
+    private temporal: TemporalService,
   ) {}
 
   async create(dto: CreateCourrierDto, emetteurId: number) {
@@ -385,6 +384,7 @@ export class CourrierService {
       });
     }
 
+    await this.temporal.startCourrierSuivi(id, existing.objet || `Courrier #${id}`);
     return updated;
   }
 
@@ -471,6 +471,7 @@ export class CourrierService {
       courrierId: id,
     });
 
+    await this.temporal.startCourrierSuivi(id, existing.objet || `Courrier #${id}`);
     return updated;
   }
 
@@ -511,6 +512,7 @@ export class CourrierService {
       });
     }
 
+    await this.temporal.cancelCourrierSuivi(id);
     return updated;
   }
 
@@ -564,7 +566,7 @@ export class CourrierService {
 
     if (!pj) throw new NotFoundException(`Pièce jointe #${pjId} introuvable`);
 
-    safeUnlink(resolveStoredFilePath(pj.cheminMinio, UPLOADS_ROOT));
+    await this.storage.remove(pj.cheminMinio);
 
     await this.db
       .delete(piecesJointes)

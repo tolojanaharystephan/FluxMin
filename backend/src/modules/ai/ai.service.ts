@@ -8,7 +8,6 @@ import {
   Logger,
   OnModuleInit,
 } from '@nestjs/common';
-import { readFileSync, existsSync } from 'fs';
 import { extname } from 'path';
 import { DATABASE_CONNECTION } from '../../infrastructure/database/database.provider';
 import type { DrizzleDB } from '../../infrastructure/database/database.provider';
@@ -18,11 +17,9 @@ import {
   utilisateurs,
 } from '../../infrastructure/database/schema';
 import { eq, and, or, inArray, lte, ne, desc, count, sql } from 'drizzle-orm';
-import {
-  ALLOWED_UPLOAD_EXTENSIONS,
-  resolveStoredFilePath,
-} from '../../common/files/storage.util';
+import { ALLOWED_UPLOAD_EXTENSIONS } from '../../common/files/storage.util';
 import { ensureDemoUploadPdfs } from '../../common/files/demo-uploads.util';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 import { StatutCourrier } from '../courrier/dto/courrier.dto';
 import { AuditService } from '../audit/audit.service';
 import { AnalyzeTextDto, DraftDto } from './dto/ai.dto';
@@ -37,6 +34,7 @@ export class AiService implements OnModuleInit {
   constructor(
     @Inject(DATABASE_CONNECTION) private db: DrizzleDB,
     private auditService: AuditService,
+    private storage: StorageService,
   ) {}
 
   async onModuleInit() {
@@ -249,15 +247,16 @@ export class AiService implements OnModuleInit {
 
     if (!pj) throw new NotFoundException('Pièce jointe introuvable');
 
-    const path = resolveStoredFilePath(pj.cheminMinio);
-    if (!path || !existsSync(path)) {
+    let buffer: Buffer;
+    try {
+      buffer = await this.storage.readBuffer(pj.cheminMinio);
+    } catch {
       throw new NotFoundException(
-        `Fichier introuvable sur le disque (${pj.cheminMinio || 'chemin vide'}). ` +
+        `Fichier introuvable (${pj.cheminMinio || 'chemin vide'}). ` +
           `Ré-uploadez la pièce jointe.`,
       );
     }
 
-    const buffer = readFileSync(path);
     const nomFichier = pj.nomFichier?.trim() || `document-${pj.id}`;
     const ext = extname(nomFichier).toLowerCase();
 
@@ -334,17 +333,7 @@ export class AiService implements OnModuleInit {
 
     for (const pj of pjs) {
       const nomFichier = pj.nomFichier?.trim() || `document-${pj.id}`;
-      const path = resolveStoredFilePath(pj.cheminMinio);
       const ext = extname(nomFichier).toLowerCase();
-      if (!path || !existsSync(path)) {
-        details.push({
-          pieceJointeId: pj.id,
-          nomFichier,
-          ok: false,
-          error: `Fichier introuvable (${pj.cheminMinio || 'chemin vide'})`,
-        });
-        continue;
-      }
       if (!ANALYZABLE_EXTS.has(ext)) {
         details.push({
           pieceJointeId: pj.id,
@@ -356,7 +345,7 @@ export class AiService implements OnModuleInit {
       }
 
       try {
-        const buffer = readFileSync(path);
+        const buffer = await this.storage.readBuffer(pj.cheminMinio);
         const analysis = await this.callIaAnalyzeFile(buffer, nomFichier);
         const texte = this.extractTexteFromAnalysis(analysis);
         if (!texte) {

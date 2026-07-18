@@ -21,4 +21,10 @@ export class StatsController {
   ) {
     return this.statsService.getAnalytics(userId, months);
   }
+
+  @Get('process-mining')
+  @RequirePermissions(Permission.VIEW_ANALYTICS)
+  getProcessMining(@CurrentUser('id') userId: number) {
+    return this.statsService.getProcessMining(userId);
+  }
 }

@@ -68,6 +68,14 @@ export function relativeUploadPath(
   return `uploads/${filename}`;
 }
 
+/** Chemins legacy disque vs clés objet MinIO (`courriers/…`, `messages/…`, …). */
+export function isDiskStoredPath(stored: string | null | undefined): boolean {
+  if (!stored) return false;
+  if (isAbsolute(stored)) return true;
+  const n = stored.replace(/\\/g, '/');
+  return n.startsWith('uploads/') || n.startsWith('./uploads/');
+}
+
 /**
  * Resolve a stored path whether absolute (legacy) or relative to cwd.
  * Falls back to basename under the expected upload directory.

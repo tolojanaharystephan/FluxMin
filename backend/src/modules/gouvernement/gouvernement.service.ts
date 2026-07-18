@@ -26,13 +26,14 @@ import {
   PublicationMessageDto,
   UpdatePublicationDto,
 } from './dto/gouvernement.dto';
-import { relativeUploadPath } from '../../common/files/storage.util';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 
 @Injectable()
 export class GouvernementService {
   constructor(
     @Inject(DATABASE_CONNECTION) private db: DrizzleDB,
     private notificationService: NotificationService,
+    private storage: StorageService,
   ) {}
 
   private async getUserContext(userId: number) {
@@ -351,18 +352,25 @@ export class GouvernementService {
       throw new BadRequestException('Publication archivée : pièces jointes verrouillées');
     }
 
-    const inserted = await this.db
-      .insert(publicationPiecesJointes)
-      .values(
-        files.map((file) => ({
-          publicationId,
-          nomFichier: file.originalname,
-          cheminFichier: relativeUploadPath(file.filename, 'publications'),
-          typeMime: file.mimetype,
-          tailleBytes: file.size,
-        })),
-      )
-      .returning();
+    const rows: Array<{
+      publicationId: number;
+      nomFichier: string;
+      cheminFichier: string;
+      typeMime: string;
+      tailleBytes: number;
+    }> = [];
+    for (const file of files) {
+      const stored = await this.storage.persistMulterFile(file, 'publications');
+      rows.push({
+        publicationId,
+        nomFichier: file.originalname,
+        cheminFichier: stored.storedPath,
+        typeMime: file.mimetype,
+        tailleBytes: file.size,
+      });
+    }
+
+    const inserted = await this.db.insert(publicationPiecesJointes).values(rows).returning();
     return inserted;
   }
 

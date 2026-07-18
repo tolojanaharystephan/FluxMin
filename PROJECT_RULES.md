@@ -1,7 +1,7 @@
 # FluxMin – Plateforme de Gestion et d'Automatisation Intelligente des Courriers Ministériels
 
 ## Version du document : 2.0
-## Dernière mise à jour : 18 juillet 2026 — M1–M6 ✅ · MG Communications Gouvernement (en cours) · M7 backlog
+## Dernière mise à jour : 18 juillet 2026 — M1–M6 ✅ · MG ✅ · M7 Hyperautomation ✅
 
 ---
 
@@ -17,15 +17,15 @@
 | **M5 Notifications produit** | ✅ | In-app : WS JWT, toast, filtres, messages discussion ; pas de SaaS email tiers (SMTP interne optionnel plus tard) |
 | **M6 IA bout-en-bout** | ✅ | Nest→FastAPI ; OCR local ; résumé/infos clés LLM multi-fournisseurs ; validation humaine |
 | **MG Communications Gouvernement** | ✅ | Rôle `gouvernement` ; posts publics/ciblés ; PJ ; notifs ; AR/réponses par **directeur de ministère** uniquement |
-| M7 Temporal / MinIO réel | ⏳ | **Backlog hyperautomation** (après MG) |
+| **M7 Hyperautomation** | ✅ | **M7a** MinIO (PJ courriers/messages/publications, dual-read disque) · **M7b** Temporal (relances/escalades) · **M7c** process mining (Analytics) |
 | M8 Durcissement (tests, Swagger, rate limit) | ⏳ | — |
 
-### Backlog hyperautomation (M7+) — ne pas démarrer avant fin MG
+### M7 — Hyperautomation (livré)
 
-- Workflows **Temporal** : relances, escalades, délais automatiques
-- Stockage objet **MinIO** intégré aux flux
-- **Process mining** / tableau des flux
-- Objectif titre : enchaînements et délais gérés par le moteur de workflow, pas seulement l’IA documentaire
+- **MinIO** : `StorageService` S3 ; bucket auto ; fallback disque si MinIO down ; clés `courriers/…`, `messages/…`, `publications/…`
+- **Temporal** : workflow `courrierSuiviWorkflow` (relance puis escalade) ; start à l’envoi/transmission ; cancel à AR/archivage
+- **Process mining** : `GET /stats/process-mining` + section Analytics (volumes, transitions, délais moyens)
+- Env : voir [`backend/.env.example`](backend/.env.example) ; console MinIO `:9001` ; Temporal UI (compose)
 
 ### Rôles organisationnels (MAJ)
 
@@ -89,7 +89,7 @@ Développer une plateforme web sécurisée de gestion des courriers et documents
 - [x] Extraction / résumé + objet proposé
 - [x] Suggestions d'actions et pré-remplissage *(UI réelle, validation humaine)*
 - [x] Rédaction assistée par gabarit local
-- [ ] Tableau de bord d'analyse des flux (process mining)
+- [x] Tableau de bord d'analyse des flux (process mining)
 
 ### 3.3 Administration et Sécurité
 - [x] Gestion des ministères, directions, utilisateurs et rôles (RBAC)

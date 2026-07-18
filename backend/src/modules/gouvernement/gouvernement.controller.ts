@@ -19,8 +19,8 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuid } from 'uuid';
-import { createReadStream, existsSync } from 'fs';
 import { GouvernementService } from './gouvernement.service';
+import { StorageService } from '../../infrastructure/storage/storage.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/types/roles';
 import {
@@ -35,7 +35,6 @@ import {
   PUBLICATIONS_UPLOAD_DIR,
   ensureUploadDirs,
   isAllowedUpload,
-  resolveStoredFilePath,
 } from '../../common/files/storage.util';
 
 const SkipAudit = () => SetMetadata(SKIP_AUDIT_KEY, true);
@@ -60,7 +59,10 @@ ensureUploadDirs();
 
 @Controller('gouvernement')
 export class GouvernementController {
-  constructor(private readonly service: GouvernementService) {}
+  constructor(
+    private readonly service: GouvernementService,
+    private readonly storage: StorageService,
+  ) {}
 
   @Get('publications')
   list(
@@ -149,15 +151,16 @@ export class GouvernementController {
     @CurrentUser('id') userId: number,
   ) {
     const pj = await this.service.getPieceJointe(id, pjId, userId);
-    const filePath = resolveStoredFilePath(pj.cheminFichier, PUBLICATIONS_UPLOAD_DIR);
-    if (!filePath || !existsSync(filePath)) {
+    try {
+      const { stream } = await this.storage.openReadStream(pj.cheminFichier);
+      const filename = pj.nomFichier || 'document';
+      return new StreamableFile(stream, {
+        type: pj.typeMime || 'application/octet-stream',
+        disposition: `attachment; filename="${encodeURIComponent(filename)}"`,
+      });
+    } catch {
       throw new NotFoundException('Fichier non trouvé');
     }
-    const filename = pj.nomFichier || 'document';
-    return new StreamableFile(createReadStream(filePath), {
-      type: pj.typeMime || 'application/octet-stream',
-      disposition: `attachment; filename="${encodeURIComponent(filename)}"`,
-    });
   }
 
   @Post('publications/:id/accuse-reception')

@@ -42,6 +42,8 @@ const typeConfig: Record<string, { icon: any; color: string; label: string }> = 
   publication_gouv: { icon: Newspaper, color: "text-fuchsia-400", label: "Actualité gouv." },
   publication_ar: { icon: CheckCircle2, color: "text-pink-400", label: "AR publication" },
   publication_message: { icon: Landmark, color: "text-rose-300", label: "Réponse gouv." },
+  courrier_relance: { icon: RefreshCw, color: "text-amber-400", label: "Relance auto" },
+  courrier_escalade: { icon: Forward, color: "text-orange-400", label: "Escalade auto" },
 };
 
 interface Notification {

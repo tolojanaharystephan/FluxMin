@@ -3,6 +3,8 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './infrastructure/database/database.module';
+import { StorageModule } from './infrastructure/storage/storage.module';
+import { TemporalModule } from './infrastructure/temporal/temporal.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { AuditModule } from './modules/audit/audit.module';
@@ -20,12 +22,14 @@ import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 @Module({
   imports: [
     DatabaseModule,
+    StorageModule,
     AuthModule,
     AdminModule,
     AuditModule,
+    NotificationModule,
+    TemporalModule,
     CourrierModule,
     ArchiveModule,
-    NotificationModule,
     MessagingModule,
     StatsModule,
     AiModule,
