@@ -164,6 +164,9 @@ services:
     environment:
       - PROJECT_NAME=FluxMin AI Service
       - API_V1_STR=/api/v1
+      # Binaire du conteneur (identique pour tous les utilisateurs)
+      - TESSERACT_CMD=/usr/bin/tesseract
+      - TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
     ports:
       - "8000:8000"
     networks:

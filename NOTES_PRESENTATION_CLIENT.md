@@ -147,7 +147,11 @@
 **Formats PJ acceptés :**  
 PDF, png/jpg/jpeg/gif/webp, txt/csv/rtf, Word (doc/docx), Excel (xls/xlsx), PowerPoint (ppt/pptx), OpenDocument (odt/ods/odp).
 
-**Analyse IA :** tous les formats PJ sont analysables. Résumé structuré (synthèse + points clés + repères). Bouton **Analyser tout** pour correspondances croisées. OCR : Tesseract installé + fallback RapidOCR.
+**OCR / déploiement IA :**
+- Dev local : Tesseract dans `ia-service/vendor/tesseract/` (chemin relatif, script `setup-tesseract.ps1`)
+- Prod / multi-utilisateurs : image Docker `ia-service` avec Tesseract inclus — tous les agents passent par le même service
+- Fallback pip : RapidOCR si aucun binaire Tesseract
+
 
 ---
 

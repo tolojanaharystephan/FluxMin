@@ -1,0 +1,6 @@
+# Tesseract embarqué (binaires + tessdata) — généré par scripts/setup-tesseract.*
+# Ne pas committer les binaires (trop volumineux) ; chaque machine / CI exécute le setup,
+# et Docker installe tesseract via apt (voir Dockerfile).
+vendor/tesseract/**
+!vendor/tesseract/README.md
+!vendor/tesseract/.gitkeep

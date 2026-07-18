@@ -92,7 +92,7 @@ Développer une plateforme web sécurisée de gestion des courriers et documents
 | Frontend | Next.js 15 (App Router) + TypeScript + Tailwind CSS + shadcn/ui + TanStack Query + Zustand |
 | Backend | NestJS + TypeScript |
 | Base de données | PostgreSQL 16 + Drizzle ORM |
-| IA / ML | Python FastAPI + Tesseract OCR + NLP |
+| IA / ML | Python FastAPI + Tesseract OCR (vendor/ projet ou Docker) + RapidOCR fallback + NLP |
 | Workflow | Temporal.io |
 | Stockage fichiers | MinIO (S3 compatible) |
 | Cache / Queues | Redis + BullMQ |
@@ -462,3 +462,7 @@ taskkill /PID <PID> /F
 
 **Backend ne démarre pas :**
 Vérifier que PostgreSQL est en cours d'exécution et que le `.env` est correct.
+
+
+Sur un autre PC, pour l'acces au tesseract: 
+powershell -ExecutionPolicy Bypass -File .\ia-service\scripts\setup-tesseract.ps1

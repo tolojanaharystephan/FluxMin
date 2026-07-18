@@ -58,3 +58,9 @@ coverage/
 *.pem
 *.key
 *.cert
+
+# Tesseract embarqué (binaires locaux — setup via ia-service/scripts)
+ia-service/vendor/tesseract/**
+!ia-service/vendor/tesseract/README.md
+!ia-service/vendor/tesseract/.gitkeep
+!ia-service/vendor/tesseract/.gitignore
