@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException, Inject } from '@nestjs/common';
+﻿import { Injectable, NotFoundException, ForbiddenException, Inject } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../../infrastructure/database/database.provider';
 import type { DrizzleDB } from '../../infrastructure/database/database.provider';
 import {
@@ -57,10 +57,10 @@ export class ArchiveService {
 
     if (!user) throw new NotFoundException('Utilisateur introuvable');
 
-    let ministereId: number | null = null;
+    let ministereId: number | null = user.ministereId ?? null;
     let directionIdsInMinistere: number[] = [];
 
-    if (user.directionId) {
+    if (!ministereId && user.directionId) {
       const [dir] = await this.db
         .select()
         .from(directions)
@@ -86,7 +86,7 @@ export class ArchiveService {
     };
   }
 
-  /** Visible si émetteur, destinataire, admin ministère, auditeur ou super admin */
+  /** Visible si émetteur, destinataire, Directeur de ministère, auditeur ou super admin */
   private canAccessCourrier(
     scope: Awaited<ReturnType<ArchiveService['getUserScope']>>,
     courrier: {
@@ -96,7 +96,7 @@ export class ArchiveService {
   ) {
     if (scope.role === 'super_admin' || scope.role === 'auditeur') return true;
 
-    if (scope.role === 'admin_ministere' && scope.directionIdsInMinistere.length > 0) {
+    if (scope.role === 'directeur_ministere' && scope.directionIdsInMinistere.length > 0) {
       return (
         (courrier.directionEmetteurId != null &&
           scope.directionIdsInMinistere.includes(courrier.directionEmetteurId)) ||
@@ -198,7 +198,7 @@ export class ArchiveService {
 
     if (scope.role === 'super_admin' || scope.role === 'auditeur') {
       // pas de filtre direction
-    } else if (scope.role === 'admin_ministere' && scope.directionIdsInMinistere.length > 0) {
+    } else if (scope.role === 'directeur_ministere' && scope.directionIdsInMinistere.length > 0) {
       conditions.push(
         or(
           inArray(courriers.directionEmetteurId, scope.directionIdsInMinistere),

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -125,7 +125,7 @@ export default function AISuggestionsPage() {
 
   return (
     <AuthGuard>
-      <RBACGuard allowedRoles={["responsable", "agent_courrier", "responsable_direction", "admin_ministere", "super_admin"]}>
+      <RBACGuard allowedRoles={["responsable", "agent_courrier", "responsable_direction", "directeur_ministere", "super_admin"]}>
         <AppShell>
           <div className="flex flex-col gap-6 animate-fade-in">
             <div className="flex items-center justify-between flex-wrap gap-3">

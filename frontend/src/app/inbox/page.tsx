@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useCallback, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -110,7 +110,7 @@ function InboxContent() {
   return (
     <AuthGuard>
       <RBACGuard
-        allowedRoles={["agent_courrier", "responsable", "responsable_direction", "admin_ministere"]}
+        allowedRoles={["agent_courrier", "responsable", "responsable_direction", "directeur_ministere"]}
       >
       <AppShell>
         <div className="flex flex-col gap-6 animate-fade-in">

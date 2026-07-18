@@ -1,7 +1,7 @@
 # FluxMin – Plateforme de Gestion et d'Automatisation Intelligente des Courriers Ministériels
 
-## Version du document : 1.9
-## Dernière mise à jour : 18 juillet 2026 — M1–M6 ✅ · LLM résumé (optionnel) + OCR local
+## Version du document : 2.0
+## Dernière mise à jour : 18 juillet 2026 — M1–M6 ✅ · MG Communications Gouvernement (en cours) · M7 backlog
 
 ---
 
@@ -15,9 +15,23 @@
 | **M3 Archivage complet** | ✅ | Scopes accès, dialogue durée/emplacement, rétention (expire bientôt/expiré), désarchivage détail + liste |
 | **M4 Audit lecture** (search / reports / anomalies) | ✅ | APIs réelles + UI branchée ; logs interceptor ; rapports générés ; anomalies délai/workflow |
 | **M5 Notifications produit** | ✅ | In-app : WS JWT, toast, filtres, messages discussion ; pas de SaaS email tiers (SMTP interne optionnel plus tard) |
-| **M6 IA bout-en-bout** | ✅ | Nest→FastAPI ; OCR local ; résumé/infos clés via LLM OpenAI-compatible (si clé) sinon NLP local ; grounding anti-hallucination ; validation humaine |
-| M7 Temporal / MinIO réel | ⏳ | Conteneurs Compose seulement |
+| **M6 IA bout-en-bout** | ✅ | Nest→FastAPI ; OCR local ; résumé/infos clés LLM multi-fournisseurs ; validation humaine |
+| **MG Communications Gouvernement** | ✅ | Rôle `gouvernement` ; posts publics/ciblés ; PJ ; notifs ; AR/réponses par **directeur de ministère** uniquement |
+| M7 Temporal / MinIO réel | ⏳ | **Backlog hyperautomation** (après MG) |
 | M8 Durcissement (tests, Swagger, rate limit) | ⏳ | — |
+
+### Backlog hyperautomation (M7+) — ne pas démarrer avant fin MG
+
+- Workflows **Temporal** : relances, escalades, délais automatiques
+- Stockage objet **MinIO** intégré aux flux
+- **Process mining** / tableau des flux
+- Objectif titre : enchaînements et délais gérés par le moteur de workflow, pas seulement l’IA documentaire
+
+### Rôles organisationnels (MAJ)
+
+- `super_admin` : admin **plateforme** technique (pas de réponse aux publications gouvernement)
+- `directeur_ministere` : ex-`admin_ministere` — **un par ministère**, rattaché au **ministère uniquement** (`ministereId`, **sans direction**) ; seul à AR / répondre aux posts gouvernement **ciblés**
+- `gouvernement` : publie actualités (public ou ministère), PJ, archive
 
 **Règle :** un module se termine (backend + frontend + parcours testé, sans mock) avant le suivant.
 
@@ -409,6 +423,12 @@ agent.courrier.mcc@fluxmin.gouv.fr → Courrier MCC
 agent.patrimoine.mcc@fluxmin.gouv.fr → Agent Patrimoine MCC
 agent.daf.mcc@fluxmin.gouv.fr → Agent DAF MCC
 auditeur@fluxmin.gouv.fr → Auditeur
+gouvernement@fluxmin.gouv.fr
+directeur.mfa@fluxmin.gouv.fr
+directeur.minjus@fluxmin.gouv.fr
+
+
+
 5 courriers illustrant tous les flux :
 1. Interne MFA (DSI → DRH)
 2. Externe MINJUS → MFA (Courrier MINJUS → DSI MFA)
@@ -467,12 +487,6 @@ taskkill /PID <PID> /F
 
 **Backend ne démarre pas :**
 Vérifier que PostgreSQL est en cours d'exécution et que le `.env` est correct.
-
-
-Sur un autre PC, pour l'accès au tesseract :
-```powershell
-powershell -ExecutionPolicy Bypass -File .\ia-service\scripts\setup-tesseract.ps1
-```
 
 **LLM (résumé / infos clés)** — cascade multi-fournisseurs, **sans NLP local** :
 1. Clés dans `ia-service/.env` : **Groq** ([console](https://console.groq.com/keys)), OpenAI, OpenRouter, Claude, xAI, Gemini, Mistral

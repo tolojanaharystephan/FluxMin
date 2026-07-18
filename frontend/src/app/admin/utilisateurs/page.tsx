@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { AppShell } from "@/components/layout/app-shell";
@@ -36,6 +36,7 @@ interface Utilisateur {
   prenom: string;
   role: string | null;
   directionId: number | null;
+  ministereId: number | null;
   created_at: string;
 }
 
@@ -45,21 +46,39 @@ interface Direction {
   ministereId: number | null;
 }
 
+interface Ministere {
+  id: number;
+  nom: string;
+  code: string;
+}
+
+const emptyForm = {
+  email: "",
+  motDePasse: "",
+  nom: "",
+  prenom: "",
+  role: "responsable",
+  directionId: "",
+  ministereId: "",
+};
+
 const roleLabels: Record<string, string> = {
   responsable: "Responsable",
   agent_courrier: "Agent Courrier",
   auditeur: "Auditeur",
   super_admin: "Super Admin",
-  admin_ministere: "Admin Ministère",
+  directeur_ministere: "Directeur de ministère",
+  gouvernement: "Gouvernement",
   responsable_direction: "Responsable Direction",
 };
 
 const roleColors: Record<string, "default" | "secondary" | "success" | "warning" | "info" | "destructive" | "outline"> = {
   agent_courrier: "secondary",
   responsable: "info",
-  admin_ministere: "default",
+  directeur_ministere: "default",
   auditeur: "warning",
   super_admin: "destructive",
+  gouvernement: "success",
   responsable_direction: "info",
 };
 
@@ -67,30 +86,28 @@ export default function UtilisateursPage() {
   const { accessToken } = useAuthStore();
   const [utilisateurs, setUtilisateurs] = React.useState<Utilisateur[]>([]);
   const [directions, setDirections] = React.useState<Direction[]>([]);
+  const [ministeres, setMinisteres] = React.useState<Ministere[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [search, setSearch] = React.useState("");
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [editItem, setEditItem] = React.useState<Utilisateur | null>(null);
-  const [form, setForm] = React.useState({
-    email: "",
-    motDePasse: "",
-    nom: "",
-    prenom: "",
-    role: "responsable",
-    directionId: "",
-  });
+  const [form, setForm] = React.useState(emptyForm);
   const [saving, setSaving] = React.useState(false);
+
+  const isDirecteur = form.role === "directeur_ministere";
 
   const fetchData = React.useCallback(async () => {
     if (!accessToken) return;
     setLoading(true);
     try {
-      const [users, dirs]: any = await Promise.all([
+      const [users, dirs, mins]: any = await Promise.all([
         api.getUtilisateurs(accessToken, search || undefined),
         api.getDirections(accessToken),
+        api.getMinisteres(accessToken),
       ]);
       setUtilisateurs(users);
       setDirections(dirs);
+      setMinisteres(mins);
     } catch (err) {
       console.error(err);
     } finally {
@@ -104,6 +121,10 @@ export default function UtilisateursPage() {
 
   const handleSave = async () => {
     if (!accessToken || !form.email || !form.nom || !form.prenom) return;
+    if (isDirecteur && !form.ministereId) {
+      alert("Un directeur de ministère doit être rattaché à un ministère");
+      return;
+    }
     setSaving(true);
     try {
       const data: any = {
@@ -111,8 +132,14 @@ export default function UtilisateursPage() {
         nom: form.nom,
         prenom: form.prenom,
         role: form.role,
-        directionId: form.directionId ? parseInt(form.directionId) : undefined,
       };
+      if (isDirecteur) {
+        data.ministereId = parseInt(form.ministereId);
+        data.directionId = null;
+      } else {
+        data.directionId = form.directionId ? parseInt(form.directionId) : null;
+        data.ministereId = null;
+      }
       if (!editItem) {
         data.motDePasse = form.motDePasse || "fluxmin2026";
       } else if (form.motDePasse) {
@@ -126,7 +153,7 @@ export default function UtilisateursPage() {
       }
       setDialogOpen(false);
       setEditItem(null);
-      setForm({ email: "", motDePasse: "", nom: "", prenom: "", role: "responsable", directionId: "" });
+      setForm(emptyForm);
       fetchData();
     } catch (err: any) {
       alert(err.message);
@@ -145,9 +172,12 @@ export default function UtilisateursPage() {
     }
   };
 
-  const getDirectionName = (id: number | null) => {
-    if (!id) return "—";
-    return directions.find((d) => d.id === id)?.nom || "—";
+  const getAffiliationLabel = (u: Utilisateur) => {
+    if (u.role === "directeur_ministere" && u.ministereId) {
+      return ministeres.find((m) => m.id === u.ministereId)?.nom || "—";
+    }
+    if (!u.directionId) return "—";
+    return directions.find((d) => d.id === u.directionId)?.nom || "—";
   };
 
   return (
@@ -161,7 +191,7 @@ export default function UtilisateursPage() {
             </div>
             <Button onClick={() => {
               setEditItem(null);
-              setForm({ email: "", motDePasse: "", nom: "", prenom: "", role: "responsable", directionId: "" });
+              setForm(emptyForm);
               setDialogOpen(true);
             }}>
               <UserPlus className="h-4 w-4" />
@@ -205,7 +235,7 @@ export default function UtilisateursPage() {
                         </Badge>
                       </div>
                       <p className="text-xs text-muted-foreground truncate">
-                        {u.email} · {getDirectionName(u.directionId)}
+                        {u.email} · {getAffiliationLabel(u)}
                       </p>
                     </div>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
@@ -218,6 +248,7 @@ export default function UtilisateursPage() {
                           prenom: u.prenom || "",
                           role: u.role || "responsable",
                           directionId: String(u.directionId || ""),
+                          ministereId: String(u.ministereId || ""),
                         });
                         setDialogOpen(true);
                       }}>
@@ -261,33 +292,68 @@ export default function UtilisateursPage() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label>Rôle</Label>
-                <Select value={form.role} onValueChange={(v) => setForm({ ...form, role: v })}>
+                <Select
+                  value={form.role}
+                  onValueChange={(v) =>
+                    setForm({
+                      ...form,
+                      role: v,
+                      directionId: v === "directeur_ministere" ? "" : form.directionId,
+                      ministereId: v === "directeur_ministere" ? form.ministereId : "",
+                    })
+                  }
+                >
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="responsable">Responsable</SelectItem>
                     <SelectItem value="agent_courrier">Agent Courrier</SelectItem>
                     <SelectItem value="auditeur">Auditeur</SelectItem>
                     <SelectItem value="super_admin">Super Admin</SelectItem>
-                    <SelectItem value="admin_ministere">Admin Ministère</SelectItem>
+                    <SelectItem value="directeur_ministere">Directeur de ministère</SelectItem>
+                    <SelectItem value="gouvernement">Gouvernement</SelectItem>
                     <SelectItem value="responsable_direction">Responsable Direction</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex flex-col gap-2">
-                <Label>Direction</Label>
-                <Select value={form.directionId} onValueChange={(v) => setForm({ ...form, directionId: v })}>
-                  <SelectTrigger><SelectValue placeholder="Aucune" /></SelectTrigger>
-                  <SelectContent>
-                    {directions.map((d) => (
-                      <SelectItem key={d.id} value={String(d.id)}>{d.nom}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {isDirecteur ? (
+                <div className="flex flex-col gap-2">
+                  <Label>Ministère *</Label>
+                  <Select value={form.ministereId} onValueChange={(v) => setForm({ ...form, ministereId: v, directionId: "" })}>
+                    <SelectTrigger><SelectValue placeholder="Choisir un ministère" /></SelectTrigger>
+                    <SelectContent>
+                      {ministeres.map((m) => (
+                        <SelectItem key={m.id} value={String(m.id)}>{m.nom}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <Label>Direction</Label>
+                  <Select value={form.directionId} onValueChange={(v) => setForm({ ...form, directionId: v })}>
+                    <SelectTrigger><SelectValue placeholder="Aucune" /></SelectTrigger>
+                    <SelectContent>
+                      {directions.map((d) => (
+                        <SelectItem key={d.id} value={String(d.id)}>{d.nom}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setDialogOpen(false)}>Annuler</Button>
-              <Button onClick={handleSave} disabled={saving || !form.email || !form.nom || !form.prenom || (!editItem && !form.motDePasse)}>
+              <Button
+                onClick={handleSave}
+                disabled={
+                  saving ||
+                  !form.email ||
+                  !form.nom ||
+                  !form.prenom ||
+                  (!editItem && !form.motDePasse) ||
+                  (isDirecteur && !form.ministereId)
+                }
+              >
                 {saving ? "Enregistrement..." : editItem ? "Modifier" : "Créer"}
               </Button>
             </DialogFooter>

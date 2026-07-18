@@ -14,12 +14,23 @@ export enum UserRole {
   AGENT_COURRIER = 'agent_courrier',
   AUDITEUR = 'auditeur',
   SUPER_ADMIN = 'super_admin',
-  ADMIN_MINISTERE = 'admin_ministere',
+  /** Ex-admin_ministere — un par ministère ; seul à AR/répondre aux posts gouv ciblés */
+  DIRECTEUR_MINISTERE = 'directeur_ministere',
+  /** Canal officiel État — publie actualités */
+  GOUVERNEMENT = 'gouvernement',
+}
+
+/** Alias legacy pour migration douce */
+export const LEGACY_ADMIN_MINISTERE = 'admin_ministere';
+
+export function normalizeRole(role: string | null | undefined): string {
+  if (!role) return '';
+  if (role === LEGACY_ADMIN_MINISTERE) return UserRole.DIRECTEUR_MINISTERE;
+  return role;
 }
 
 // Permissions prédéfinies
 export enum Permission {
-  // Courriers
   CREATE_COURRIER = 'create_courrier',
   READ_COURRIER = 'read_courrier',
   UPDATE_COURRIER = 'update_courrier',
@@ -27,20 +38,20 @@ export enum Permission {
   FORWARD_COURRIER = 'forward_courrier',
   ARCHIVE_COURRIER = 'archive_courrier',
 
-  // Administration
   MANAGE_MINISTERES = 'manage_ministeres',
   MANAGE_DIRECTIONS = 'manage_directions',
   MANAGE_UTILISATEURS = 'manage_utilisateurs',
 
-  // Pilotage
   VIEW_DASHBOARD = 'view_dashboard',
   VIEW_ANALYTICS = 'view_analytics',
 
-  // Audit
   VIEW_AUDIT_LOGS = 'view_audit_logs',
 
-  // IA
   USE_AI_FEATURES = 'use_ai_features',
+
+  MANAGE_PUBLICATIONS_GOUV = 'manage_publications_gouv',
+  READ_PUBLICATIONS_GOUV = 'read_publications_gouv',
+  REPLY_PUBLICATIONS_GOUV = 'reply_publications_gouv',
 }
 
 const OPERATIONAL_PERMISSIONS = [
@@ -52,15 +63,23 @@ const OPERATIONAL_PERMISSIONS = [
   Permission.USE_AI_FEATURES,
   Permission.VIEW_DASHBOARD,
   Permission.VIEW_ANALYTICS,
+  Permission.READ_PUBLICATIONS_GOUV,
 ];
 
-// Matrice rôles → permissions
 export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
-  [UserRole.SUPER_ADMIN]: Object.values(Permission),
-  [UserRole.ADMIN_MINISTERE]: [
+  [UserRole.SUPER_ADMIN]: Object.values(Permission).filter(
+    (p) => p !== Permission.MANAGE_PUBLICATIONS_GOUV && p !== Permission.REPLY_PUBLICATIONS_GOUV,
+  ),
+  [UserRole.DIRECTEUR_MINISTERE]: [
     ...OPERATIONAL_PERMISSIONS,
     Permission.MANAGE_DIRECTIONS,
     Permission.MANAGE_UTILISATEURS,
+    Permission.REPLY_PUBLICATIONS_GOUV,
+  ],
+  [UserRole.GOUVERNEMENT]: [
+    Permission.MANAGE_PUBLICATIONS_GOUV,
+    Permission.READ_PUBLICATIONS_GOUV,
+    Permission.VIEW_DASHBOARD,
   ],
   [UserRole.AGENT_COURRIER]: [
     Permission.CREATE_COURRIER,
@@ -70,6 +89,7 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     Permission.ARCHIVE_COURRIER,
     Permission.USE_AI_FEATURES,
     Permission.VIEW_DASHBOARD,
+    Permission.READ_PUBLICATIONS_GOUV,
   ],
   [UserRole.RESPONSABLE]: OPERATIONAL_PERMISSIONS,
   [UserRole.RESPONSABLE_DIRECTION]: OPERATIONAL_PERMISSIONS,
@@ -77,5 +97,13 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     Permission.READ_COURRIER,
     Permission.VIEW_AUDIT_LOGS,
     Permission.VIEW_ANALYTICS,
+    Permission.READ_PUBLICATIONS_GOUV,
+  ],
+  // Compat lecture seed/DB non migrée
+  [LEGACY_ADMIN_MINISTERE]: [
+    ...OPERATIONAL_PERMISSIONS,
+    Permission.MANAGE_DIRECTIONS,
+    Permission.MANAGE_UTILISATEURS,
+    Permission.REPLY_PUBLICATIONS_GOUV,
   ],
 };

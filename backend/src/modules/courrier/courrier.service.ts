@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException, Inject, BadRequestException } from '@nestjs/common';
+﻿import { Injectable, NotFoundException, ForbiddenException, Inject, BadRequestException } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../../infrastructure/database/database.provider';
 import type { DrizzleDB } from '../../infrastructure/database/database.provider';
 import {
@@ -121,17 +121,21 @@ export class CourrierService {
       const role = user[0].role;
       if (role === 'super_admin' || role === 'auditeur') {
         // Pas de filtre supplémentaire — vue globale
-      } else if (role === 'admin_ministere' && user[0].directionId) {
-        const [userDir] = await this.db
-          .select({ ministereId: directions.ministereId })
-          .from(directions)
-          .where(eq(directions.id, user[0].directionId))
-          .limit(1);
-        if (userDir?.ministereId) {
+      } else if (role === 'directeur_ministere') {
+        let ministereId = user[0].ministereId ?? null;
+        if (!ministereId && user[0].directionId) {
+          const [userDir] = await this.db
+            .select({ ministereId: directions.ministereId })
+            .from(directions)
+            .where(eq(directions.id, user[0].directionId))
+            .limit(1);
+          ministereId = userDir?.ministereId ?? null;
+        }
+        if (ministereId) {
           const dirs = await this.db
             .select({ id: directions.id })
             .from(directions)
-            .where(eq(directions.ministereId, userDir.ministereId));
+            .where(eq(directions.ministereId, ministereId));
           const dirIds = dirs.map((d) => d.id);
           if (dirIds.length > 0) {
             conditions.push(

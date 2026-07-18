@@ -18,6 +18,7 @@ export class NotificationService {
     titre: string;
     message?: string;
     courrierId?: number;
+    publicationId?: number;
   }) {
     const [notification] = await this.db
       .insert(notifications)
@@ -27,12 +28,71 @@ export class NotificationService {
         titre: data.titre,
         message: data.message || null,
         courrierId: data.courrierId || null,
+        publicationId: data.publicationId || null,
       })
       .returning();
 
     this.gateway.emitToUser(data.utilisateurId, 'notification', notification);
 
     return notification;
+  }
+
+  /** Notifie tous les utilisateurs métier (hors super_admin / gouvernement). */
+  async createForAllMinistereUsers(data: {
+    type: string;
+    titre: string;
+    message?: string;
+    publicationId?: number;
+    excludeUserId?: number;
+  }) {
+    const users = await this.db
+      .select({ id: utilisateurs.id, role: utilisateurs.role })
+      .from(utilisateurs);
+
+    for (const user of users) {
+      if (data.excludeUserId && user.id === data.excludeUserId) continue;
+      if (user.role === 'super_admin' || user.role === 'gouvernement') continue;
+      await this.create({
+        utilisateurId: user.id,
+        type: data.type,
+        titre: data.titre,
+        message: data.message,
+        publicationId: data.publicationId,
+      });
+    }
+  }
+
+  async createForMinistere(ministereId: number, data: {
+    type: string;
+    titre: string;
+    message?: string;
+    publicationId?: number;
+    excludeUserId?: number;
+  }) {
+    const viaDirection = await this.db
+      .select({ id: utilisateurs.id })
+      .from(utilisateurs)
+      .innerJoin(directions, eq(utilisateurs.directionId, directions.id))
+      .where(eq(directions.ministereId, ministereId));
+
+    const viaMinistere = await this.db
+      .select({ id: utilisateurs.id })
+      .from(utilisateurs)
+      .where(eq(utilisateurs.ministereId, ministereId));
+
+    const seen = new Set<number>();
+    for (const user of [...viaDirection, ...viaMinistere]) {
+      if (seen.has(user.id)) continue;
+      seen.add(user.id);
+      if (data.excludeUserId && user.id === data.excludeUserId) continue;
+      await this.create({
+        utilisateurId: user.id,
+        type: data.type,
+        titre: data.titre,
+        message: data.message,
+        publicationId: data.publicationId,
+      });
+    }
   }
 
   async createForDirection(directionId: number, data: {

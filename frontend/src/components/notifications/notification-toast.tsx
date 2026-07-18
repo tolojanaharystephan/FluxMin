@@ -9,9 +9,11 @@ import {
   Archive,
   CheckCircle2,
   MessageSquare,
+  Newspaper,
+  Landmark,
   X,
 } from "lucide-react";
-import { useNotifications } from "@/lib/use-notifications";
+import { notificationHref, useNotifications } from "@/lib/use-notifications";
 import { useAuthStore } from "@/lib/auth-store";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -22,6 +24,9 @@ const typeConfig: Record<string, { icon: React.ElementType; color: string; bg: s
   courrier_acuse: { icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-500/15" },
   courrier_archive: { icon: Archive, color: "text-zinc-400", bg: "bg-zinc-500/15" },
   message_discussion: { icon: MessageSquare, color: "text-teal-400", bg: "bg-teal-500/15" },
+  publication_gouv: { icon: Newspaper, color: "text-fuchsia-400", bg: "bg-fuchsia-500/15" },
+  publication_ar: { icon: CheckCircle2, color: "text-pink-400", bg: "bg-pink-500/15" },
+  publication_message: { icon: Landmark, color: "text-rose-300", bg: "bg-rose-500/15" },
 };
 
 const AUTO_DISMISS_MS = 8000;
@@ -57,11 +62,8 @@ export function NotificationToast() {
       }
     }
     dismissToast();
-    if (n.courrierId) {
-      router.push(`/courriers/${n.courrierId}`);
-    } else {
-      router.push("/notifications");
-    }
+    const href = notificationHref(n);
+    router.push(href || "/notifications");
   };
 
   return (

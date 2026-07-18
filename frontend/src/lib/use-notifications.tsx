@@ -12,8 +12,19 @@ export interface AppNotification {
   titre: string;
   message: string | null;
   courrierId: number | null;
+  publicationId?: number | null;
   lu?: boolean;
   createdAt?: string;
+}
+
+/** Cible de navigation pour une notification (courrier ou publication gouv). */
+export function notificationHref(n: {
+  courrierId?: number | null;
+  publicationId?: number | null;
+}): string | null {
+  if (n.publicationId) return `/actualites/${n.publicationId}`;
+  if (n.courrierId) return `/courriers/${n.courrierId}`;
+  return null;
 }
 
 interface NotificationsContextValue {

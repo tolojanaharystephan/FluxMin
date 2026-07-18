@@ -48,6 +48,9 @@
 | 17 juil. | Pas de services tiers pour la sécurité ? | **Accord initial.** Pas SendGrid / Mailgun / Firebase. Email = SMTP interne optionnel ; MinIO self-host (M7). |
 | 18 juil. | Souveraineté IA trop contraignante | **Assoupli.** OCR/extraction restent locaux ; **LLM** pour résumé / infos clés, avec grounding + validation humaine. |
 | 18 juil. | LLM only + GroqCloud | Résumé **uniquement LLM** (plus de NLP local) ; cascade Groq / OpenAI / OpenRouter / Claude / xAI / Gemini / Mistral. |
+| 18 juil. | Étendre au Gouvernement | Module **MG** : rôle `gouvernement` ; posts publics/ciblés ; AR/réponses par **directeur de ministère** uniquement. |
+| 18 juil. | Directeur sans direction | `directeur_ministere` rattaché au **ministère** (`ministereId`) uniquement, pas à une direction. |
+| 18 juil. | Hyperautomation M7 | **Backlog** après MG : Temporal (relances/escalades/délais), MinIO, process mining. |
 | 17 juil. | Que signifie finaliser notifs in-app ? | Toast, JWT WS, filtres, marquage lu. `message_discussion` = type de notif (icône bulle). |
 | 17 juil. | Rôle de l’IA avant M6 | **Assistant documentaire local** : OCR, résumé, routage, suggestions. **Validation humaine obligatoire** — pas de décision autonome. |
 | 17 juil. | Ne pas restreindre le périmètre IA | Périmètre complet (OCR + résumé + routage + suggestions + rédaction assistée), contrôle humain, scores, audit. |
@@ -93,8 +96,9 @@
 | **M3 Archivage** | ✅ | Durée/emplacement, rétention, scopes, désarchivage |
 | **M4 Audit** | ✅ | Search, reports, anomalies ; export CSV / PDF / XLSX / JSON |
 | **M5 Notifications** | ✅ | WS JWT, toast, filtres, discussion ; pas d’email SaaS |
-| **M6 IA** | ✅ | Nest ↔ FastAPI ; OCR local ; résumé LLM ou local ; multi-PJ ; validation humaine |
-| **M7 Temporal / MinIO** | ⏳ | Workflows + stockage objet réel |
+| **M6 IA** | ✅ | Nest ↔ FastAPI ; OCR local ; résumé LLM ; multi-PJ ; validation humaine |
+| **MG Communications Gouvernement** | ✅ | Actualités publiques/ciblées ; notifs ; AR + réponses (directeur ministère) |
+| **M7 Temporal / MinIO** | ⏳ | Backlog hyperautomation (après MG) |
 | **M8 Durcissement** | ⏳ | Tests critiques, Swagger, rate limit, monitoring |
 
 **Non priorisé immédiatement :** SSO/MFA fort, process mining avancé, K8s/Prometheus prod.
@@ -118,7 +122,9 @@
 
 | Email | Rôle | Usage démo |
 |-------|------|------------|
-| `admin@fluxmin.gouv.fr` | Super Admin | Admin, analytics, audit — **pas** messagerie |
+| `admin@fluxmin.gouv.fr` | Super Admin | Admin plateforme — **pas** messagerie / réponses gouv |
+| `gouvernement@fluxmin.gouv.fr` | Gouvernement | Publier actualités publiques / ciblées |
+| `directeur.mfa@fluxmin.gouv.fr` | Directeur MFA | Seul AR / réponses posts ciblés MFA |
 | `agent.courrier.mfa@fluxmin.gouv.fr` | Agent Courrier MFA | Cycle courrier, PJ, discussion, archivage |
 | `auditeur@fluxmin.gouv.fr` | Auditeur | Landing `/audit/search`, rapports, anomalies |
 | `responsable.dsi.mfa@fluxmin.gouv.fr` | Responsable DSI MFA | Pilotage direction |

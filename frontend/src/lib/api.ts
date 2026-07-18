@@ -595,6 +595,110 @@ class ApiClient {
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   }
+
+  // ── Communications Gouvernement ──
+  async listPublications(token: string, params?: { portee?: string; statut?: string }) {
+    const q = new URLSearchParams();
+    if (params?.portee) q.set('portee', params.portee);
+    if (params?.statut) q.set('statut', params.statut);
+    const qs = q.toString() ? `?${q.toString()}` : '';
+    return this.request(`/gouvernement/publications${qs}`, { token });
+  }
+
+  async getPublication(token: string, id: number) {
+    return this.request(`/gouvernement/publications/${id}`, { token });
+  }
+
+  async createPublication(token: string, body: Record<string, unknown>) {
+    return this.request(`/gouvernement/publications`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      token,
+    });
+  }
+
+  async publishPublication(token: string, id: number) {
+    return this.request(`/gouvernement/publications/${id}/publish`, {
+      method: 'POST',
+      token,
+    });
+  }
+
+  async archivePublication(token: string, id: number) {
+    return this.request(`/gouvernement/publications/${id}/archive`, {
+      method: 'POST',
+      token,
+    });
+  }
+
+  async uploadPublicationPj(token: string, id: number, file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetch(
+      `${this.baseUrl}/api/gouvernement/publications/${id}/pieces-jointes`,
+      { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: formData },
+    );
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Erreur réseau' }));
+      const msg = Array.isArray(error.message) ? error.message.join(', ') : error.message;
+      throw new Error(msg || `Erreur ${response.status}`);
+    }
+    return response.json();
+  }
+
+  async uploadPublicationPjBatch(token: string, id: number, files: File[]) {
+    if (files.length === 0) return [];
+    if (files.length === 1) {
+      return [await this.uploadPublicationPj(token, id, files[0])];
+    }
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append('files', file);
+    }
+    const response = await fetch(
+      `${this.baseUrl}/api/gouvernement/publications/${id}/pieces-jointes/batch`,
+      { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: formData },
+    );
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Erreur réseau' }));
+      const msg = Array.isArray(error.message) ? error.message.join(', ') : error.message;
+      throw new Error(msg || `Erreur ${response.status}`);
+    }
+    return response.json();
+  }
+
+  async downloadPublicationPj(token: string, id: number, pjId: number, filename: string) {
+    const response = await fetch(
+      `${this.baseUrl}/api/gouvernement/publications/${id}/pieces-jointes/${pjId}/download`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    if (!response.ok) throw new Error('Téléchargement impossible');
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }
+
+  async accuseReceptionPublication(token: string, id: number, commentaire?: string) {
+    return this.request(`/gouvernement/publications/${id}/accuse-reception`, {
+      method: 'POST',
+      body: JSON.stringify({ commentaire }),
+      token,
+    });
+  }
+
+  async sendPublicationMessage(token: string, id: number, contenu: string) {
+    return this.request(`/gouvernement/publications/${id}/messages`, {
+      method: 'POST',
+      body: JSON.stringify({ contenu }),
+      token,
+    });
+  }
 }
 
 export const api = new ApiClient(API_BASE);

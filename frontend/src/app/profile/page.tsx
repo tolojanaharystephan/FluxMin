@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { AppShell } from "@/components/layout/app-shell";
@@ -24,7 +24,7 @@ import {
 
 const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Administrateur",
-  admin_ministere: "Admin Ministère",
+  directeur_ministere: "Directeur de ministère",
   agent_courrier: "Agent Courrier",
   responsable: "Responsable",
   responsable_direction: "Responsable Direction",

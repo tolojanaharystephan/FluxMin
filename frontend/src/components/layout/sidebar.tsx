@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -32,6 +32,9 @@ import {
   FileSearch,
   AlertTriangle,
   LayoutDashboard,
+  Newspaper,
+  Landmark,
+  PenSquare,
 } from "lucide-react";
 
 interface NavItem {
@@ -50,7 +53,7 @@ const dashboardNav: NavItem[] = [
     label: "Tableau de bord",
     href: "/dashboard",
     icon: LayoutDashboard,
-    roles: ["super_admin", "admin_ministere", "responsable", "responsable_direction", "agent_courrier"],
+    roles: ["super_admin", "directeur_ministere", "responsable", "responsable_direction", "agent_courrier"],
     iconColor: "text-sky-400",
     iconBg: "bg-sky-500/15",
   },
@@ -61,7 +64,7 @@ const messagerieNav: NavItem[] = [
     label: "Boîte de réception",
     href: "/inbox",
     icon: Inbox,
-    roles: ["agent_courrier", "responsable", "responsable_direction", "admin_ministere"],
+    roles: ["agent_courrier", "responsable", "responsable_direction", "directeur_ministere"],
     iconColor: "text-teal-400",
     iconBg: "bg-teal-500/15",
   },
@@ -69,7 +72,7 @@ const messagerieNav: NavItem[] = [
     label: "Courriers envoyés",
     href: "/sent",
     icon: Send,
-    roles: ["agent_courrier", "responsable", "responsable_direction", "admin_ministere"],
+    roles: ["agent_courrier", "responsable", "responsable_direction", "directeur_ministere"],
     iconColor: "text-emerald-400",
     iconBg: "bg-emerald-500/15",
   },
@@ -77,7 +80,7 @@ const messagerieNav: NavItem[] = [
     label: "Brouillons",
     href: "/drafts",
     icon: FileText,
-    roles: ["agent_courrier", "responsable", "responsable_direction", "admin_ministere"],
+    roles: ["agent_courrier", "responsable", "responsable_direction", "directeur_ministere"],
     iconColor: "text-amber-400",
     iconBg: "bg-amber-500/15",
   },
@@ -85,9 +88,51 @@ const messagerieNav: NavItem[] = [
     label: "Archives",
     href: "/archives",
     icon: Archive,
-    roles: ["agent_courrier", "responsable", "responsable_direction", "admin_ministere", "auditeur"],
+    roles: ["agent_courrier", "responsable", "responsable_direction", "directeur_ministere", "auditeur"],
     iconColor: "text-orange-400",
     iconBg: "bg-orange-500/15",
+  },
+];
+
+const actualitesNav: NavItem[] = [
+  {
+    label: "Actualités générales",
+    href: "/actualites",
+    icon: Newspaper,
+    roles: [
+      "gouvernement",
+      "directeur_ministere",
+      "agent_courrier",
+      "responsable",
+      "responsable_direction",
+      "admin_ministere",
+      "auditeur",
+    ],
+    iconColor: "text-fuchsia-400",
+    iconBg: "bg-fuchsia-500/15",
+  },
+  {
+    label: "Actualités ministère",
+    href: "/actualites/ministere",
+    icon: Landmark,
+    roles: [
+      "gouvernement",
+      "directeur_ministere",
+      "agent_courrier",
+      "responsable",
+      "responsable_direction",
+      "admin_ministere",
+    ],
+    iconColor: "text-pink-400",
+    iconBg: "bg-pink-500/15",
+  },
+  {
+    label: "Publier",
+    href: "/gouvernement/publier",
+    icon: PenSquare,
+    roles: ["gouvernement"],
+    iconColor: "text-rose-300",
+    iconBg: "bg-rose-500/15",
   },
 ];
 
@@ -96,7 +141,7 @@ const iaNav: NavItem[] = [
     label: "Suggestions IA",
     href: "/ai/suggestions",
     icon: Sparkles,
-    roles: ["responsable", "agent_courrier", "responsable_direction"],
+    roles: ["responsable", "agent_courrier", "responsable_direction", "directeur_ministere"],
     iconColor: "text-cyan-400",
     iconBg: "bg-cyan-500/15",
   },
@@ -107,7 +152,7 @@ const adminNav: NavItem[] = [
     label: "Ministères",
     href: "/admin/ministeres",
     icon: Building2,
-    roles: ["super_admin", "admin_ministere"],
+    roles: ["super_admin", "directeur_ministere"],
     iconColor: "text-indigo-400",
     iconBg: "bg-indigo-500/15",
   },
@@ -115,7 +160,7 @@ const adminNav: NavItem[] = [
     label: "Directions",
     href: "/admin/directions",
     icon: Users,
-    roles: ["super_admin", "admin_ministere", "agent_courrier"],
+    roles: ["super_admin", "directeur_ministere", "agent_courrier"],
     iconColor: "text-violet-400",
     iconBg: "bg-violet-500/15",
   },
@@ -123,7 +168,7 @@ const adminNav: NavItem[] = [
     label: "Utilisateurs",
     href: "/admin/utilisateurs",
     icon: Shield,
-    roles: ["super_admin", "admin_ministere"],
+    roles: ["super_admin", "directeur_ministere"],
     iconColor: "text-rose-400",
     iconBg: "bg-rose-500/15",
   },
@@ -131,7 +176,7 @@ const adminNav: NavItem[] = [
     label: "Analytics",
     href: "/analytics",
     icon: BarChart3,
-    roles: ["super_admin", "admin_ministere", "responsable", "responsable_direction", "auditeur"],
+    roles: ["super_admin", "directeur_ministere", "responsable", "responsable_direction", "auditeur"],
     iconColor: "text-blue-400",
     iconBg: "bg-blue-500/15",
   },
@@ -166,7 +211,9 @@ const auditNav: NavItem[] = [
 
 const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Administrateur",
-  admin_ministere: "Admin Ministère",
+  directeur_ministere: "Directeur de ministère",
+  admin_ministere: "Directeur de ministère",
+  gouvernement: "Gouvernement",
   agent_courrier: "Agent Courrier",
   responsable: "Responsable",
   responsable_direction: "Responsable Direction",
@@ -187,15 +234,29 @@ export function Sidebar() {
 
   const visibleDashboard = dashboardNav.filter((item) => hasRole(item.roles));
   const visibleMessagerie = messagerieNav.filter((item) => hasRole(item.roles));
+  const visibleActualites = actualitesNav.filter((item) => hasRole(item.roles));
   const visibleIa = iaNav.filter((item) => hasRole(item.roles));
   const visibleAdmin = adminNav.filter((item) => hasRole(item.roles));
   const visibleAudit = auditNav.filter((item) => hasRole(item.roles));
 
   const showDashboardSection = visibleDashboard.length > 0;
   const showMessagerieSection = visibleMessagerie.length > 0;
+  const showActualitesSection = visibleActualites.length > 0;
   const showAdminSection = visibleAdmin.length > 0;
   const showAuditSection = visibleAudit.length > 0;
   const showIaSection = visibleIa.length > 0;
+
+  /** Préfixe le plus long gagnant — évite que /actualites reste actif sur /actualites/ministere */
+  const allNavHrefs = [
+    ...visibleDashboard,
+    ...visibleMessagerie,
+    ...visibleActualites,
+    ...visibleIa,
+    ...visibleAudit,
+    ...visibleAdmin,
+    { href: "/settings" },
+  ].map((item) => item.href);
+  const activeHref = resolveActiveHref(pathname, allNavHrefs);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -233,7 +294,7 @@ export function Sidebar() {
               )}
               <nav className="flex flex-col gap-1">
                 {visibleDashboard.map((item) => (
-                  <NavLink key={item.href} item={item} collapsed={collapsed} pathname={pathname} />
+                  <NavLink key={item.href} item={item} collapsed={collapsed} active={activeHref === item.href} />
                 ))}
               </nav>
             </div>
@@ -248,10 +309,28 @@ export function Sidebar() {
               )}
               <nav className="flex flex-col gap-1">
                 {visibleMessagerie.map((item) => (
-                  <NavLink key={item.href} item={item} collapsed={collapsed} pathname={pathname} />
+                  <NavLink key={item.href} item={item} collapsed={collapsed} active={activeHref === item.href} />
                 ))}
               </nav>
             </div>
+          )}
+
+          {showActualitesSection && (
+            <>
+              <Separator className="mb-4 bg-sidebar-border" />
+              <div className="mb-4">
+                {!collapsed && (
+                  <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    Gouvernement
+                  </p>
+                )}
+                <nav className="flex flex-col gap-1">
+                  {visibleActualites.map((item) => (
+                    <NavLink key={item.href} item={item} collapsed={collapsed} active={activeHref === item.href} />
+                  ))}
+                </nav>
+              </div>
+            </>
           )}
 
           {showIaSection && (
@@ -265,7 +344,7 @@ export function Sidebar() {
                 )}
                 <nav className="flex flex-col gap-1">
                   {visibleIa.map((item) => (
-                    <NavLink key={item.href} item={item} collapsed={collapsed} pathname={pathname} />
+                    <NavLink key={item.href} item={item} collapsed={collapsed} active={activeHref === item.href} />
                   ))}
                 </nav>
               </div>
@@ -283,7 +362,7 @@ export function Sidebar() {
                 )}
                 <nav className="flex flex-col gap-1">
                   {visibleAudit.map((item) => (
-                    <NavLink key={item.href} item={item} collapsed={collapsed} pathname={pathname} />
+                    <NavLink key={item.href} item={item} collapsed={collapsed} active={activeHref === item.href} />
                   ))}
                 </nav>
               </div>
@@ -301,7 +380,7 @@ export function Sidebar() {
                 )}
                 <nav className="flex flex-col gap-1">
                   {visibleAdmin.map((item) => (
-                    <NavLink key={item.href} item={item} collapsed={collapsed} pathname={pathname} />
+                    <NavLink key={item.href} item={item} collapsed={collapsed} active={activeHref === item.href} />
                   ))}
                 </nav>
               </div>
@@ -320,7 +399,7 @@ export function Sidebar() {
               iconBg: "bg-zinc-500/15",
             }}
             collapsed={collapsed}
-            pathname={pathname}
+            active={activeHref === "/settings"}
           />
           <Button
             variant="ghost"
@@ -336,16 +415,24 @@ export function Sidebar() {
   );
 }
 
+function resolveActiveHref(pathname: string, hrefs: string[]): string | null {
+  const matches = hrefs.filter(
+    (href) => pathname === href || pathname.startsWith(`${href}/`),
+  );
+  if (matches.length === 0) return null;
+  return matches.reduce((best, href) => (href.length > best.length ? href : best));
+}
+
 function NavLink({
   item,
   collapsed,
-  pathname,
+  active,
 }: {
   item: NavItem;
   collapsed: boolean;
-  pathname: string;
+  active: boolean;
 }) {
-  const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+  const isActive = active;
   const Icon = item.icon;
 
   const link = (

@@ -102,6 +102,7 @@ export class AuthService {
         role: utilisateurs.role,
         permissions: utilisateurs.permissions,
         directionId: utilisateurs.directionId,
+        ministereId: utilisateurs.ministereId,
         createdAt: utilisateurs.createdAt,
       })
       .from(utilisateurs)
@@ -148,6 +149,29 @@ export class AuthService {
           ministereCode: ministere?.code || null,
         };
       }
+    }
+
+    // Directeur / utilisateurs rattachés au ministère sans direction
+    if (user.ministereId) {
+      const [ministere] = await this.db
+        .select({
+          id: ministeres.id,
+          nom: ministeres.nom,
+          code: ministeres.code,
+        })
+        .from(ministeres)
+        .where(eq(ministeres.id, user.ministereId))
+        .limit(1);
+
+      return {
+        ...user,
+        permissions,
+        directionNom: null,
+        directionType: null,
+        ministereId: user.ministereId,
+        ministereNom: ministere?.nom || null,
+        ministereCode: ministere?.code || null,
+      };
     }
 
     return {
@@ -235,6 +259,15 @@ export class AuthService {
       }
     }
 
+    if (user.ministereId) {
+      const [ministere] = await this.db
+        .select()
+        .from(ministeres)
+        .where(eq(ministeres.id, user.ministereId))
+        .limit(1);
+      return { ...user, direction: null, ministere: ministere ?? null };
+    }
+
     return { ...user, direction: null, ministere: null };
   }
 
@@ -262,6 +295,15 @@ export class AuthService {
           .limit(1);
         ministereNom = ministere?.nom || null;
       }
+    } else if (user.ministereId) {
+      ministereId = user.ministereId;
+      directionId = null;
+      const [ministere] = await this.db
+        .select()
+        .from(ministeres)
+        .where(eq(ministeres.id, user.ministereId))
+        .limit(1);
+      ministereNom = ministere?.nom || null;
     }
 
     const permissions = this.resolvePermissions(user.role || '', user.permissions);

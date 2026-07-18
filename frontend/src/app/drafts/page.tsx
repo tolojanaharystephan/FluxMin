@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -82,7 +82,7 @@ export default function DraftsPage() {
   return (
     <AuthGuard>
       <RBACGuard
-        allowedRoles={["agent_courrier", "responsable", "responsable_direction", "admin_ministere"]}
+        allowedRoles={["agent_courrier", "responsable", "responsable_direction", "directeur_ministere"]}
       >
       <AppShell>
         <div className="flex flex-col gap-6 animate-fade-in">

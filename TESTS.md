@@ -195,14 +195,34 @@
 
 ---
 
+## 8. Communications Gouvernement (MG)
+
+| # | Action | Résultat attendu | ☐ |
+|---|--------|------------------|---|
+| 8.1 | Login `gouvernement@…` → menu Publier | Formulaire accessible | ☐ |
+| 8.2 | Publier communiqué **public** | Visible dans Actualités générales ; notif tous ministères | ☐ |
+| 8.2a | Clic notif `publication_gouv` (liste ou toast) | Ouvre `/actualites/:id` pour tout utilisateur notifié | ☐ |
+| 8.2b | Joindre **1 ou plusieurs** fichiers à la publication | Zone drag & drop ; PJ listées + téléchargeables sur le détail | ☐ |
+| 8.2c | Ajouter des PJ depuis le détail (rôle gouvernement) | Fichiers uploadés et visibles après refresh | ☐ |
+| 8.3 | Publier **ordre ciblé MFA** + PJ | Visible Actualités ministère (users MFA) ; pas MINJUS | ☐ |
+| 8.4 | Agent MFA ouvre le post ciblé | Lecture OK ; **pas** de bouton AR | ☐ |
+| 8.5 | `directeur.mfa@…` AR + message | AR enregistré ; notif Gouvernement | ☐ |
+| 8.6 | Directeur MINJUS tente AR sur post MFA | Refus / pas de droit | ☐ |
+| 8.7 | Gouvernement répond dans le fil | Message visible côté MFA | ☐ |
+
+---
+
 ## Comptes de test
 
 | Rôle | Email | Mot de passe |
 |------|-------|-------------|
 | Super Admin | admin@fluxmin.gouv.fr | fluxmin2026 |
-| Admin Courrier MFA | agent.courrier.mfa@fluxmin.gouv.fr | fluxmin2026 |
+| Gouvernement | gouvernement@fluxmin.gouv.fr | fluxmin2026 |
+| Directeur MFA | directeur.mfa@fluxmin.gouv.fr | fluxmin2026 |
+| Directeur MINJUS | directeur.minjus@fluxmin.gouv.fr | fluxmin2026 |
+| Agent Courrier MFA | agent.courrier.mfa@fluxmin.gouv.fr | fluxmin2026 |
 | Responsable DSI MFA | responsable.dsi.mfa@fluxmin.gouv.fr | fluxmin2026 |
 | Agent DSI MFA | agent.dsi.mfa@fluxmin.gouv.fr | fluxmin2026 |
-| Admin Courrier MINJUS | agent.courrier.minjus@fluxmin.gouv.fr | fluxmin2026 |
+| Agent Courrier MINJUS | agent.courrier.minjus@fluxmin.gouv.fr | fluxmin2026 |
 | Responsable DAF MINJUS | responsable.daf.minjus@fluxmin.gouv.fr | fluxmin2026 |
 | Auditeur | auditeur@fluxmin.gouv.fr | fluxmin2026 |

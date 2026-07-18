@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -39,7 +39,8 @@ function getInitials(nom?: string, prenom?: string): string {
 
 const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Administrateur",
-  admin_ministere: "Admin Ministère",
+  directeur_ministere: "Directeur de ministère",
+  gouvernement: "Gouvernement",
   agent_courrier: "Agent Courrier",
   responsable: "Responsable",
   responsable_direction: "Responsable Direction",

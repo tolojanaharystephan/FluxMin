@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -70,7 +70,7 @@ export default function AnalyticsPage() {
 
   return (
     <AuthGuard>
-      <RBACGuard allowedRoles={["super_admin", "admin_ministere", "responsable", "responsable_direction", "auditeur"]}>
+      <RBACGuard allowedRoles={["super_admin", "directeur_ministere", "responsable", "responsable_direction", "auditeur"]}>
         <AppShell>
           <div className="flex flex-col gap-6 animate-fade-in">
             <div className="flex items-center justify-between">

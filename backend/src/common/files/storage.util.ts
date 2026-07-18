@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, unlinkSync } from 'fs';
 
 export const UPLOADS_ROOT = join(process.cwd(), 'uploads');
 export const MESSAGES_UPLOAD_DIR = join(UPLOADS_ROOT, 'messages');
+export const PUBLICATIONS_UPLOAD_DIR = join(UPLOADS_ROOT, 'publications');
 
 export const ALLOWED_UPLOAD_EXTENSIONS = [
   '.pdf',
@@ -54,11 +55,17 @@ export const MESSAGE_MAX_FILE_BYTES = 20 * 1024 * 1024;
 export function ensureUploadDirs() {
   if (!existsSync(UPLOADS_ROOT)) mkdirSync(UPLOADS_ROOT, { recursive: true });
   if (!existsSync(MESSAGES_UPLOAD_DIR)) mkdirSync(MESSAGES_UPLOAD_DIR, { recursive: true });
+  if (!existsSync(PUBLICATIONS_UPLOAD_DIR)) mkdirSync(PUBLICATIONS_UPLOAD_DIR, { recursive: true });
 }
 
 /** Relative path stored in DB (never store Multer absolute paths on Windows). */
-export function relativeUploadPath(filename: string, folder: 'root' | 'messages' = 'root') {
-  return folder === 'messages' ? `uploads/messages/${filename}` : `uploads/${filename}`;
+export function relativeUploadPath(
+  filename: string,
+  folder: 'root' | 'messages' | 'publications' = 'root',
+) {
+  if (folder === 'messages') return `uploads/messages/${filename}`;
+  if (folder === 'publications') return `uploads/publications/${filename}`;
+  return `uploads/${filename}`;
 }
 
 /**

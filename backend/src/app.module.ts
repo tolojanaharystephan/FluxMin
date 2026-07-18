@@ -12,6 +12,7 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { MessagingModule } from './modules/messaging/messaging.module';
 import { StatsModule } from './modules/stats/stats.module';
 import { AiModule } from './modules/ai/ai.module';
+import { GouvernementModule } from './modules/gouvernement/gouvernement.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { AuditInterceptor } from './common/interceptors/audit.interceptor';
@@ -28,6 +29,7 @@ import { AuditInterceptor } from './common/interceptors/audit.interceptor';
     MessagingModule,
     StatsModule,
     AiModule,
+    GouvernementModule,
   ],
   controllers: [AppController],
   providers: [

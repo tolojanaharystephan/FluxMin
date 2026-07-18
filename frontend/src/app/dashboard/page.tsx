@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import Link from "next/link";
@@ -32,7 +32,7 @@ import {
 
 const ROLE_LABELS: Record<string, string> = {
   super_admin: "Super Administrateur",
-  admin_ministere: "Admin Ministère",
+  directeur_ministere: "Directeur de ministère",
   agent_courrier: "Agent Courrier",
   responsable: "Responsable",
   responsable_direction: "Responsable Direction",
@@ -103,7 +103,7 @@ export default function DashboardPage() {
   return (
     <AuthGuard>
       <RBACGuard
-        allowedRoles={["super_admin", "admin_ministere", "responsable", "responsable_direction", "agent_courrier"]}
+        allowedRoles={["super_admin", "directeur_ministere", "responsable", "responsable_direction", "agent_courrier"]}
       >
         <AppShell>
           <div className="flex flex-col gap-6 animate-fade-in">
@@ -111,7 +111,7 @@ export default function DashboardPage() {
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">
                   {userRole === "super_admin" && "Vue globale multi-ministères"}
-                  {userRole === "admin_ministere" && "Dashboard Ministère"}
+                  {userRole === "directeur_ministere" && "Dashboard Directeur de ministère"}
                   {userRole === "responsable" && "Dashboard Responsable"}
                   {userRole === "responsable_direction" && "Dashboard Direction"}
                   {userRole === "agent_courrier" && "Tableau de bord Agent"}

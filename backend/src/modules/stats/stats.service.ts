@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+﻿import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../../infrastructure/database/database.provider';
 import type { DrizzleDB } from '../../infrastructure/database/database.provider';
 import {
@@ -44,23 +44,23 @@ export class StatsService {
 
     if (!user) throw new NotFoundException('Utilisateur introuvable');
 
-    let ministereId: number | null = null;
+    let ministereId: number | null = user.ministereId ?? null;
     let directionIdsInMinistere: number[] = [];
 
-    if (user.directionId) {
+    if (!ministereId && user.directionId) {
       const [dir] = await this.db
         .select()
         .from(directions)
         .where(eq(directions.id, user.directionId))
         .limit(1);
       ministereId = dir?.ministereId ?? null;
-      if (ministereId) {
-        const dirs = await this.db
-          .select({ id: directions.id })
-          .from(directions)
-          .where(eq(directions.ministereId, ministereId));
-        directionIdsInMinistere = dirs.map((d) => d.id);
-      }
+    }
+    if (ministereId) {
+      const dirs = await this.db
+        .select({ id: directions.id })
+        .from(directions)
+        .where(eq(directions.ministereId, ministereId));
+      directionIdsInMinistere = dirs.map((d) => d.id);
     }
 
     return {
@@ -77,7 +77,7 @@ export class StatsService {
     if (scope.role === 'super_admin' || scope.role === 'auditeur') {
       return sql`1 = 1`;
     }
-    if (scope.role === 'admin_ministere' && scope.directionIdsInMinistere.length > 0) {
+    if (scope.role === 'directeur_ministere' && scope.directionIdsInMinistere.length > 0) {
       return or(
         inArray(courriers.destinataireDirectionId, scope.directionIdsInMinistere),
         inArray(courriers.directionEmetteurId, scope.directionIdsInMinistere),
@@ -296,7 +296,7 @@ export class StatsService {
       ];
     }
 
-    if (role === 'admin_ministere') {
+    if (role === 'directeur_ministere') {
       return [
         { key: 'total', label: 'Courriers du ministère', value: data.total, changePct: vol.changePct, trend: vol.trend },
         { key: 'directions', label: 'Directions', value: data.directionsCount, changePct: null, trend: 'flat' as const },

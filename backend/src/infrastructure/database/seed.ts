@@ -17,6 +17,13 @@ const runSeed = async () => {
 
   // 1. Nettoyer les tables existantes (ordre FK)
   console.log('Cleaning existing tables...');
+  await db.delete(schema.publicationLectures);
+  await db.delete(schema.publicationMessages);
+  await db.delete(schema.publicationAccuses);
+  await db.delete(schema.publicationPiecesJointes);
+  await db.delete(schema.publicationsGouvernement);
+  await db.delete(schema.anomalyResolutions);
+  await db.delete(schema.auditReports);
   await db.delete(schema.auditLogs);
   await db.delete(schema.archives);
   await db.delete(schema.messagePiecesJointes);
@@ -224,6 +231,92 @@ const runSeed = async () => {
     },
   ]).returning();
 
+  // ── Gouvernement (canal officiel) ──
+  const [userGouvernement] = await db.insert(schema.utilisateurs).values([
+    {
+      directionId: null,
+      email: 'gouvernement@fluxmin.gouv.fr',
+      nom: 'Rabenoro',
+      prenom: 'Soa',
+      role: 'gouvernement',
+      permissions: {},
+      motDePasse: hashedMdp,
+    },
+  ]).returning();
+
+  // ── Directeurs de ministère (un par ministère) ──
+  // Directeurs : rattachés au ministère uniquement (pas de direction)
+  const [dirMfa, dirMinjus, dirMcc] = await db.insert(schema.utilisateurs).values([
+    {
+      directionId: null,
+      ministereId: mfa.id,
+      email: 'directeur.mfa@fluxmin.gouv.fr',
+      nom: 'Razafy',
+      prenom: 'Mamy',
+      role: 'directeur_ministere',
+      permissions: {},
+      motDePasse: hashedMdp,
+    },
+    {
+      directionId: null,
+      ministereId: minjus.id,
+      email: 'directeur.minjus@fluxmin.gouv.fr',
+      nom: 'Ravelo',
+      prenom: 'Hasina',
+      role: 'directeur_ministere',
+      permissions: {},
+      motDePasse: hashedMdp,
+    },
+    {
+      directionId: null,
+      ministereId: mcc.id,
+      email: 'directeur.mcc@fluxmin.gouv.fr',
+      nom: 'Andrianina',
+      prenom: 'Lalao',
+      role: 'directeur_ministere',
+      permissions: {},
+      motDePasse: hashedMdp,
+    },
+  ]).returning();
+
+  // Publications gouvernement démo
+  console.log('Inserting publications gouvernement...');
+  const [pubPublic] = await db.insert(schema.publicationsGouvernement).values([
+    {
+      titre: 'Communiqué — Semaine de la modernisation administrative',
+      corps:
+        'Le Gouvernement invite tous les ministères à participer à la semaine de modernisation des services publics du 21 au 25 juillet 2026. Des ateliers de formation FluxMin seront organisés.',
+      typePublication: 'communique',
+      priorite: 'normale',
+      portee: 'public',
+      ministereId: null,
+      statut: 'publie',
+      auteurId: userGouvernement.id,
+      datePublication: new Date(),
+    },
+  ]).returning();
+
+  const [pubCible] = await db.insert(schema.publicationsGouvernement).values([
+    {
+      titre: 'Ordre de mission — Audit de cybersécurité MFA',
+      corps:
+        'Le Ministère des Forces Armées est invité à préparer un rapport de cybersécurité pour le 30 juillet 2026. Merci d\'accuser réception et de confirmer le calendrier.',
+      typePublication: 'ordre',
+      priorite: 'haute',
+      portee: 'ministere',
+      ministereId: mfa.id,
+      statut: 'publie',
+      auteurId: userGouvernement.id,
+      datePublication: new Date(),
+    },
+  ]).returning();
+
+  void pubPublic;
+  void pubCible;
+  void dirMfa;
+  void dirMinjus;
+  void dirMcc;
+
   // 5. Insérer des courriers de démo illustrant les flux
   console.log('Inserting courriers...');
 
@@ -423,6 +516,12 @@ const runSeed = async () => {
   console.log('  COMPTES DE DÉMO');
   console.log('═══════════════════════════════════════════════');
   console.log('  Super Admin   : admin@fluxmin.gouv.fr');
+  console.log('  Gouvernement  : gouvernement@fluxmin.gouv.fr');
+  console.log('');
+  console.log('  Directeurs de ministère :');
+  console.log('    MFA         : directeur.mfa@fluxmin.gouv.fr');
+  console.log('    MINJUS      : directeur.minjus@fluxmin.gouv.fr');
+  console.log('    MCC         : directeur.mcc@fluxmin.gouv.fr');
   console.log('');
   console.log('  MFA :');
   console.log('    Courrier    : agent.courrier.mfa@fluxmin.gouv.fr');

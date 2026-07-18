@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber, IsObject, MinLength, MaxLength, IsEmail } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsObject, MinLength, MaxLength, IsEmail, ValidateIf } from 'class-validator';
 
 // ─── Ministeres ───
 export class CreateMinistereDto {
@@ -80,7 +80,14 @@ export class CreateUtilisateurDto {
 
   @IsNumber()
   @IsOptional()
-  directionId?: number;
+  @ValidateIf((_, v) => v !== null)
+  directionId?: number | null;
+
+  /** Pour directeur_ministere : ministère sans direction */
+  @IsNumber()
+  @IsOptional()
+  @ValidateIf((_, v) => v !== null)
+  ministereId?: number | null;
 
   @IsString()
   @IsOptional()
@@ -115,7 +122,13 @@ export class UpdateUtilisateurDto {
 
   @IsNumber()
   @IsOptional()
-  directionId?: number;
+  @ValidateIf((_, v) => v !== null)
+  directionId?: number | null;
+
+  @IsNumber()
+  @IsOptional()
+  @ValidateIf((_, v) => v !== null)
+  ministereId?: number | null;
 
   @IsString()
   @IsOptional()

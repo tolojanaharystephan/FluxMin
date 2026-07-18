@@ -5,7 +5,12 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ROLES_KEY, PERMISSIONS_KEY, ROLE_PERMISSIONS } from '../types/roles';
+import {
+  ROLES_KEY,
+  PERMISSIONS_KEY,
+  ROLE_PERMISSIONS,
+  normalizeRole,
+} from '../types/roles';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 @Injectable()
@@ -39,9 +44,13 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('Utilisateur non authentifié');
     }
 
+    const userRole = normalizeRole(user.role);
+
     // Vérification des rôles
     if (requiredRoles && requiredRoles.length > 0) {
-      const hasRole = requiredRoles.some((role) => user.role === role);
+      const hasRole = requiredRoles.some(
+        (role) => userRole === normalizeRole(role) || user.role === role,
+      );
       if (!hasRole) {
         throw new ForbiddenException(
           `Accès refusé. Rôle requis: ${requiredRoles.join(', ')}`,
@@ -51,7 +60,7 @@ export class RolesGuard implements CanActivate {
 
     // Vérification des permissions
     if (requiredPermissions && requiredPermissions.length > 0) {
-      const userPermissions = ROLE_PERMISSIONS[user.role] || [];
+      const userPermissions = ROLE_PERMISSIONS[userRole] || ROLE_PERMISSIONS[user.role] || [];
       const customPermissions = user.permissions
         ? Object.keys(user.permissions).filter((k) => user.permissions[k] === true)
         : [];

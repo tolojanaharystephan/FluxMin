@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException, Inject } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException, Inject } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../../infrastructure/database/database.provider';
 import type { DrizzleDB } from '../../infrastructure/database/database.provider';
 import {
@@ -16,12 +16,33 @@ import {
   CreateUtilisateurDto,
   UpdateUtilisateurDto,
 } from './dto/admin.dto';
+import { UserRole } from '../../common/types/roles';
 
 @Injectable()
 export class AdminService {
   constructor(
     @Inject(DATABASE_CONNECTION) private db: DrizzleDB,
   ) {}
+
+  /** Directeur de ministère : ministère obligatoire, jamais de direction */
+  private normalizeUtilisateurRattachement(dto: {
+    role?: string;
+    directionId?: number | null;
+    ministereId?: number | null;
+  }) {
+    if (dto.role === UserRole.DIRECTEUR_MINISTERE) {
+      if (!dto.ministereId) {
+        throw new BadRequestException(
+          'Un directeur de ministère doit être rattaché à un ministère (sans direction)',
+        );
+      }
+      return { directionId: null as null, ministereId: dto.ministereId };
+    }
+    return {
+      directionId: dto.directionId ?? null,
+      ministereId: dto.ministereId ?? null,
+    };
+  }
 
   // ═══════════════════════════════════════════
   // MINISTERES
@@ -162,6 +183,7 @@ export class AdminService {
         role: utilisateurs.role,
         permissions: utilisateurs.permissions,
         directionId: utilisateurs.directionId,
+        ministereId: utilisateurs.ministereId,
         createdAt: utilisateurs.createdAt,
       })
       .from(utilisateurs)
@@ -179,6 +201,7 @@ export class AdminService {
         role: utilisateurs.role,
         permissions: utilisateurs.permissions,
         directionId: utilisateurs.directionId,
+        ministereId: utilisateurs.ministereId,
         createdAt: utilisateurs.createdAt,
       })
       .from(utilisateurs)
@@ -189,12 +212,22 @@ export class AdminService {
   }
 
   async createUtilisateur(dto: CreateUtilisateurDto) {
+    const rattachement = this.normalizeUtilisateurRattachement(dto);
+    if (rattachement.ministereId) {
+      await this.findMinistereById(rattachement.ministereId);
+    }
     const hashedPassword = await bcrypt.hash(dto.motDePasse, 10);
     try {
       const [result] = await this.db
         .insert(utilisateurs)
         .values({
-          ...dto,
+          email: dto.email,
+          nom: dto.nom,
+          prenom: dto.prenom,
+          role: dto.role,
+          permissions: dto.permissions,
+          directionId: rattachement.directionId,
+          ministereId: rattachement.ministereId,
           motDePasse: hashedPassword,
         })
         .returning();
@@ -210,11 +243,27 @@ export class AdminService {
   }
 
   async updateUtilisateur(id: number, dto: UpdateUtilisateurDto) {
-    await this.findUtilisateurById(id);
-    const updateData: any = { ...dto };
+    const existing = await this.findUtilisateurById(id);
+    const role = dto.role ?? existing.role ?? undefined;
+    const rattachement = this.normalizeUtilisateurRattachement({
+      role,
+      directionId: dto.directionId !== undefined ? dto.directionId : existing.directionId,
+      ministereId: dto.ministereId !== undefined ? dto.ministereId : existing.ministereId,
+    });
+    if (rattachement.ministereId) {
+      await this.findMinistereById(rattachement.ministereId);
+    }
+
+    const updateData: any = {
+      ...dto,
+      directionId: rattachement.directionId,
+      ministereId: rattachement.ministereId,
+    };
 
     if (dto.motDePasse) {
       updateData.motDePasse = await bcrypt.hash(dto.motDePasse, 10);
+    } else {
+      delete updateData.motDePasse;
     }
 
     const [result] = await this.db

@@ -27,10 +27,12 @@ export const directions = pgTable('directions', {
 export const utilisateurs = pgTable('utilisateurs', {
   id: serial('id').primaryKey(),
   directionId: integer('direction_id').references(() => directions.id),
+  /** Rattachement ministère sans direction (ex. directeur_ministere) */
+  ministereId: integer('ministere_id').references(() => ministeres.id),
   email: varchar('email', { length: 255 }).unique().notNull(),
   nom: varchar('nom', { length: 100 }),
   prenom: varchar('prenom', { length: 100 }),
-  role: varchar('role', { length: 50 }), // 'responsable', 'agent_courrier', 'auditeur', 'super_admin', 'admin_ministere', 'responsable_direction'
+  role: varchar('role', { length: 50 }), // responsable, agent_courrier, auditeur, super_admin, directeur_ministere, gouvernement, responsable_direction
   permissions: jsonb('permissions'), // RBAC fin
   motDePasse: varchar('mot_de_passe', { length: 255 }).notNull(), // INDISPENSABLE pour l'authentification
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -148,8 +150,68 @@ export const notifications = pgTable('notifications', {
   titre: varchar('titre', { length: 255 }).notNull(),
   message: text('message'),
   courrierId: integer('courrier_id').references(() => courriers.id),
+  publicationId: integer('publication_id'),
   lu: boolean('lu').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// 10. Communications Gouvernement (MG)
+export const publicationsGouvernement = pgTable('publications_gouvernement', {
+  id: serial('id').primaryKey(),
+  titre: varchar('titre', { length: 255 }).notNull(),
+  corps: text('corps'),
+  typePublication: varchar('type_publication', { length: 50 }).default('communique').notNull(), // communique | information | ordre | alerte
+  priorite: varchar('priorite', { length: 30 }).default('normale').notNull(), // normale | haute | urgente
+  portee: varchar('portee', { length: 30 }).notNull(), // public | ministere
+  ministereId: integer('ministere_id').references(() => ministeres.id),
+  statut: varchar('statut', { length: 30 }).default('brouillon').notNull(), // brouillon | publie | archive
+  auteurId: integer('auteur_id').references(() => utilisateurs.id).notNull(),
+  datePublication: timestamp('date_publication'),
+  dateArchivage: timestamp('date_archivage'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const publicationPiecesJointes = pgTable('publication_pieces_jointes', {
+  id: serial('id').primaryKey(),
+  publicationId: integer('publication_id')
+    .references(() => publicationsGouvernement.id)
+    .notNull(),
+  nomFichier: varchar('nom_fichier', { length: 255 }).notNull(),
+  cheminFichier: varchar('chemin_fichier', { length: 512 }).notNull(),
+  typeMime: varchar('type_mime', { length: 100 }),
+  tailleBytes: bigint('taille_bytes', { mode: 'number' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const publicationAccuses = pgTable('publication_accuses', {
+  id: serial('id').primaryKey(),
+  publicationId: integer('publication_id')
+    .references(() => publicationsGouvernement.id)
+    .notNull(),
+  ministereId: integer('ministere_id').references(() => ministeres.id).notNull(),
+  utilisateurId: integer('utilisateur_id').references(() => utilisateurs.id).notNull(),
+  commentaire: text('commentaire'),
+  dateAr: timestamp('date_ar').defaultNow().notNull(),
+});
+
+export const publicationMessages = pgTable('publication_messages', {
+  id: serial('id').primaryKey(),
+  publicationId: integer('publication_id')
+    .references(() => publicationsGouvernement.id)
+    .notNull(),
+  utilisateurId: integer('utilisateur_id').references(() => utilisateurs.id).notNull(),
+  contenu: text('contenu').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const publicationLectures = pgTable('publication_lectures', {
+  id: serial('id').primaryKey(),
+  publicationId: integer('publication_id')
+    .references(() => publicationsGouvernement.id)
+    .notNull(),
+  utilisateurId: integer('utilisateur_id').references(() => utilisateurs.id).notNull(),
+  luAt: timestamp('lu_at').defaultNow().notNull(),
 });
 
 // ==========================================
@@ -183,6 +245,10 @@ export const utilisateursRelations = relations(utilisateurs, ({ one, many }) => 
   direction: one(directions, {
     fields: [utilisateurs.directionId],
     references: [directions.id],
+  }),
+  ministere: one(ministeres, {
+    fields: [utilisateurs.ministereId],
+    references: [ministeres.id],
   }),
   courriersEmetteurs: many(courriers),
   fluxEtapes: many(fluxEtapes),

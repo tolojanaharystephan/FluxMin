@@ -26,10 +26,12 @@ import {
   CheckCheck,
   MessageSquare,
   Filter,
+  Newspaper,
+  Landmark,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
-import { useNotifications } from "@/lib/use-notifications";
+import { notificationHref, useNotifications } from "@/lib/use-notifications";
 
 const typeConfig: Record<string, { icon: any; color: string; label: string }> = {
   courrier_recu: { icon: Mail, color: "text-sky-400", label: "Courrier reçu" },
@@ -37,6 +39,9 @@ const typeConfig: Record<string, { icon: any; color: string; label: string }> = 
   courrier_acuse: { icon: CheckCircle2, color: "text-emerald-400", label: "Accusé" },
   courrier_archive: { icon: Archive, color: "text-zinc-400", label: "Archivage" },
   message_discussion: { icon: MessageSquare, color: "text-teal-400", label: "Message" },
+  publication_gouv: { icon: Newspaper, color: "text-fuchsia-400", label: "Actualité gouv." },
+  publication_ar: { icon: CheckCircle2, color: "text-pink-400", label: "AR publication" },
+  publication_message: { icon: Landmark, color: "text-rose-300", label: "Réponse gouv." },
 };
 
 interface Notification {
@@ -45,6 +50,7 @@ interface Notification {
   titre: string;
   message: string | null;
   courrierId: number | null;
+  publicationId: number | null;
   lu: boolean;
   createdAt: string;
 }
@@ -105,9 +111,8 @@ export default function NotificationsPage() {
         /* navigation anyway */
       }
     }
-    if (n.courrierId) {
-      router.push(`/courriers/${n.courrierId}`);
-    }
+    const href = notificationHref(n);
+    if (href) router.push(href);
   };
 
   return (
@@ -159,6 +164,9 @@ export default function NotificationsPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tous les types</SelectItem>
+                    <SelectItem value="publication_gouv">Actualités gouvernement</SelectItem>
+                    <SelectItem value="publication_ar">AR publications</SelectItem>
+                    <SelectItem value="publication_message">Réponses gouvernement</SelectItem>
                     <SelectItem value="message_discussion">Messages</SelectItem>
                     <SelectItem value="courrier_recu">Courriers reçus</SelectItem>
                     <SelectItem value="courrier_transmis">Transmissions</SelectItem>
