@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FluxMin | Publier une Communication Officielle</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --sidebar-expanded: 260px;
+            --sidebar-collapsed: 68px;
+        }
+        body {
+            background-color: #0e1513;
+            color: #dde4e1;
+            font-family: 'Geist', sans-serif;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(20, 184, 166, 0.3);
+            border-radius: 10px;
+        }
+        .drag-active {
+            border-color: #14b8a6 !important;
+            background: rgba(20, 184, 166, 0.05) !important;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#0e1513",
+                        "surface-container-high": "#252b2a",
+                        "primary": "#4fdbc8",
+                        "tertiary": "#ffb59e",
+                        "surface-container": "#1a211f",
+                        "surface": "#0e1513",
+                        "on-background": "#dde4e1",
+                        "on-surface": "#dde4e1",
+                        "on-surface-variant": "#bbcac6",
+                        "primary-container": "#14b8a6",
+                        "outline": "#859490",
+                        "outline-variant": "#3c4947"
+                    },
+                    "spacing": {
+                        "stack-sm": "0.5rem",
+                        "stack-md": "1rem",
+                        "stack-lg": "2rem",
+                        "sidebar-expanded": "260px",
+                        "gutter": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "label-caps": ["Geist"],
+                        "label-md": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="dark selection:bg-primary/30">
+<!-- Background Atmospheric Effect -->
+
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar-expanded transition-all duration-300 bg-surface/80 dark:bg-surface/80 backdrop-blur-md border-r border-white/10 flex flex-col py-stack-md z-50">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">FluxMin</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant font-bold">Ministerial Mail</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1 px-3 overflow-y-auto custom-scrollbar">
+<!-- Navigation Items Mapping -->
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+<span class="font-body-lg text-body-lg">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="inbox">inbox</span>
+<span class="font-body-lg text-body-lg">Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 border-l-2 border-primary bg-primary/5 text-primary scale-[0.98] transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="send" style="font-variation-settings: 'FILL' 1;">send</span>
+<span class="font-body-lg text-body-lg">Publier</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="drafts">drafts</span>
+<span class="font-body-lg text-body-lg">Drafts</span>
+</a>
+<div class="pt-4 pb-2 px-3">
+<p class="font-label-caps text-label-caps text-on-surface-variant/40">SYSTEM</p>
+</div>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="analytics">analytics</span>
+<span class="font-body-lg text-body-lg">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="rule">rule</span>
+<span class="font-body-lg text-body-lg">Audit</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="admin_panel_settings">admin_panel_settings</span>
+<span class="font-body-lg text-body-lg">Admin</span>
+</a>
+</nav>
+<div class="px-3 mt-auto">
+<a class="flex items-center gap-3 px-3 py-3 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="account_circle">account_circle</span>
+<span class="font-body-lg text-body-lg text-sm">Profile Settings</span>
+</a>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 h-16 z-40 bg-surface/60 dark:bg-surface/60 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-gutter w-[calc(100%-var(--sidebar-expanded))] ml-auto">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full bg-white/5 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Command + K pour rechercher..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-md text-label-md text-primary">Super Admin</span>
+</div>
+<button class="relative text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="Professional studio portrait of a high-ranking government official with a serious yet approachable expression. The lighting is dramatic and cinematic, emphasizing authority. The background is a blurred, dark institutional setting with hints of dark teal and glass architecture, maintaining a high-end enterprise SaaS aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0jeNNxFAvgP_wnoJf2Nu4IpUeIjIBj86-zN2Yecm1XY0dDQVzXud5xrerCsXQ6lX4WH5gfaesxiNKhVXEwA4hywmb3YK-cBHxcsz3ApHYhGueoIy9mxWDcEdRWNy6bUtRu4tIy00-NeCgU6CZ_Dza2EVdxERj_Tm1I76lmSZQyKBqKnvfZMI7HNgGgxtvxXxYirvynaQFrgwNT9kSmAEQwTOA8BpsmtdNufrAUVdwEpea2u_ODZNs"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pt-24 pb-12 ml-[var(--sidebar-expanded)] px-gutter min-h-screen">
+<div class="max-w-5xl mx-auto">
+<!-- Header Section -->
+<div class="mb-10">
+<div class="flex items-center gap-3 text-primary mb-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">security</span>
+<span class="font-label-caps text-label-caps tracking-widest uppercase">Espace Gouvernemental Sécurisé</span>
+</div>
+<h2 class="font-headline-lg text-3xl font-bold text-on-surface mb-2">Publier une Communication</h2>
+<p class="text-on-surface-variant font-body-lg">Rédigez et diffusez vos messages officiels, communiqués et alertes de haute importance.</p>
+</div>
+<!-- Form Container -->
+<form class="grid grid-cols-12 gap-8" onsubmit="return false;">
+<!-- Main Form Column -->
+<div class="col-span-8 space-y-6">
+<div class="glass-card rounded-xl p-6 space-y-6">
+<!-- Title Field -->
+<div class="space-y-2">
+<label class="font-label-md text-on-surface-variant block">Titre de la communication</label>
+<input class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-lg font-medium focus:ring-primary/20 focus:border-primary transition-all text-on-surface placeholder:text-on-surface-variant/30" placeholder="Entrez le titre officiel..." type="text"/>
+</div>
+<!-- Content Field -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-on-surface-variant block">Corps du message</label>
+<div class="flex gap-2">
+<button class="p-1 hover:bg-white/10 rounded text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">format_bold</span>
+</button>
+<button class="p-1 hover:bg-white/10 rounded text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">format_italic</span>
+</button>
+<button class="p-1 hover:bg-white/10 rounded text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">format_list_bulleted</span>
+</button>
+</div>
+</div>
+<textarea class="w-full bg-white/5 border border-white/10 rounded-lg p-4 font-body-lg focus:ring-primary/20 focus:border-primary transition-all text-on-surface placeholder:text-on-surface-variant/30 resize-none custom-scrollbar" placeholder="Saisissez le contenu ici..." rows="12"></textarea>
+</div>
+</div>
+<!-- Drag & Drop Section -->
+<div class="glass-card rounded-xl p-6">
+<label class="font-label-md text-on-surface-variant block mb-4">Pièces jointes (Documents PDF, Images signées)</label>
+<div class="border-2 border-dashed border-white/10 rounded-xl p-10 flex flex-col items-center justify-center transition-all hover:bg-white/5 cursor-pointer group" id="drop-zone">
+<div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-[28px]">upload_file</span>
+</div>
+<p class="font-body-lg text-on-surface font-medium">Glissez-déposez vos fichiers ici</p>
+<p class="font-label-md text-on-surface-variant mt-1">Ou cliquez pour parcourir vos dossiers locaux (Max 50MB)</p>
+<input class="hidden" id="file-input" multiple="" type="file"/>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-3" id="file-list">
+<!-- Selected files appear here -->
+</div>
+</div>
+</div>
+<!-- Sidebar Controls -->
+<div class="col-span-4 space-y-6">
+<!-- Configuration Card -->
+<div class="glass-card rounded-xl p-6 space-y-6">
+<h3 class="font-headline-sm text-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">settings_applications</span>
+                            Paramètres
+                        </h3>
+<!-- Type Select -->
+<div class="space-y-2">
+<label class="font-label-md text-on-surface-variant block">Type de communication</label>
+<select class="w-full bg-surface-container-high border border-white/10 rounded-lg p-2.5 text-sm focus:ring-primary/20 focus:border-primary appearance-none">
+<option>Communiqué</option>
+<option>Information</option>
+<option>Ordre-mission</option>
+<option>Alerte</option>
+</select>
+</div>
+<!-- Priority Select -->
+<div class="space-y-2">
+<label class="font-label-md text-on-surface-variant block">Niveau de priorité</label>
+<div class="grid grid-cols-3 gap-2">
+<button class="priority-btn px-2 py-2 rounded-lg border border-white/10 text-[10px] font-bold uppercase transition-all hover:bg-white/5 active" data-priority="normal" type="button">Normale</button>
+<button class="priority-btn px-2 py-2 rounded-lg border border-white/10 text-[10px] font-bold uppercase transition-all hover:bg-white/5" data-priority="high" type="button">Haute</button>
+<button class="priority-btn px-2 py-2 rounded-lg border border-white/10 text-[10px] font-bold uppercase transition-all hover:bg-white/5" data-priority="urgent" type="button">Urgente</button>
+</div>
+</div>
+<!-- Scope Select -->
+<div class="space-y-2">
+<label class="font-label-md text-on-surface-variant block">Portée de diffusion</label>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 text-primary bg-white/5 border-white/20 focus:ring-primary/30" name="scope" type="radio" value="all"/>
+<span class="text-sm group-hover:text-primary transition-colors">Tous les ministères</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 text-primary bg-white/5 border-white/20 focus:ring-primary/30" name="scope" type="radio" value="specific"/>
+<span class="text-sm group-hover:text-primary transition-colors">Ministère spécifique</span>
+</label>
+</div>
+<select class="w-full mt-3 bg-surface-container-high border border-white/10 rounded-lg p-2.5 text-sm focus:ring-primary/20 focus:border-primary opacity-50 transition-opacity" disabled="" id="ministry-select">
+<option>Ministère de l'Intérieur</option>
+<option>Ministère des Finances</option>
+<option>Ministère de la Défense</option>
+<option>Ministère de la Justice</option>
+<option>Ministère de la Santé</option>
+</select>
+</div>
+</div>
+<!-- Publication Summary Card -->
+<div class="glass-card rounded-xl p-6 border-primary/20 bg-primary/5">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-label-caps text-primary mb-1">ÉTAT</h4>
+<p class="text-xl font-bold">Prêt pour envoi</p>
+</div>
+<span class="material-symbols-outlined text-primary animate-pulse">check_circle</span>
+</div>
+<ul class="space-y-2 mb-6">
+<li class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">history</span>
+                                Dernière sauvegarde : Il y a 2 min
+                            </li>
+<li class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+                                Cryptage AES-256 activé
+                            </li>
+</ul>
+<div class="space-y-3">
+<button class="w-full bg-primary text-on-primary font-bold py-3 rounded-lg hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_-5px_rgba(20,184,166,0.5)]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+                                Publier maintenant
+                            </button>
+<button class="w-full bg-white/5 border border-white/10 text-on-surface font-bold py-3 rounded-lg hover:bg-white/10 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">save</span>
+                                Enregistrer brouillon
+                            </button>
+</div>
+</div>
+</div>
+</form>
+</div>
+</main>
+<script>
+        // Priority Buttons Logic
+        const priorityBtns = document.querySelectorAll('.priority-btn');
+        priorityBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                priorityBtns.forEach(b => {
+                    b.classList.remove('bg-primary/20', 'border-primary', 'text-primary');
+                    b.classList.add('border-white/10', 'text-on-surface-variant');
+                });
+                btn.classList.remove('border-white/10', 'text-on-surface-variant');
+                btn.classList.add('bg-primary/20', 'border-primary', 'text-primary');
+            });
+        });
+        // Set initial active state for "Normale"
+        document.querySelector('[data-priority="normal"]').click();
+
+        // Scope Selector Logic
+        const scopeRadios = document.querySelectorAll('input[name="scope"]');
+        const ministrySelect = document.getElementById('ministry-select');
+        scopeRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (radio.value === 'specific') {
+                    ministrySelect.disabled = false;
+                    ministrySelect.classList.remove('opacity-50');
+                } else {
+                    ministrySelect.disabled = true;
+                    ministrySelect.classList.add('opacity-50');
+                }
+            });
+        });
+
+        // Drag and Drop Micro-interactions
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileList = document.getElementById('file-list');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        dropZone.addEventListener('dragover', () => dropZone.classList.add('drag-active'));
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
+        dropZone.addEventListener('drop', (e) => {
+            dropZone.classList.remove('drag-active');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                const fileEl = document.createElement('div');
+                fileEl.className = 'flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10 group';
+                fileEl.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <span class="material-symbols-outlined text-primary">description</span>
+                        <div class="overflow-hidden">
+                            <p class="text-xs font-medium truncate text-on-surface">${file.name}</p>
+                            <p class="text-[10px] text-on-surface-variant">${(file.size / 1024).toFixed(1)} KB</p>
+                        </div>
+                    </div>
+                    <button class="text-on-surface-variant hover:text-red-400 transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                `;
+                fileList.appendChild(fileEl);
+                
+                fileEl.querySelector('button').onclick = () => fileEl.remove();
+            });
+        }
+
+        // Atmosphere Effect Init
+        window.addEventListener('load', () => {
+            console.log('Ministerial Interface Loaded and Secure.');
+        });
+    </script>
+</body></html>

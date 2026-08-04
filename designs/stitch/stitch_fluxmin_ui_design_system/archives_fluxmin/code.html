@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FluxMin | Archives</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
+        
+        :root {
+            --sidebar-expanded: 260px;
+            --sidebar-collapsed: 68px;
+        }
+
+        body {
+            font-family: 'Geist', sans-serif;
+            background-color: #07110f;
+            color: #dde4e1;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .archive-table-row:hover {
+            background: rgba(20, 184, 166, 0.05);
+            border-color: rgba(20, 184, 166, 0.2);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0e1513;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2f3634;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #14b8a6;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#bbcac6",
+                        "surface-bright": "#343b39",
+                        "on-secondary-container": "#00344e",
+                        "on-primary-container": "#00423b",
+                        "primary-container": "#14b8a6",
+                        "error-container": "#93000a",
+                        "background": "#0e1513",
+                        "on-error-container": "#ffdad6",
+                        "error": "#ffb4ab",
+                        "primary": "#4fdbc8",
+                        "on-surface": "#dde4e1",
+                        "surface": "#0e1513",
+                        "outline-variant": "#3c4947",
+                        "surface-container": "#1a211f",
+                        "tertiary-container": "#f38764",
+                        "on-tertiary-container": "#6c2106"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "label-caps": ["Geist"],
+                        "body-sm": ["Geist"],
+                        "title-md": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "body-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "600"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "title-md": ["18px", {"lineHeight": "28px", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface">
+<!-- SideNavBar (from JSON Shared Components) -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar-expanded transition-all duration-300 border-r border-white/10 bg-surface/80 backdrop-blur-md flex flex-col py-stack-md z-50">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-xl" style="font-variation-settings: 'FILL' 1;">mail</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary leading-none">FluxMin</h1>
+<p class="text-[10px] text-on-surface-variant tracking-widest uppercase mt-1">Ministerial Mail</p>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<!-- Nav Item: Dashboard -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+<span class="font-body-lg text-body-lg">Tableau de bord</span>
+</a>
+<!-- Nav Item: Inbox -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="inbox">inbox</span>
+<span class="font-body-lg text-body-lg">Inbox</span>
+</a>
+<!-- Nav Item: Sent -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="send">send</span>
+<span class="font-body-lg text-body-lg">Sent</span>
+</a>
+<!-- Nav Item: Archives (ACTIVE) -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg border-l-2 border-primary bg-primary/5 text-primary scale-[0.98] transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="archive" style="font-variation-settings: 'FILL' 1;">archive</span>
+<span class="font-body-lg text-body-lg font-medium">Archives</span>
+</a>
+<!-- Nav Item: Analytics -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="analytics">analytics</span>
+<span class="font-body-lg text-body-lg">Analytics</span>
+</a>
+<!-- Nav Item: Admin -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="admin_panel_settings">admin_panel_settings</span>
+<span class="font-body-lg text-body-lg">Admin</span>
+</a>
+</nav>
+<div class="px-3 pt-4 border-t border-white/5">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="account_circle">account_circle</span>
+<span class="font-body-lg text-body-lg">Profile Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="ml-[var(--sidebar-expanded)] min-h-screen">
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 h-16 w-[calc(100%-var(--sidebar-expanded))] z-40 bg-surface/60 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-gutter">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+<input class="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Rechercher dans les archives (CMD+K)" type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full border-2 border-surface"></span>
+</button>
+<div class="flex items-center gap-3 pl-6 border-l border-white/10">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface">Super Admin</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">FluxMin Global</p>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a senior government official in a dark navy suit, studio lighting with a subtle teal backlight, high-end corporate photography style, dark background, sharp focus, 8k resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDucdRjjxRiyby_Jr0REsC4vBK-cz0r-x6-EoV3Ikp3bPJgx9YQaWUr7iTWNTJ4QigcFd-u6e8gO2go97yUUIxwuIDn-fZNMKJNmI7XgS5zPFGpkmdbUwiGBy8uTjlUGv7wpa9yIUoPJXbuoSgSa7QzqMbtYMFzsh7Al2RNoOGiyB02_XVkEEtiLTwY5s1PVYI9EL5PL-A8FPYJGMIknCNJ7LvWESL5goRU0_MHwX4EN7LsR1OS_GRN"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="pt-24 px-gutter pb-12">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+<div class="flex items-start gap-5">
+<div class="w-14 h-14 rounded-2xl bg-tertiary-container/20 flex items-center justify-center border border-tertiary-container/30">
+<span class="material-symbols-outlined text-tertiary-container text-3xl" data-icon="archive" style="font-variation-settings: 'FILL' 1;">archive</span>
+</div>
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Archives</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-1 flex items-center gap-2">
+<span class="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                            1,284 documents sécurisés dans le coffre-fort numérique
+                        </p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-5 py-2.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-on-surface transition-all flex items-center gap-2 font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                        Filtres avancés
+                    </button>
+<button class="px-5 py-2.5 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:opacity-90 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">download</span>
+                        Exporter le registre
+                    </button>
+</div>
+</div>
+<!-- Filters Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+<div class="md:col-span-1 space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant block ml-1">Référence / Objet</label>
+<div class="relative">
+<input class="w-full bg-surface-container border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none transition-all" placeholder="REF-2024-..." type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant block ml-1">Type de courrier</label>
+<select class="w-full bg-surface-container border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none appearance-none">
+<option>Tous les types</option>
+<option>Interne</option>
+<option>Externe</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant block ml-1">Statut Rétention</label>
+<select class="w-full bg-surface-container border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none appearance-none">
+<option>Tous les statuts</option>
+<option>Valide</option>
+<option>Expire bientôt</option>
+<option>Expiré</option>
+</select>
+</div>
+<div class="flex items-end">
+<button class="w-full bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-xl transition-colors font-label-md text-label-md">
+                        Appliquer les filtres
+                    </button>
+</div>
+</div>
+<!-- Archives Table -->
+<div class="glass-panel rounded-2xl overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-white/5 border-b border-white/10">
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">Document</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">Rétention</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">Émetteur &amp; Type</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">Dates &amp; Durée</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">Emplacement</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<!-- Row 1: Valid -->
+<tr class="archive-table-row transition-all group">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+</div>
+<div>
+<p class="font-title-md text-on-surface text-sm font-medium">Contrat de Partenariat Stratégique</p>
+<p class="font-mono text-[11px] text-on-surface-variant uppercase mt-0.5">REF-2023-A892</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
+<span class="w-1 h-1 rounded-full bg-primary"></span>
+                                        Valide
+                                    </span>
+</td>
+<td class="px-6 py-5">
+<p class="font-body-sm text-body-sm text-on-surface">Direction Juridique</p>
+<p class="text-[12px] text-on-surface-variant">Interne</p>
+</td>
+<td class="px-6 py-5">
+<div class="space-y-0.5">
+<p class="text-[12px] text-on-surface"><span class="text-on-surface-variant">Archivé le :</span> 12 Jan 2023</p>
+<p class="text-[12px] text-on-surface"><span class="text-on-surface-variant">Expire le :</span> 12 Jan 2033 (10 ans)</p>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="text-[12px]">Coffre A-102 / S-B4</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="p-2 rounded-lg hover:bg-white/10 text-on-surface-variant hover:text-white transition-all" title="Consulter">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-white/10 text-on-surface-variant hover:text-primary transition-all" title="Désarchiver">
+<span class="material-symbols-outlined text-[20px]">unarchive</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2: Warning -->
+<tr class="archive-table-row transition-all group">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="article">article</span>
+</div>
+<div>
+<p class="font-title-md text-on-surface text-sm font-medium">Bail Commercial - Annexe Nord</p>
+<p class="font-mono text-[11px] text-on-surface-variant uppercase mt-0.5">REF-2018-B411</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-tertiary-container/10 text-tertiary-container border border-tertiary-container/20">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                                        Expire bientôt
+                                    </span>
+</td>
+<td class="px-6 py-5">
+<p class="font-body-sm text-body-sm text-on-surface">Gestion Patrimoine</p>
+<p class="text-[12px] text-on-surface-variant">Externe</p>
+</td>
+<td class="px-6 py-5">
+<div class="space-y-0.5">
+<p class="text-[12px] text-on-surface"><span class="text-on-surface-variant">Archivé le :</span> 05 Fév 2018</p>
+<p class="text-[12px] text-tertiary-container font-medium"><span class="text-on-surface-variant font-normal">Expire le :</span> 05 Fév 2025 (7 ans)</p>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="text-[12px]">Cloud Sécurisé Zone 2</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="p-2 rounded-lg hover:bg-white/10 text-on-surface-variant hover:text-white transition-all">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-white/10 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">unarchive</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Expired -->
+<tr class="archive-table-row transition-all group">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4 opacity-60">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="policy">policy</span>
+</div>
+<div>
+<p class="font-title-md text-on-surface text-sm font-medium">Ancien Règlement Intérieur</p>
+<p class="font-mono text-[11px] text-on-surface-variant uppercase mt-0.5">REF-2010-RI-V2</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-error-container/10 text-error border border-error-container/20">
+<span class="material-symbols-outlined text-[14px]">error</span>
+                                        Expiré
+                                    </span>
+</td>
+<td class="px-6 py-5">
+<p class="font-body-sm text-body-sm text-on-surface">Ressources Humaines</p>
+<p class="text-[12px] text-on-surface-variant">Interne</p>
+</td>
+<td class="px-6 py-5">
+<div class="space-y-0.5">
+<p class="text-[12px] text-on-surface"><span class="text-on-surface-variant">Archivé le :</span> 20 Mai 2010</p>
+<p class="text-[12px] text-error font-medium"><span class="text-on-surface-variant font-normal">Expiré le :</span> 20 Mai 2020 (10 ans)</p>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="text-[12px]">Stockage Physique Hors-Site</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="p-2 rounded-lg hover:bg-white/10 text-on-surface-variant hover:text-white transition-all">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-white/10 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">unarchive</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Valid -->
+<tr class="archive-table-row transition-all group">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="folder_zip">folder_zip</span>
+</div>
+<div>
+<p class="font-title-md text-on-surface text-sm font-medium">Audit Financier Annuel Q3</p>
+<p class="font-mono text-[11px] text-on-surface-variant uppercase mt-0.5">REF-2022-FIN-45</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
+<span class="w-1 h-1 rounded-full bg-primary"></span>
+                                        Valide
+                                    </span>
+</td>
+<td class="px-6 py-5">
+<p class="font-body-sm text-body-sm text-on-surface">Inspection Générale</p>
+<p class="text-[12px] text-on-surface-variant">Interne</p>
+</td>
+<td class="px-6 py-5">
+<div class="space-y-0.5">
+<p class="text-[12px] text-on-surface"><span class="text-on-surface-variant">Archivé le :</span> 14 Nov 2022</p>
+<p class="text-[12px] text-on-surface"><span class="text-on-surface-variant">Expire le :</span> 14 Nov 2027 (5 ans)</p>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="text-[12px]">Archives Centrales</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="p-2 rounded-lg hover:bg-white/10 text-on-surface-variant hover:text-white transition-all">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-white/10 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">unarchive</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-6 py-4 bg-white/5 border-t border-white/10 flex items-center justify-between">
+<p class="font-label-md text-label-md text-on-surface-variant">Page 1 sur 128</p>
+<div class="flex items-center gap-2">
+<button class="px-4 py-1.5 rounded-lg border border-white/5 bg-white/5 text-on-surface-variant disabled:opacity-50 hover:bg-white/10 transition-all font-label-md text-label-md flex items-center gap-1" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+                            Précédent
+                        </button>
+<button class="px-4 py-1.5 rounded-lg border border-white/5 bg-white/5 text-on-surface hover:bg-white/10 transition-all font-label-md text-label-md flex items-center gap-1">
+                            Suivant
+                            <span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Dashboard Stats Preview (Bottom) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+<div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-all duration-500">
+<span class="material-symbols-outlined text-[120px]" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Intégrité des données</p>
+<h4 class="font-headline-md text-headline-md mt-2">100% Vérifié</h4>
+<p class="text-[12px] text-primary mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                        Signature blockchain valide
+                    </p>
+</div>
+<div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-all duration-500">
+<span class="material-symbols-outlined text-[120px]" style="font-variation-settings: 'FILL' 1;">timer_off</span>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Documents Expirés</p>
+<h4 class="font-headline-md text-headline-md mt-2">24 dossiers</h4>
+<p class="text-[12px] text-error mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">auto_delete</span>
+                        Action requise pour destruction
+                    </p>
+</div>
+<div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 group-hover:opacity-10 transition-all duration-500">
+<span class="material-symbols-outlined text-[120px]" style="font-variation-settings: 'FILL' 1;">database</span>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Volume de stockage</p>
+<h4 class="font-headline-md text-headline-md mt-2">4.2 TB / 10 TB</h4>
+<div class="w-full h-1.5 bg-white/10 rounded-full mt-4">
+<div class="w-[42%] h-full bg-primary rounded-full shadow-[0_0_8px_rgba(20,184,166,0.4)]"></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple Command+K focus interaction
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                document.querySelector('input[type="text"]').focus();
+            }
+        });
+
+        // Add micro-interaction for rows
+        const rows = document.querySelectorAll('.archive-table-row');
+        rows.forEach(row => {
+            row.addEventListener('click', () => {
+                // Flash interaction
+                row.classList.add('bg-primary/10');
+                setTimeout(() => {
+                    row.classList.remove('bg-primary/10');
+                }, 150);
+            });
+        });
+    </script>
+</body></html>

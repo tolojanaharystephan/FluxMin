@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --sidebar-expanded: 260px;
+            --sidebar-collapsed: 68px;
+        }
+        body {
+            font-family: 'Geist', sans-serif;
+            background-color: #0e1513;
+            color: #dde4e1;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(20, 184, 166, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+        .search-container:focus-within {
+            box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(20, 184, 166, 0.4);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#ffb59e",
+                        "tertiary-container": "#f38764",
+                        "inverse-primary": "#006b5f",
+                        "secondary": "#89ceff",
+                        "on-error": "#690005",
+                        "primary-fixed": "#71f8e4",
+                        "error": "#ffb4ab",
+                        "outline": "#859490",
+                        "on-secondary": "#00344d",
+                        "on-surface-variant": "#bbcac6",
+                        "on-secondary-fixed": "#001e2f",
+                        "on-primary-fixed": "#00201c",
+                        "on-primary-container": "#00423b",
+                        "background": "#0e1513",
+                        "surface-container-low": "#161d1b",
+                        "secondary-fixed-dim": "#89ceff",
+                        "on-tertiary": "#5e1800",
+                        "outline-variant": "#3c4947",
+                        "tertiary-fixed-dim": "#ffb59e",
+                        "surface-dim": "#0e1513",
+                        "surface-container": "#1a211f",
+                        "surface-bright": "#343b39",
+                        "tertiary-fixed": "#ffdbd0",
+                        "surface-container-highest": "#2f3634",
+                        "surface": "#0e1513",
+                        "inverse-on-surface": "#2b3230",
+                        "secondary-container": "#00a2e6",
+                        "on-primary-fixed-variant": "#005048",
+                        "surface-container-lowest": "#090f0e",
+                        "primary-fixed-dim": "#4fdbc8",
+                        "on-surface": "#dde4e1",
+                        "error-container": "#93000a",
+                        "surface-tint": "#4fdbc8",
+                        "on-tertiary-fixed-variant": "#7c2d11",
+                        "surface-container-high": "#252b2a",
+                        "on-tertiary-container": "#6c2106",
+                        "on-error-container": "#ffdad6",
+                        "inverse-surface": "#dde4e1",
+                        "on-secondary-fixed-variant": "#004c6e",
+                        "primary": "#4fdbc8",
+                        "surface-variant": "#2f3634",
+                        "on-primary": "#003731",
+                        "secondary-fixed": "#c9e6ff",
+                        "primary-container": "#14b8a6",
+                        "on-tertiary-fixed": "#3a0b00",
+                        "on-background": "#dde4e1",
+                        "on-secondary-container": "#00344e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "0.5rem",
+                        "container-padding": "2rem",
+                        "stack-lg": "2rem",
+                        "sidebar-expanded": "260px",
+                        "sidebar-collapsed": "68px",
+                        "stack-md": "1rem",
+                        "gutter": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "title-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "label-md": ["Geist"],
+                        "label-caps": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "body-sm": ["Geist"]
+                    },
+                    "fontSize": {
+                        "title-md": ["18px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar-expanded transition-all duration-300 bg-surface/80 dark:bg-surface/80 backdrop-blur-md border-r border-white/10 flex flex-col py-stack-md z-50">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">FluxMin</h1>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-[0.2em]">Ministerial Mail</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1 px-3">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-lg text-body-lg">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="inbox">inbox</span>
+<span class="font-body-lg text-body-lg">Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+<span class="font-body-lg text-body-lg">Sent</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="drafts">drafts</span>
+<span class="font-body-lg text-body-lg">Drafts</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+<span class="font-body-lg text-body-lg">Archives</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-body-lg text-body-lg">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="rule">rule</span>
+<span class="font-body-lg text-body-lg">Audit</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg border-l-2 border-primary bg-primary/5 text-primary scale-[0.98] transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+<span class="font-body-lg text-body-lg">Admin</span>
+</a>
+</nav>
+<div class="mt-auto px-3">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-body-lg text-body-lg">Profile Settings</span>
+</a>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 h-16 z-40 bg-surface/60 dark:bg-surface/60 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-gutter w-[calc(100%-var(--sidebar-expanded))] ml-auto">
+<div class="flex items-center gap-4 flex-1 max-w-2xl">
+<div class="relative w-full search-container rounded-lg transition-all duration-200">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full bg-white/5 border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-0 focus:border-primary/50 placeholder:text-on-surface-variant/50" placeholder="Command + K pour rechercher..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<div class="flex items-center gap-3 pl-6 border-l border-white/10">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface">Jean Dupont</p>
+<p class="text-[10px] text-primary uppercase font-bold tracking-wider">Super Admin</p>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
+<img alt="User Avatar" data-alt="Professional headshot of a senior government official, clean lighting, ministerial background, sharp focus, 8k resolution, minimalist style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0EyMvs4co6USorVmTX69lBYQxGfcWlNWMhd9zPrXUSuKUQaGomEWkwe730gM9tJE1f7zrYu1XV6BDO9-D7hmlOXQTviJCsA_Qd9p7qsCtEKCZwZiSOD8B_ub1hNb5fRAP3hp02a_Yv5AXroye5F5eDN8s7qiFsKBoJtunt3NyFxN4ILLgAXle6ZwA6fJkh4_NGE9cAc6al5a8vQTfJ8FNhZCk-oslR0Y05bD8lVqGCffcY_MWGf1k"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pt-24 pb-12 pl-[calc(var(--sidebar-expanded)+2rem)] pr-8 min-h-screen">
+<!-- Header Actions -->
+<div class="flex items-end justify-between mb-10">
+<div>
+<nav class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="font-label-caps text-label-caps opacity-50">Administration</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="font-label-caps text-label-caps text-primary">Ministères</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Administration des Ministères</h2>
+<p class="text-on-surface-variant font-body-sm text-body-sm mt-1">Gérez les entités ministérielles et leurs directions rattachées.</p>
+</div>
+<button class="flex items-center gap-2 bg-primary-container text-on-primary-container px-5 py-2.5 rounded-lg font-title-md text-title-md hover:brightness-110 active:scale-[0.98] transition-all shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>Nouveau ministère</span>
+</button>
+</div>
+<!-- Filter & Search Section -->
+<div class="glass-card rounded-xl p-4 mb-8 flex items-center gap-4">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">filter_list</span>
+<input class="w-full bg-white/5 border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-1 focus:ring-primary/30 transition-all" id="ministrySearch" placeholder="Filtrer par nom ou code court..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-on-surface-variant text-sm px-2">Trier par:</span>
+<select class="bg-white/5 border-none rounded-lg text-sm focus:ring-1 focus:ring-primary/30 text-on-surface py-2">
+<option>Nom (A-Z)</option>
+<option>Directions (Croissant)</option>
+<option>Récents</option>
+</select>
+</div>
+</div>
+<!-- Ministry Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="ministryGrid">
+<!-- Ministry Card Template (Loop via JS or repeated) -->
+<div class="ministry-card group relative glass-card rounded-xl p-6 overflow-hidden">
+<div class="flex items-start justify-between mb-4">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+<span class="material-symbols-outlined text-[28px]" data-icon="building">switches</span>
+</div>
+<span class="bg-secondary/15 text-secondary px-2 py-1 rounded font-label-caps text-label-caps">MIN-INT</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2 group-hover:text-primary transition-colors">Ministère de l'Intérieur</h3>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">account_tree</span>
+<span>14 directions rattachées</span>
+</div>
+<!-- Hover Actions -->
+<div class="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+<button class="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/10">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+<span>Modifier</span>
+</button>
+<button class="flex items-center gap-2 bg-error/20 hover:bg-error text-error hover:text-on-error px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-error/20">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+<span>Supprimer</span>
+</button>
+</div>
+</div>
+<!-- More Cards -->
+<div class="ministry-card group relative glass-card rounded-xl p-6 overflow-hidden">
+<div class="flex items-start justify-between mb-4">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+<span class="material-symbols-outlined text-[28px]" data-icon="building">switches</span>
+</div>
+<span class="bg-secondary/15 text-secondary px-2 py-1 rounded font-label-caps text-label-caps">MIN-ECO</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2 group-hover:text-primary transition-colors">Ministère de l'Économie</h3>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">account_tree</span>
+<span>22 directions rattachées</span>
+</div>
+<div class="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+<button class="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/10">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+<span>Modifier</span>
+</button>
+<button class="flex items-center gap-2 bg-error/20 hover:bg-error text-error hover:text-on-error px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-error/20">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+<span>Supprimer</span>
+</button>
+</div>
+</div>
+<div class="ministry-card group relative glass-card rounded-xl p-6 overflow-hidden">
+<div class="flex items-start justify-between mb-4">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+<span class="material-symbols-outlined text-[28px]" data-icon="building">switches</span>
+</div>
+<span class="bg-secondary/15 text-secondary px-2 py-1 rounded font-label-caps text-label-caps">MIN-JUST</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2 group-hover:text-primary transition-colors">Ministère de la Justice</h3>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">account_tree</span>
+<span>8 directions rattachées</span>
+</div>
+<div class="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+<button class="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/10">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+<span>Modifier</span>
+</button>
+<button class="flex items-center gap-2 bg-error/20 hover:bg-error text-error hover:text-on-error px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-error/20">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+<span>Supprimer</span>
+</button>
+</div>
+</div>
+<div class="ministry-card group relative glass-card rounded-xl p-6 overflow-hidden">
+<div class="flex items-start justify-between mb-4">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+<span class="material-symbols-outlined text-[28px]" data-icon="building">switches</span>
+</div>
+<span class="bg-secondary/15 text-secondary px-2 py-1 rounded font-label-caps text-label-caps">MIN-SANT</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2 group-hover:text-primary transition-colors">Ministère de la Santé</h3>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">account_tree</span>
+<span>11 directions rattachées</span>
+</div>
+<div class="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+<button class="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/10">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+<span>Modifier</span>
+</button>
+<button class="flex items-center gap-2 bg-error/20 hover:bg-error text-error hover:text-on-error px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-error/20">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+<span>Supprimer</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Empty State (Hidden by default) -->
+<div class="hidden flex-col items-center justify-center py-24 text-center" id="emptyState">
+<div class="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6 text-on-surface-variant opacity-50">
+<span class="material-symbols-outlined text-[48px]">search_off</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-2">Aucun ministère trouvé</h4>
+<p class="text-on-surface-variant font-body-lg text-body-lg max-w-md mx-auto">Nous n'avons trouvé aucun résultat correspondant à votre recherche. Essayez d'ajuster vos filtres ou créez une nouvelle entité.</p>
+<button class="mt-8 text-primary font-label-md text-label-md hover:underline flex items-center gap-2 mx-auto">
+                Réinitialiser les filtres
+                <span class="material-symbols-outlined text-[16px]">refresh</span>
+</button>
+</div>
+</main>
+<script>
+        // Simple client-side filtering logic
+        const searchInput = document.getElementById('ministrySearch');
+        const ministryCards = document.querySelectorAll('.ministry-card');
+        const emptyState = document.getElementById('emptyState');
+        const grid = document.getElementById('ministryGrid');
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            let visibleCount = 0;
+
+            ministryCards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const code = card.querySelector('.font-label-caps').textContent.toLowerCase();
+                
+                if (title.includes(query) || code.includes(query)) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+            } else {
+                grid.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+            }
+        });
+
+        // Command + K Micro-interaction
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                document.querySelector('header input').focus();
+            }
+        });
+    </script>
+</body></html>

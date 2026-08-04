@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FluxMin | Détail de l'Actualité</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#0e1513",
+                    "surface-container-high": "#252b2a",
+                    "primary": "#4fdbc8",
+                    "tertiary": "#ffb59e",
+                    "surface-container": "#1a211f",
+                    "tertiary-fixed": "#ffdbd0",
+                    "on-tertiary-fixed-variant": "#7c2d11",
+                    "surface": "#0e1513",
+                    "surface-dim": "#0e1513",
+                    "on-error": "#690005",
+                    "on-tertiary": "#5e1800",
+                    "on-secondary": "#00344d",
+                    "on-background": "#dde4e1",
+                    "on-secondary-fixed-variant": "#004c6e",
+                    "primary-fixed-dim": "#4fdbc8",
+                    "surface-variant": "#2f3634",
+                    "tertiary-fixed-dim": "#ffb59e",
+                    "on-secondary-fixed": "#001e2f",
+                    "inverse-primary": "#006b5f",
+                    "surface-container-low": "#161d1b",
+                    "on-primary": "#003731",
+                    "secondary-fixed-dim": "#89ceff",
+                    "surface-container-highest": "#2f3634",
+                    "on-surface": "#dde4e1",
+                    "error-container": "#93000a",
+                    "surface-container-lowest": "#090f0e",
+                    "inverse-on-surface": "#2b3230",
+                    "surface-tint": "#4fdbc8",
+                    "outline": "#859490",
+                    "on-tertiary-fixed": "#3a0b00",
+                    "on-primary-fixed": "#00201c",
+                    "tertiary-container": "#f38764",
+                    "secondary": "#89ceff",
+                    "on-tertiary-container": "#6c2106",
+                    "inverse-surface": "#dde4e1",
+                    "outline-variant": "#3c4947",
+                    "on-primary-container": "#00423b",
+                    "on-secondary-container": "#00344e",
+                    "on-primary-fixed-variant": "#005048",
+                    "on-surface-variant": "#bbcac6",
+                    "surface-bright": "#343b39",
+                    "primary-fixed": "#71f8e4",
+                    "secondary-fixed": "#c9e6ff",
+                    "on-error-container": "#ffdad6",
+                    "secondary-container": "#00a2e6",
+                    "error": "#ffb4ab",
+                    "primary-container": "#14b8a6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "0.5rem",
+                    "stack-md": "1rem",
+                    "container-padding": "2rem",
+                    "stack-lg": "2rem",
+                    "sidebar-expanded": "260px",
+                    "gutter": "1.5rem",
+                    "sidebar-collapsed": "68px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Geist"],
+                    "body-sm": ["Geist"],
+                    "headline-lg": ["Geist"],
+                    "label-md": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "title-md": ["Geist"],
+                    "label-caps": ["Geist"],
+                    "body-lg": ["Geist"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "title-md": ["18px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0e1513;
+            color: #dde4e1;
+            font-family: 'Geist', sans-serif;
+        }
+        .glass-surface {
+            background: rgba(26, 33, 31, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+        }
+        .active-teal-dot {
+            box-shadow: 0 0 10px rgba(79, 219, 200, 0.5);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="flex min-h-screen overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar-expanded transition-all duration-300 border-r border-white/10 bg-surface/80 dark:bg-surface/80 backdrop-blur-md flex flex-col py-stack-md z-50" id="sidebar">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined font-bold">mail</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md font-bold text-primary">FluxMin</span>
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60">Ministerial Mail</span>
+</div>
+</div>
+<nav class="flex-1 space-y-1 px-3">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg border-l-2 border-primary bg-primary/5 text-primary active:scale-[0.98] transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inbox">inbox</span>
+<span class="font-label-caps text-label-caps">Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+<span class="font-label-caps text-label-caps">Sent</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="drafts">drafts</span>
+<span class="font-label-caps text-label-caps">Drafts</span>
+</a>
+<div class="my-4 border-t border-white/5 mx-4"></div>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="rule">rule</span>
+<span class="font-label-caps text-label-caps">Audit</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+<span class="font-label-caps text-label-caps">Admin</span>
+</a>
+</nav>
+<div class="mt-auto px-3">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-label-caps text-label-caps">Profile Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-sidebar-expanded min-h-screen flex flex-col relative">
+<!-- TopNavBar -->
+<header class="h-16 fixed top-0 right-0 w-[calc(100%-var(--sidebar-expanded))] z-40 bg-surface/60 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-gutter">
+<div class="flex items-center flex-1 max-w-2xl">
+<div class="relative w-full focus-within:ring-2 focus-within:ring-primary/20 rounded-lg">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant material-symbols-outlined text-[20px]">search</span>
+<input class="w-full bg-white/5 border-none rounded-lg py-2 pl-10 pr-4 text-body-sm focus:ring-0 placeholder:text-on-surface-variant/40" placeholder="Command + K pour rechercher..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full active-teal-dot"></span>
+</button>
+<div class="h-8 w-px bg-white/10 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<div class="font-label-md text-label-md text-on-surface">Jean Castex</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Super Admin</div>
+</div>
+<img class="w-10 h-10 rounded-full border border-primary/20 object-cover" data-alt="A high-quality professional portrait of a senior executive in a dark tailored suit, set against a blurred luxury office background with soft teal ambient lighting. The style is modern, cinematic, and emphasizes authority and trust in a premium enterprise software environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuRZSupMzRjVS55xtIkGMrz1z-JQ7ai1I-FIGRwKLapj16CwepS9FwSv7dM6z7xFHlC37o664W1kNBLU8wDJl1AGS-ShvFjiolx6r35Y6sSTt3vMgwZeBkPxeylN6wEgX_lTS8IxniZejH4UYv1bjOf6K_p2jAhvvfS6RtOhuggA6ZoWe30_vrEcUMcbAAfv-Tezxt0Ao4LON8ltymHPylTRQCYeWhRK71NiATA-VWPVKjvuYx42Eh"/>
+</div>
+</div>
+</header>
+<!-- Page Canvas -->
+<div class="mt-16 p-gutter flex-1 overflow-y-auto bg-background flex flex-col md:flex-row gap-gutter">
+<!-- Left Column: Article Content -->
+<div class="flex-1 space-y-gutter max-w-4xl">
+<!-- En-tête Actualité -->
+<section class="glass-surface p-stack-lg rounded-xl">
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full text-label-caps font-bold">TYPE: NOTE CIRCULAIRE</span>
+<span class="px-3 py-1 bg-secondary/10 text-secondary border border-secondary/20 rounded-full text-label-caps font-bold">PORTÉE: MINISTÈRE</span>
+<span class="px-3 py-1 bg-error/10 text-error border border-error/20 rounded-full text-label-caps font-bold uppercase">PRIORITÉ: HAUTE</span>
+<span class="px-3 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-full text-label-caps font-bold">MINISTÈRE DE L'INTÉRIEUR</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-4 leading-tight">
+                        Mise à jour des protocoles de sécurité pour le traitement des courriers inter-services (Phase 2)
+                    </h1>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">person</span>
+<span class="font-label-md text-label-md">Par Direction de la Logistique</span>
+</div>
+<div class="w-1 h-1 bg-white/20 rounded-full"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-label-md text-label-md">Publié le 24 Octobre 2023 à 09:15</span>
+</div>
+</div>
+</section>
+<!-- Contenu Riche -->
+<section class="glass-surface p-stack-lg rounded-xl">
+<h3 class="font-title-md text-title-md text-primary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined">article</span>
+                        Contenu de l'actualité
+                    </h3>
+<div class="font-body-lg text-body-lg leading-relaxed text-on-surface/90 space-y-6">
+<p>Dans le cadre de la modernisation des échanges au sein de l'appareil gouvernemental, de nouveaux protocoles de sécurisation ont été validés. Cette mise à jour concerne principalement le transit des documents classifiés "Diffusion Restreinte" entre les différents cabinets.</p>
+<div class="p-6 bg-white/5 border-l-4 border-primary rounded-r-lg italic">
+                            "L'objectif est d'assurer une traçabilité totale des flux de courrier, de l'émission à l'archivage définitif, tout en réduisant les délais de transmission physique de 40%."
+                        </div>
+<p>Les directeurs de cabinet sont priés de veiller à ce que l'ensemble de leurs équipes soit formé aux nouveaux outils de numérisation sécurisée d'ici la fin du mois en cours. Les principales modifications portent sur :</p>
+<ul class="list-disc pl-6 space-y-3">
+<li>L'utilisation systématique du QR-Code de traçabilité inter-services.</li>
+<li>Le double scellage électronique des pièces jointes de plus de 20Mo.</li>
+<li>La validation obligatoire par le directeur de cabinet pour toute sortie de périmètre physique.</li>
+</ul>
+<div class="relative w-full h-64 rounded-xl overflow-hidden my-8">
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist high-tech workspace with a tablet displaying complex logistics flows and encryption nodes. The scene is lit with cool teal tones and features subtle motion blur to suggest efficiency. High-end ministerial office aesthetic, dark-mode, futuristic UI interface visible on screen." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN-ibJq_4tCfZkIacL5ReNtfFDt6VmA45E_jxi5Vh3DEvCfzbxDfRtrnhbvbmf7DUEQYXNvU3YnaIWzr0rDnj5EpeGhHa1g0sG0jtPA0JSUDciP7JH5MAqi4AC-MGOhipGGDjbKUPyQIM0lvHe1RL7KP-9jcdjAWjyV0fi7SgwSDOqtnGk3R1qNUfulpy__YB2GzUk24vuDj1ITPZaKb2XnkVn0X714hsZB0whrXeEU9OWHMAFZz2j"/>
+</div>
+</div>
+</section>
+<!-- Pièces jointes -->
+<section class="glass-surface p-stack-lg rounded-xl">
+<h3 class="font-title-md text-title-md text-on-surface mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined">attachment</span>
+                        Pièces jointes (3)
+                    </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-lg hover:border-primary/50 transition-all cursor-pointer group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">description</span>
+<div>
+<div class="text-body-sm font-medium">protocole_securite_v2.pdf</div>
+<div class="text-label-md text-on-surface-variant">2.4 MB • PDF Document</div>
+</div>
+</div>
+<span class="material-symbols-outlined group-hover:translate-y-1 transition-transform">download</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-lg hover:border-primary/50 transition-all cursor-pointer group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">picture_as_pdf</span>
+<div>
+<div class="text-body-sm font-medium">annexe_liste_codes.pdf</div>
+<div class="text-label-md text-on-surface-variant">850 KB • PDF Document</div>
+</div>
+</div>
+<span class="material-symbols-outlined group-hover:translate-y-1 transition-transform">download</span>
+</div>
+</div>
+</section>
+<!-- Section Accusé de réception (Conditionnelle: Portée Ministère) -->
+<section class="glass-surface p-stack-lg rounded-xl border border-primary/20">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">verified_user</span>
+                                Accusés de réception
+                            </h3>
+<p class="text-label-md text-on-surface-variant">Suivi de lecture obligatoire pour ce niveau de diffusion</p>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-caps flex items-center gap-2 hover:brightness-110 active:scale-[0.97] transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            Accuser réception
+                        </button>
+</div>
+<div class="space-y-4">
+<!-- Row 1 -->
+<div class="flex items-center gap-4 p-4 rounded-lg bg-primary/5 border border-primary/10">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center border border-primary/30">
+<img class="w-full h-full object-cover" data-alt="A close-up professional portrait of a woman in business attire, modern office setting, soft teal highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCogvrdihJIUAhGkjZcarm-MmZUqWgZz5S1Twp5AbmjfI6Uw7LlFZPZY1DodmHcKGVbvDRhKok1NytxDbCTmEKmvQRVeQcNV9Ztkzt-faLPaDuAarzfTP4r08DUiv4jODif_lP4q28tVE-Eud_uhlEpsHE6ex5kfofvvUP_DHOSSy_fdo2kgV8LU5lg58HK9V8Cjm83AilBibmZH22zNs33nzK75ocXlQbNpm2cysgr66wYp7ySDpgG"/>
+</div>
+<div class="flex-1 grid grid-cols-1 md:grid-cols-4 items-center gap-4">
+<div>
+<div class="text-body-sm font-bold">Mme. Sophie Laurent</div>
+<div class="text-label-md text-on-surface-variant">Dir. de Cabinet (Finances)</div>
+</div>
+<div class="text-label-md text-on-surface-variant">24/10/2023 - 10:42</div>
+<div class="text-body-sm italic opacity-80">"Bien reçu, application immédiate prévue dès demain."</div>
+<div class="flex justify-end">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="flex items-center gap-4 p-4 rounded-lg bg-white/5 border border-white/10">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-white/10 flex items-center justify-center">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1 grid grid-cols-1 md:grid-cols-4 items-center gap-4">
+<div>
+<div class="text-body-sm font-bold">M. Marc Dubois</div>
+<div class="text-label-md text-on-surface-variant">Secrétaire Général</div>
+</div>
+<div class="text-label-md text-on-surface-variant">24/10/2023 - 11:15</div>
+<div class="text-body-sm italic opacity-80">"Lectures recommandées pour tous les chefs de service."</div>
+<div class="flex justify-end">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+</div>
+<!-- Row 3 - Pending -->
+<div class="flex items-center gap-4 p-4 rounded-lg bg-white/5 border border-white/5 opacity-50">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-white/10 flex items-center justify-center">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1 grid grid-cols-1 md:grid-cols-4 items-center gap-4">
+<div>
+<div class="text-body-sm font-bold">Mme. Elena Rousseau</div>
+<div class="text-label-md text-on-surface-variant">Dir. de Cabinet (Justice)</div>
+</div>
+<div class="text-label-md text-on-surface-variant italic">— En attente —</div>
+<div class="text-body-sm italic">—</div>
+<div class="flex justify-end">
+<span class="material-symbols-outlined text-on-surface-variant">pending</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Discussion Panel -->
+<div class="w-full md:w-80 space-y-gutter">
+<section class="glass-surface h-[calc(100vh-140px)] flex flex-col rounded-xl overflow-hidden border-l border-white/5 sticky top-20">
+<div class="p-6 border-b border-white/10 flex items-center justify-between">
+<h3 class="font-title-md text-title-md text-on-surface">Discussion</h3>
+<span class="px-2 py-0.5 bg-primary/20 text-primary text-[10px] rounded font-bold uppercase tracking-widest">Restreint</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-6" id="chat-messages">
+<!-- Message 1 -->
+<div class="space-y-1">
+<div class="flex items-center justify-between">
+<span class="text-label-md font-bold text-primary">Gouvernement (SG)</span>
+<span class="text-[10px] text-on-surface-variant">09:30</span>
+</div>
+<div class="p-3 bg-white/5 rounded-tr-xl rounded-b-xl border border-white/10 text-body-sm">
+                                Veuillez confirmer la disponibilité des terminaux cryptographiques mentionnés en page 4.
+                            </div>
+</div>
+<!-- Message 2 -->
+<div class="space-y-1">
+<div class="flex items-center justify-between">
+<span class="text-label-md font-bold text-secondary">Directeur Logistique</span>
+<span class="text-[10px] text-on-surface-variant">09:45</span>
+</div>
+<div class="p-3 bg-primary/5 rounded-tl-xl rounded-b-xl border border-primary/20 text-body-sm text-right ml-4">
+                                Affirmatique. Le stock est suffisant pour couvrir les besoins immédiats du ministère de l'Intérieur.
+                            </div>
+</div>
+<!-- Message 3 -->
+<div class="space-y-1">
+<div class="flex items-center justify-between">
+<span class="text-label-md font-bold text-primary">Gouvernement (SG)</span>
+<span class="text-[10px] text-on-surface-variant">10:05</span>
+</div>
+<div class="p-3 bg-white/5 rounded-tr-xl rounded-b-xl border border-white/10 text-body-sm">
+                                Parfait. Déployez la note aux autres ministères régaliens en priorité.
+                            </div>
+</div>
+</div>
+<div class="p-4 border-t border-white/10 bg-background/50">
+<div class="relative">
+<textarea class="w-full bg-white/5 border border-white/10 rounded-xl p-3 pr-12 text-body-sm focus:ring-1 focus:ring-primary focus:border-transparent resize-none h-24 placeholder:text-on-surface-variant/40" placeholder="Écrire un message..."></textarea>
+<button class="absolute bottom-3 right-3 text-primary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+<div class="mt-2 flex items-center gap-2">
+<button class="p-1 text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+</button>
+<button class="p-1 text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]">alternate_email</span>
+</button>
+<div class="ml-auto flex items-center gap-1 text-[10px] text-on-surface-variant uppercase font-medium">
+<span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                Canal Sécurisé
+                            </div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interactions for scrolling and button states
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatContainer = document.getElementById('chat-messages');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // Simple hover effect for glass cards
+            const cards = document.querySelectorAll('.glass-surface');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.borderColor = 'rgba(79, 219, 200, 0.2)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                });
+            });
+        });
+    </script>
+</body></html>

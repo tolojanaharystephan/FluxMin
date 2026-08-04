@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FluxMin | Connexion Ministérielle</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed": "#71f8e4",
+                    "secondary-fixed": "#c9e6ff",
+                    "on-error": "#690005",
+                    "on-tertiary-fixed": "#3a0b00",
+                    "on-primary-container": "#00423b",
+                    "surface-container-highest": "#2f3634",
+                    "tertiary": "#ffb59e",
+                    "inverse-surface": "#dde4e1",
+                    "outline-variant": "#3c4947",
+                    "on-secondary": "#00344d",
+                    "secondary": "#89ceff",
+                    "secondary-fixed-dim": "#89ceff",
+                    "surface-container-low": "#161d1b",
+                    "surface": "#0e1513",
+                    "surface-container-high": "#252b2a",
+                    "tertiary-fixed": "#ffdbd0",
+                    "primary": "#4fdbc8",
+                    "error-container": "#93000a",
+                    "primary-container": "#14b8a6",
+                    "tertiary-fixed-dim": "#ffb59e",
+                    "on-secondary-fixed": "#001e2f",
+                    "on-tertiary-fixed-variant": "#7c2d11",
+                    "on-tertiary-container": "#6c2106",
+                    "surface-dim": "#0e1513",
+                    "tertiary-container": "#f38764",
+                    "on-secondary-fixed-variant": "#004c6e",
+                    "inverse-primary": "#006b5f",
+                    "error": "#ffb4ab",
+                    "surface-container": "#1a211f",
+                    "surface-tint": "#4fdbc8",
+                    "surface-bright": "#343b39",
+                    "on-primary": "#003731",
+                    "on-background": "#dde4e1",
+                    "on-secondary-container": "#00344e",
+                    "inverse-on-surface": "#2b3230",
+                    "on-primary-fixed-variant": "#005048",
+                    "on-surface": "#dde4e1",
+                    "surface-variant": "#2f3634",
+                    "background": "#0e1513",
+                    "primary-fixed-dim": "#4fdbc8",
+                    "on-error-container": "#ffdad6",
+                    "secondary-container": "#00a2e6",
+                    "on-primary-fixed": "#00201c",
+                    "outline": "#859490",
+                    "surface-container-lowest": "#090f0e",
+                    "on-tertiary": "#5e1800",
+                    "on-surface-variant": "#bbcac6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-lg": "2rem",
+                    "container-padding": "2rem",
+                    "gutter": "1.5rem",
+                    "sidebar-expanded": "260px",
+                    "stack-sm": "0.5rem",
+                    "stack-md": "1rem",
+                    "sidebar-collapsed": "68px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Geist"],
+                    "body-sm": ["Geist"],
+                    "title-md": ["Geist"],
+                    "display-lg": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "label-md": ["Geist"],
+                    "label-caps": ["Geist"],
+                    "body-lg": ["Geist"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "title-md": ["18px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0e1513;
+            color: #dde4e1;
+            font-family: 'Geist', sans-serif;
+            overflow: hidden;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        .glow-teal {
+            box-shadow: 0 0 20px rgba(20, 184, 166, 0.15);
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(0.5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex overflow-hidden">
+<!-- LEFT PANEL (52%) -->
+<section class="relative w-[52%] h-full hidden lg:flex flex-col justify-between p-container-padding overflow-hidden border-r border-white/5">
+<!-- Shader Background -->
+<!-- STITCH_SHADER_START:ANIMATION_2 class="absolute inset-0 w-full h-full opacity-60" -->
+<div class="absolute inset-0 w-full h-full opacity-60" style="display:block;">
+<canvas id="shader-canvas-ANIMATION_2" style="display:block;width:100%;height:100%"></canvas>
+<script>
+(function() {
+  const canvas = document.getElementById('shader-canvas-ANIMATION_2');
+
+  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
+  // This fires on initial layout and whenever the element is resized.
+  function syncSize() {
+    const w = canvas.clientWidth  || 1280;
+    const h = canvas.clientHeight || 720;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width  = w;
+      canvas.height = h;
+    }
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncSize).observe(canvas);
+  }
+  syncSize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+  const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+  const fs = `precision highp float;
+uniform float u_time;
+uniform vec2 u_resolution;
+varying vec2 v_texCoord;
+
+void main() {
+    vec2 uv = v_texCoord;
+    float time = u_time * 0.2;
+    
+    // Background deep green-black
+    vec3 color = vec3(0.027, 0.067, 0.059); // #07110f
+    
+    // Teal orbs
+    vec3 accent = vec3(0.078, 0.722, 0.651); // #14b8a6
+    
+    // Create soft floating orbs
+    for(float i=1.0; i<4.0; i++) {
+        vec2 p = vec2(
+            0.5 + 0.3 * cos(time * i + i),
+            0.5 + 0.3 * sin(time * 0.7 * i + i * 2.0)
+        );
+        float d = length(uv - p);
+        float glow = 0.05 / (d * d + 0.01);
+        color += accent * glow * 0.1;
+    }
+    
+    // Subtle mesh gradient effect
+    float noise = sin(uv.x * 10.0 + time) * cos(uv.y * 10.0 - time) * 0.02;
+    color += noise * accent;
+
+    gl_FragColor = vec4(color, 1.0);
+}`;
+  function cs(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
+  // Shaders that need normalized coords should use: u_mouse / u_resolution.
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+  window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+      mouse.x = nx * canvas.width;
+      mouse.y = ny * canvas.height;
+    }
+  });
+
+  function render(t) {
+    if (typeof ResizeObserver === 'undefined') syncSize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (uTime) gl.uniform1f(uTime, t * 0.001);
+    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  render(0);
+})();
+</script>
+</div>
+<!-- STITCH_SHADER_END:ANIMATION_2 -->
+<!-- Branding Top -->
+<div class="relative z-10 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container font-bold" style="font-variation-settings: 'FILL' 1;">mail</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">FluxMin</h1>
+</div>
+<!-- Middle Content & Features -->
+<div class="relative z-10 max-w-xl">
+<h2 class="font-display-lg text-display-lg mb-stack-md leading-tight">
+                Gestion et automatisation intelligente des courriers ministériels
+            </h2>
+<div class="space-y-6 mt-12">
+<div class="flex items-start gap-4">
+<div class="mt-1 p-2 rounded-full bg-primary/10 border border-primary/20">
+<span class="material-symbols-outlined text-primary text-[20px]">psychology</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-white">IA locale assistive</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant opacity-80">Traitement sémantique et résumé automatique sans sortie de données.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="mt-1 p-2 rounded-full bg-primary/10 border border-primary/20">
+<span class="material-symbols-outlined text-primary text-[20px]">shield</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-white">Souveraineté des données</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant opacity-80">Infrastructure sécurisée répondant aux normes de la haute administration.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="mt-1 p-2 rounded-full bg-primary/10 border border-primary/20">
+<span class="material-symbols-outlined text-primary text-[20px]">route</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-white">Flux tracés</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant opacity-80">Audit complet et traçabilité en temps réel de chaque correspondance.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Card Preview -->
+<div class="absolute bottom-20 right-[-40px] z-20 w-96 animate-float">
+<div class="glass-panel rounded-xl p-6 shadow-2xl">
+<div class="flex justify-between items-center mb-4">
+<span class="font-label-caps text-label-caps text-primary tracking-widest">APERÇU COURRIER ENTRANT</span>
+<span class="bg-primary/20 text-primary-fixed text-[10px] px-2 py-0.5 rounded-full border border-primary/30">PRIORITÉ HAUTE</span>
+</div>
+<div class="space-y-3">
+<div class="h-2 w-3/4 bg-white/10 rounded"></div>
+<div class="h-2 w-full bg-white/5 rounded"></div>
+<div class="h-2 w-1/2 bg-white/5 rounded"></div>
+<div class="flex gap-2 mt-4">
+<div class="h-8 w-20 bg-primary-container/20 border border-primary/30 rounded flex items-center justify-center">
+<div class="h-1 w-10 bg-primary/40 rounded"></div>
+</div>
+<div class="h-8 w-20 bg-white/5 border border-white/10 rounded flex items-center justify-center">
+<div class="h-1 w-10 bg-white/20 rounded"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Policy -->
+<div class="relative z-10">
+<p class="font-label-md text-label-md text-on-surface-variant opacity-50 uppercase tracking-widest">République Française • Système Sécurisé</p>
+</div>
+</section>
+<!-- RIGHT PANEL (LOGIN) -->
+<main class="w-full lg:w-[48%] h-full flex flex-col items-center justify-center p-gutter bg-surface">
+<div class="w-full max-w-[420px]">
+<!-- Mobile Logo (only visible on small screens) -->
+<div class="lg:hidden flex items-center gap-3 mb-10 justify-center">
+<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container fill-icon">mail</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary font-bold">FluxMin</h1>
+</div>
+<div class="mb-10">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Espace Collaborateur</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Identifiez-vous pour accéder à vos dossiers.</p>
+</div>
+<!-- Login Form Card -->
+<div class="glass-panel rounded-xl p-8 mb-8">
+<form class="space-y-6" onsubmit="event.preventDefault();">
+<!-- Email -->
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant" for="email">Adresse mail professionnelle</label>
+<div class="relative group">
+<input class="w-full h-12 bg-white/5 border border-white/10 rounded-lg px-10 text-on-surface placeholder:text-on-surface-variant/30 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none" id="email" placeholder="agent.dupont@ministere.gouv.fr" type="email"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] group-focus-within:text-primary transition-colors">alternate_email</span>
+</div>
+</div>
+<!-- Password -->
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface-variant" for="password">Mot de passe</label>
+<a class="font-label-md text-label-md text-primary hover:underline decoration-primary/30" href="#">Mot de passe oublié ?</a>
+</div>
+<div class="relative group" id="password-wrapper">
+<input class="w-full h-12 bg-white/5 border border-white/10 rounded-lg px-10 text-on-surface placeholder:text-on-surface-variant/30 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none" id="password" placeholder="••••••••••••" type="password"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] group-focus-within:text-primary transition-colors">lock</span>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface" onclick="togglePassword()" type="button">
+<span class="material-symbols-outlined text-[20px]" id="eye-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Options -->
+<div class="flex items-center">
+<input class="w-4 h-4 rounded border-white/10 bg-white/5 text-primary focus:ring-offset-surface focus:ring-primary cursor-pointer" id="remember" type="checkbox"/>
+<label class="ml-3 font-body-sm text-body-sm text-on-surface-variant cursor-pointer select-none" for="remember">Se souvenir de moi</label>
+</div>
+<!-- Submit -->
+<button class="w-full h-12 bg-primary text-on-primary font-title-md text-title-md rounded-lg hover:brightness-110 active:scale-[0.98] transition-all glow-teal flex items-center justify-center gap-2" type="submit">
+                        Se connecter
+                        <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</form>
+</div>
+<!-- Demo Access -->
+<div class="space-y-4">
+<div class="flex items-center gap-4 text-on-surface-variant/30">
+<div class="h-px flex-1 bg-white/10"></div>
+<span class="font-label-caps text-label-caps">DÉMO RAPIDE</span>
+<div class="h-px flex-1 bg-white/10"></div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<button class="h-12 glass-panel hover:bg-white/10 border-white/10 rounded-lg flex items-center justify-center gap-2 transition-all group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">person</span>
+<span class="font-label-md text-label-md">Agent Courrier</span>
+</button>
+<button class="h-12 glass-panel hover:bg-white/10 border-white/10 rounded-lg flex items-center justify-center gap-2 transition-all group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">verified_user</span>
+<span class="font-label-md text-label-md">Responsable</span>
+</button>
+</div>
+</div>
+<!-- Footer Footer -->
+<div class="mt-12 text-center">
+<p class="font-body-sm text-body-sm text-on-surface-variant opacity-60 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-error">gpp_maybe</span>
+                    Accès réservé aux agents autorisés
+                </p>
+</div>
+</div>
+</main>
+<script>
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
+
+        // Atmospheric micro-interaction for cards
+        document.querySelectorAll('.glass-panel').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body></html>

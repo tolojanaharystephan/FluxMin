@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FluxMin | Anomalies d'Audit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#343b39",
+                    "tertiary-fixed": "#ffdbd0",
+                    "secondary-container": "#00a2e6",
+                    "on-tertiary-container": "#6c2106",
+                    "error-container": "#93000a",
+                    "on-error-container": "#ffdad6",
+                    "primary": "#4fdbc8",
+                    "secondary-fixed": "#c9e6ff",
+                    "outline-variant": "#3c4947",
+                    "tertiary-fixed-dim": "#ffb59e",
+                    "inverse-primary": "#006b5f",
+                    "surface-container-low": "#161d1b",
+                    "inverse-on-surface": "#2b3230",
+                    "error": "#ffb4ab",
+                    "on-surface": "#dde4e1",
+                    "on-primary-container": "#00423b",
+                    "surface-variant": "#2f3634",
+                    "surface": "#0e1513",
+                    "surface-container": "#1a211f",
+                    "secondary": "#89ceff",
+                    "surface-container-high": "#252b2a",
+                    "on-surface-variant": "#bbcac6",
+                    "on-primary": "#003731",
+                    "on-primary-fixed-variant": "#005048",
+                    "inverse-surface": "#dde4e1",
+                    "background": "#0e1513",
+                    "secondary-fixed-dim": "#89ceff",
+                    "on-background": "#dde4e1",
+                    "on-tertiary": "#5e1800",
+                    "surface-dim": "#0e1513",
+                    "on-secondary-container": "#00344e",
+                    "outline": "#859490",
+                    "primary-fixed": "#71f8e4",
+                    "on-tertiary-fixed": "#3a0b00",
+                    "on-secondary": "#00344d",
+                    "on-error": "#690005",
+                    "on-secondary-fixed-variant": "#004c6e",
+                    "surface-tint": "#4fdbc8",
+                    "primary-fixed-dim": "#4fdbc8",
+                    "tertiary": "#ffb59e",
+                    "on-tertiary-fixed-variant": "#7c2d11",
+                    "tertiary-container": "#f38764",
+                    "surface-container-highest": "#2f3634",
+                    "on-secondary-fixed": "#001e2f",
+                    "surface-container-lowest": "#090f0e",
+                    "on-primary-fixed": "#00201c",
+                    "primary-container": "#14b8a6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sidebar-collapsed": "68px",
+                    "container-padding": "2rem",
+                    "stack-lg": "2rem",
+                    "sidebar-expanded": "260px",
+                    "stack-sm": "0.5rem",
+                    "gutter": "1.5rem",
+                    "stack-md": "1rem"
+            },
+            "fontFamily": {
+                    "display-lg": ["Geist"],
+                    "body-sm": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "label-caps": ["Geist"],
+                    "title-md": ["Geist"],
+                    "headline-lg": ["Geist"],
+                    "label-md": ["Geist"],
+                    "body-lg": ["Geist"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "title-md": ["18px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #07110f;
+            font-family: 'Geist', sans-serif;
+            color: #dde4e1;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+    </style>
+</head>
+<body class="overflow-hidden">
+<!-- Side Navigation Shell -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar-expanded transition-all duration-300 border-r border-white/10 bg-surface/80 dark:bg-surface/80 backdrop-blur-md flex flex-col py-stack-md z-50">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary">shield_person</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary leading-none">FluxMin</h1>
+<p class="text-[10px] font-label-caps uppercase tracking-widest text-on-surface-variant opacity-70">Ministerial Mail</p>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">inbox</span>
+<span class="font-label-caps text-label-caps">Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">send</span>
+<span class="font-label-caps text-label-caps">Sent</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">drafts</span>
+<span class="font-label-caps text-label-caps">Drafts</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span class="font-label-caps text-label-caps">Archives</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+<!-- Active Tab: Audit -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg border-l-2 border-primary bg-primary/5 text-primary scale-[0.98] transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">rule</span>
+<span class="font-label-caps text-label-caps">Audit</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span>
+<span class="font-label-caps text-label-caps">Admin</span>
+</a>
+</nav>
+<div class="px-3 pt-4 border-t border-white/5">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-label-caps text-label-caps">Profile Settings</span>
+</a>
+</div>
+</aside>
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 right-0 h-16 w-[calc(100%-var(--sidebar-expanded))] ml-auto bg-surface/60 dark:bg-surface/60 backdrop-blur-xl border-b border-white/10 z-40 flex items-center justify-between px-gutter">
+<div class="flex-1 flex items-center">
+<div class="relative w-full max-w-xl group focus-within:ring-2 focus-within:ring-primary/20 rounded-lg">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-white/5 border-none rounded-lg pl-10 pr-4 py-2 text-label-md font-label-md focus:ring-0 text-on-surface placeholder:text-on-surface-variant/50" placeholder="Rechercher une anomalie, un dossier ou une règle... (Cmd + K)" type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative hover:text-primary transition-colors flex items-center">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary rounded-full ring-2 ring-surface"></span>
+</button>
+<div class="h-8 w-px bg-white/10"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface leading-tight">Super Admin</p>
+<p class="text-[10px] text-on-surface-variant">Gouvernance Centrale</p>
+</div>
+<div class="w-9 h-9 rounded-full overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="Close up professional headshot of a government administrator in a dark business suit, high resolution photography with soft cinematic studio lighting on a neutral grey background, corporate and authoritative aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClWpOdCFyocgoBiKjCYe3ljpxZm1Y3dzPjqVvOT97G-qqCS5MJtk8aP9t9CjS0NAQQRMIINK7w2negLn_zGChORMrU4X6gr08GcBfp8kV3LHMkPldLW1OBqQHY8NB30R12xuj7uMOUBLqBv22NwY-anhzJtf9C29jPZGWifQ10L5zy-ImDwuWmK3JfXS_pbRqPG5_-1Mi8P8XEH5qH2w19jxnzHQYDZERY6VbC_aVTJkLcmnFaj18m"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-sidebar-expanded pt-16 h-screen overflow-y-auto px-gutter pb-stack-lg">
+<!-- Dashboard Header -->
+<div class="py-stack-lg flex justify-between items-end">
+<div>
+<nav class="flex items-center gap-2 mb-2 text-on-surface-variant font-label-md text-label-md">
+<span>Audit</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary">Anomalies</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Anomalies d'Audit</h2>
+<p class="text-on-surface-variant max-w-2xl font-body-lg text-body-lg">Surveillance en temps réel de la conformité administrative. Détection automatique des irrégularités basée sur les règles du Code Administratif et les protocoles ministériels.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 glass-card rounded-lg hover:border-white/40 transition-all font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm">download</span> Exporter le rapport
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg hover:opacity-90 transition-all font-label-md text-label-md shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined text-sm">refresh</span> Lancer l'analyse
+                </button>
+</div>
+</div>
+<!-- KPI Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-stack-lg">
+<div class="glass-card p-6 rounded-xl relative overflow-hidden group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 rounded-lg bg-white/5 text-on-surface-variant">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<span class="text-xs font-label-caps text-on-surface-variant">+12% vs hier</span>
+</div>
+<h4 class="text-on-surface-variant font-label-caps text-label-caps mb-1">Total Anomalies</h4>
+<div class="font-display-lg text-display-lg text-on-surface">42</div>
+<div class="absolute bottom-0 right-0 opacity-10 translate-x-1/4 translate-y-1/4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[80px]">warning</span>
+</div>
+</div>
+<div class="glass-card p-6 rounded-xl relative overflow-hidden group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 rounded-lg bg-error/10 text-error">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+</div>
+<h4 class="text-on-surface-variant font-label-caps text-label-caps mb-1">Haut Risque</h4>
+<div class="font-display-lg text-display-lg text-error">08</div>
+<div class="absolute bottom-0 right-0 opacity-10 translate-x-1/4 translate-y-1/4">
+<span class="material-symbols-outlined text-[80px]">priority_high</span>
+</div>
+</div>
+<div class="glass-card p-6 rounded-xl relative overflow-hidden group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">task_alt</span>
+</div>
+<div class="w-12 h-1 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 76%"></div>
+</div>
+</div>
+<h4 class="text-on-surface-variant font-label-caps text-label-caps mb-1">Taux de Résolution</h4>
+<div class="font-display-lg text-display-lg text-primary">76%</div>
+<div class="absolute bottom-0 right-0 opacity-10 translate-x-1/4 translate-y-1/4">
+<span class="material-symbols-outlined text-[80px]">trending_up</span>
+</div>
+</div>
+<div class="glass-card p-6 rounded-xl relative overflow-hidden group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 rounded-lg bg-secondary/10 text-secondary">
+<span class="material-symbols-outlined">pending</span>
+</div>
+</div>
+<h4 class="text-on-surface-variant font-label-caps text-label-caps mb-1">En attente</h4>
+<div class="font-display-lg text-display-lg text-on-surface">14</div>
+<div class="absolute bottom-0 right-0 opacity-10 translate-x-1/4 translate-y-1/4">
+<span class="material-symbols-outlined text-[80px]">history</span>
+</div>
+</div>
+</div>
+<!-- Filters & Table Section -->
+<div class="glass-card rounded-xl overflow-hidden border-white/5">
+<!-- Filter Bar -->
+<div class="p-4 border-b border-white/5 flex flex-wrap gap-4 items-center bg-white/[0.02]">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 font-label-md text-label-md">
+<span class="text-on-surface-variant">Sévérité:</span>
+<select class="bg-transparent border-none focus:ring-0 p-0 text-primary cursor-pointer font-bold">
+<option value="all">Toutes</option>
+<option value="critical">Critique</option>
+<option value="major">Majeur</option>
+<option value="minor">Mineur</option>
+</select>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 font-label-md text-label-md">
+<span class="text-on-surface-variant">Département:</span>
+<select class="bg-transparent border-none focus:ring-0 p-0 text-primary cursor-pointer font-bold">
+<option value="all">Tous</option>
+<option value="cabinet">Cabinet</option>
+<option value="it">Service IT</option>
+<option value="legal">Affaires Juridiques</option>
+</select>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 font-label-md text-label-md">
+<span class="text-on-surface-variant">Date:</span>
+<input class="bg-transparent border-none focus:ring-0 p-0 text-primary cursor-pointer font-bold w-32" type="date"/>
+</div>
+<div class="ml-auto flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+<button class="p-2 text-primary">
+<span class="material-symbols-outlined">list</span>
+</button>
+</div>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-on-surface-variant font-label-caps text-label-caps border-b border-white/5">
+<th class="px-6 py-4 font-normal">Status</th>
+<th class="px-6 py-4 font-normal">Description</th>
+<th class="px-6 py-4 font-normal">Source</th>
+<th class="px-6 py-4 font-normal">Sévérité</th>
+<th class="px-6 py-4 font-normal">Détecté le</th>
+<th class="px-6 py-4 font-normal">Auditeur</th>
+<th class="px-6 py-4 font-normal text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<!-- Row 1 -->
+<tr class="hover:bg-white/[0.03] transition-colors group">
+<td class="px-6 py-4">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">error</span>
+</td>
+<td class="px-6 py-4">
+<div class="font-label-md text-label-md text-on-surface">Délai de réponse dépassé > 48h</div>
+<div class="text-[10px] text-on-surface-variant">Vérification automatique de flux sortant</div>
+</td>
+<td class="px-6 py-4">
+<span class="font-label-md text-label-md text-primary">#REF-2024-0128</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-error/15 text-error text-[10px] font-label-caps border border-error/20">CRITIQUE</span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant font-label-md text-label-md">12 Jan 2024</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">JM</div>
+<span class="text-on-surface font-label-md text-label-md">J. Martin</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-white/10 rounded transition-colors" onclick="toggleDetails()" title="Détails">
+<span class="material-symbols-outlined text-sm">visibility</span>
+</button>
+<button class="p-1.5 hover:bg-primary/20 text-primary rounded transition-colors" title="Résoudre">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+</button>
+<button class="p-1.5 hover:bg-white/10 text-on-surface-variant rounded transition-colors" title="Ignorer">
+<span class="material-symbols-outlined text-sm">block</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-white/[0.03] transition-colors group">
+<td class="px-6 py-4">
+<span class="material-symbols-outlined text-tertiary-container" style="font-variation-settings: 'FILL' 1;">warning</span>
+</td>
+<td class="px-6 py-4">
+<div class="font-label-md text-label-md text-on-surface">Signature numérique manquante</div>
+<div class="text-[10px] text-on-surface-variant">Validation de l'intégrité du document</div>
+</td>
+<td class="px-6 py-4">
+<span class="font-label-md text-label-md text-primary">#REF-2024-0542</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-tertiary-container/15 text-tertiary-container text-[10px] font-label-caps border border-tertiary-container/20">MAJEUR</span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant font-label-md text-label-md">11 Jan 2024</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-secondary/20 flex items-center justify-center text-[10px] font-bold text-secondary">AL</div>
+<span class="text-on-surface font-label-md text-label-md">A. Leclerc</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-white/10 rounded transition-colors" title="Détails">
+<span class="material-symbols-outlined text-sm">visibility</span>
+</button>
+<button class="p-1.5 hover:bg-primary/20 text-primary rounded transition-colors" title="Résoudre">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+</button>
+<button class="p-1.5 hover:bg-white/10 text-on-surface-variant rounded transition-colors" title="Ignorer">
+<span class="material-symbols-outlined text-sm">block</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-white/[0.03] transition-colors group">
+<td class="px-6 py-4">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">info</span>
+</td>
+<td class="px-6 py-4">
+<div class="font-label-md text-label-md text-on-surface">Classification imprécise</div>
+<div class="text-[10px] text-on-surface-variant">Indexation des métadonnées courrier</div>
+</td>
+<td class="px-6 py-4">
+<span class="font-label-md text-label-md text-primary">#REF-2024-0012</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-secondary/15 text-secondary text-[10px] font-label-caps border border-secondary/20">MINEUR</span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant font-label-md text-label-md">10 Jan 2024</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">JM</div>
+<span class="text-on-surface font-label-md text-label-md">J. Martin</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-white/10 rounded transition-colors" title="Détails">
+<span class="material-symbols-outlined text-sm">visibility</span>
+</button>
+<button class="p-1.5 hover:bg-primary/20 text-primary rounded transition-colors" title="Résoudre">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+</button>
+<button class="p-1.5 hover:bg-white/10 text-on-surface-variant rounded transition-colors" title="Ignorer">
+<span class="material-symbols-outlined text-sm">block</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-6 py-4 border-t border-white/5 flex items-center justify-between font-label-md text-label-md">
+<p class="text-on-surface-variant">Affichage de 1 à 10 sur 42 anomalies</p>
+<div class="flex gap-2">
+<button class="px-3 py-1 glass-card rounded hover:bg-white/10 disabled:opacity-30" disabled="">Précédent</button>
+<button class="px-3 py-1 bg-primary/20 text-primary rounded border border-primary/30">1</button>
+<button class="px-3 py-1 glass-card rounded hover:bg-white/10">2</button>
+<button class="px-3 py-1 glass-card rounded hover:bg-white/10">3</button>
+<button class="px-3 py-1 glass-card rounded hover:bg-white/10">Suivant</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Detail Sidebar (Hidden by default) -->
+<aside class="fixed top-0 right-0 h-screen w-[400px] bg-surface-container/95 backdrop-blur-2xl border-l border-white/10 z-[60] translate-x-full transition-transform duration-500 shadow-2xl" id="detailSidebar">
+<div class="p-6 h-full flex flex-col">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-headline-md text-headline-md text-on-surface">Détails de l'anomalie</h3>
+<button class="p-2 hover:bg-white/10 rounded-full" onclick="toggleDetails()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="space-y-6 flex-1 overflow-y-auto pr-2">
+<!-- Anomaly Badge -->
+<div class="p-4 rounded-xl bg-error/10 border border-error/20">
+<div class="flex items-center gap-3 text-error mb-2">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-label-caps text-label-caps">Violation de Conformité</span>
+</div>
+<p class="text-on-surface font-title-md text-title-md">Délai de réponse dépassé > 48h</p>
+</div>
+<!-- Rule Breached -->
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Base Légale</label>
+<div class="p-4 rounded-xl bg-white/5 border border-white/10">
+<p class="font-bold text-primary mb-1">Article L.123 du code administratif</p>
+<p class="text-on-surface-variant text-body-sm font-body-sm leading-relaxed">
+                            "L'administration est tenue de répondre à toute sollicitation d'ordre prioritaire dans un délai n'excédant pas deux jours ouvrés à compter de la réception."
+                        </p>
+</div>
+</div>
+<!-- Context -->
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant">COURRIER SOURCE</label>
+<p class="text-on-surface font-label-md text-label-md">#REF-2024-0128</p>
+</div>
+<div class="space-y-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant">DÉTECTION</label>
+<p class="text-on-surface font-label-md text-label-md">12 Jan 2024 - 09:14</p>
+</div>
+</div>
+<!-- Timeline / Audit Trail -->
+<div class="space-y-4">
+<label class="font-label-caps text-label-caps text-on-surface-variant">JOURNAL D'AUDIT</label>
+<div class="space-y-4 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-white/10">
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-[22px] h-[22px] rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center">
+<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+</div>
+<p class="text-on-surface font-label-md text-label-md">Détection automatique</p>
+<p class="text-[10px] text-on-surface-variant">12/01/2024 - 09:14</p>
+</div>
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-[22px] h-[22px] rounded-full bg-surface-variant border-2 border-white/10 flex items-center justify-center">
+<div class="w-1.5 h-1.5 rounded-full bg-white/30"></div>
+</div>
+<p class="text-on-surface font-label-md text-label-md">Assignation automatique à J. Martin</p>
+<p class="text-[10px] text-on-surface-variant">12/01/2024 - 09:15</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="pt-6 border-t border-white/10 grid grid-cols-2 gap-4">
+<button class="py-2.5 px-4 rounded-lg bg-white/5 border border-white/10 text-on-surface font-label-md text-label-md hover:bg-white/10 transition-colors">
+                    Ignorer
+                </button>
+<button class="py-2.5 px-4 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:opacity-90 transition-opacity">
+                    Résoudre
+                </button>
+</div>
+</div>
+</aside>
+<script>
+        function toggleDetails() {
+            const sidebar = document.getElementById('detailSidebar');
+            sidebar.classList.toggle('translate-x-full');
+        }
+
+        // Keyboard Shortcut Sim
+        document.addEventListener('keydown', function(e) {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                alert('Ouverture du Command Center...');
+            }
+        });
+    </script>
+</body></html>

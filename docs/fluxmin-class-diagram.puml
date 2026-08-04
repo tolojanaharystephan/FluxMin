@@ -1,0 +1,266 @@
+@startuml FluxMin_Global_Class_Diagram
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+skinparam classFontSize 12
+skinparam titleFontSize 18
+skinparam shadowing false
+skinparam roundCorner 8
+
+title Diagramme de Classes Global — FluxMin\nPlateforme de Gestion et d'Automatisation Intelligente des Courriers Ministériels
+
+' ============================================================
+'  ENUMS
+' ============================================================
+package "Enums & Types" #FFFDE7 {
+  enum UserRole {
+    SUPER_ADMIN = "super_admin"
+    DIRECTEUR_MINISTERE = "directeur_ministere"
+    GOUVERNEMENT = "gouvernement"
+    AGENT_COURRIER = "agent_courrier"
+    RESPONSABLE = "responsable"
+    RESPONSABLE_DIRECTION = "responsable_direction"
+    AUDITEUR = "auditeur"
+  }
+
+  enum Permission {
+    CREATE_COURRIER
+    READ_COURRIER
+    UPDATE_COURRIER
+    DELETE_COURRIER
+    FORWARD_COURRIER
+    ARCHIVE_COURRIER
+    MANAGE_MINISTERES
+    MANAGE_DIRECTIONS
+    MANAGE_UTILISATEURS
+    VIEW_DASHBOARD
+    VIEW_ANALYTICS
+    VIEW_AUDIT_LOGS
+    USE_AI_FEATURES
+    MANAGE_PUBLICATIONS_GOUV
+    READ_PUBLICATIONS_GOUV
+    REPLY_PUBLICATIONS_GOUV
+  }
+}
+
+' ============================================================
+'  ENTITIES (DB Schema)
+' ============================================================
+package "Entités (Drizzle ORM)" #E3F2FD {
+
+  class Ministere {
+    +id : int [PK]
+    +nom : varchar(255)
+    +code : varchar(50)
+    +createdAt : timestamp
+  }
+
+  class Direction {
+    +id : int [PK]
+    +ministereId : int [FK → Ministere]
+    +nom : varchar(255)
+    +type : varchar(100)
+  }
+
+  class Utilisateur {
+    +id : int [PK]
+    +directionId : int [FK → Direction]
+    +ministereId : int [FK → Ministere]
+    +email : varchar(255)
+    +nom : varchar(100)
+    +prenom : varchar(100)
+    +role : UserRole
+    +permissions : Permission[]
+    +motDePasse : varchar(255)
+    +createdAt : timestamp
+  }
+
+  class Courrier {
+    +id : int [PK]
+    +reference : varchar(100)
+    +objet : text
+    +corps : text
+    +typeCourrier : "interne"|"externe"
+    +statut : "brouillon"|"envoye"|"recu"|"en_traitement"|"archive"
+    +emetteurId : int [FK → Utilisateur]
+    +directionEmetteurId : int [FK → Direction]
+    +directionCourrierEmetteurId : int [FK → Direction]
+    +destinataireDirectionId : int [FK → Direction]
+    +ministereDestinataireId : int [FK → Ministere]
+    +dateEnvoi : timestamp
+    +dateReception : timestamp
+    +metadata : jsonb
+    +iaSuggestions : jsonb
+    +createdAt : timestamp
+    +updatedAt : timestamp
+  }
+
+  class PieceJointe {
+    +id : int [PK]
+    +courrierId : int [FK → Courrier]
+    +nomFichier : varchar(255)
+    +cheminMinio : varchar(512)
+    +typeMime : varchar(100)
+    +tailleBytes : bigint
+    +hashSha256 : varchar(64)
+    +metadataIa : jsonb
+  }
+
+  class FluxEtape {
+    +id : int [PK]
+    +courrierId : int [FK → Courrier]
+    +directionId : int [FK → Direction]
+    +action : "envoi"|"reception"|"transmission"|"validation"
+    +utilisateurId : int [FK → Utilisateur]
+    +commentaire : text
+    +dateAction : timestamp
+  }
+
+  class Archive {
+    +id : int [PK]
+    +courrierId : int [FK → Courrier]
+    +dateArchivage : timestamp
+    +dureeConservation : int
+    +emplacement : varchar(255)
+  }
+
+  class AuditLog {
+    +id : int [PK]
+    +utilisateurId : int
+    +action : text
+    +entiteType : varchar(50)
+    +entiteId : int
+    +details : jsonb
+    +ip : varchar(45)
+    +createdAt : timestamp
+  }
+
+  class AuditReport {
+    +id : int [PK]
+    +titre : varchar(255)
+    +periodeDebut : timestamp
+    +periodeFin : timestamp
+    +genereParId : int [FK → Utilisateur]
+    +resume : jsonb
+    +createdAt : timestamp
+  }
+
+  class AnomalyResolution {
+    +id : int [PK]
+    +anomalyKey : varchar(100)
+    +resolvedById : int [FK → Utilisateur]
+    +note : text
+    +resolvedAt : timestamp
+  }
+
+  class Message {
+    +id : int [PK]
+    +courrierId : int [FK → Courrier]
+    +utilisateurId : int [FK → Utilisateur]
+    +contenu : text
+    +createdAt : timestamp
+  }
+
+  class MessagePieceJointe {
+    +id : int [PK]
+    +messageId : int [FK → Message]
+    +nomFichier : varchar(255)
+    +cheminFichier : varchar(512)
+    +typeMime : varchar(100)
+    +tailleBytes : bigint
+    +createdAt : timestamp
+  }
+
+  class Notification {
+    +id : int [PK]
+    +utilisateurId : int [FK → Utilisateur]
+    +type : varchar(50)
+    +titre : varchar(255)
+    +message : text
+    +courrierId : int [FK → Courrier]
+    +publicationId : int
+    +lu : boolean
+    +createdAt : timestamp
+  }
+
+  class PublicationGouvernement {
+    +id : int [PK]
+    +titre : varchar(255)
+    +corps : text
+    +typePublication : "communique"|"information"|"ordre"|"alerte"
+    +priorite : "normale"|"haute"|"urgente"
+    +portee : "public"|"ministere"
+    +ministereId : int [FK → Ministere]
+    +statut : "brouillon"|"publie"|"archive"
+    +auteurId : int [FK → Utilisateur]
+    +datePublication : timestamp
+    +dateArchivage : timestamp
+    +createdAt : timestamp
+    +updatedAt : timestamp
+  }
+
+  class PublicationPieceJointe {
+    +id : int [PK]
+    +publicationId : int [FK → Publication]
+    +nomFichier : varchar(255)
+    +cheminFichier : varchar(512)
+    +typeMime : varchar(100)
+    +tailleBytes : bigint
+    +createdAt : timestamp
+  }
+
+  class PublicationAccuse {
+    +id : int [PK]
+    +publicationId : int [FK → Publication]
+    +ministereId : int [FK → Ministere]
+    +utilisateurId : int [FK → Utilisateur]
+    +commentaire : text
+    +dateAr : timestamp
+  }
+
+  class PublicationMessage {
+    +id : int [PK]
+    +publicationId : int [FK → Publication]
+    +utilisateurId : int [FK → Utilisateur]
+    +contenu : text
+    +createdAt : timestamp
+  }
+
+  class PublicationLecture {
+    +id : int [PK]
+    +publicationId : int [FK → Publication]
+    +utilisateurId : int [FK → Utilisateur]
+    +luAt : timestamp
+  }
+}
+
+' ============================================================
+'  RELATIONS ENTITÉS
+' ============================================================
+Ministere "1" -- "0..*" Direction : contient >
+Ministere "1" -- "0..*" Courrier : reçoit >
+Direction "1" -- "0..*" Utilisateur : emploie >
+Utilisateur "1" -- "0..*" Courrier : émet >
+Direction "1" -- "0..*" Courrier : émet/dir. >
+Direction "1" -- "0..*" Courrier : reçoit/dir. >
+Direction "1" -- "0..*" FluxEtape : concerne >
+Utilisateur "1" -- "0..*" FluxEtape : effectue >
+Courrier "1" -- "0..*" PieceJointe : contient >
+Courrier "1" -- "0..*" FluxEtape : historique >
+Courrier "1" -- "0..1" Archive : archivé >
+Courrier "1" -- "0..*" Message : discussion >
+Courrier "1" -- "0..*" Notification : notifie >
+Message "1" -- "0..*" MessagePieceJointe : contient >
+Utilisateur "1" -- "0..*" Notification : reçoit >
+Utilisateur "1" -- "0..*" AuditReport : génère >
+Utilisateur "1" -- "0..*" AnomalyResolution : résout >
+Ministere "1" -- "0..*" PublicationGouvernement : concerne >
+Utilisateur "1" -- "0..*" PublicationGouvernement : rédige >
+PublicationGouvernement "1" -- "0..*" PublicationPieceJointe : contient >
+PublicationGouvernement "1" -- "0..*" PublicationAccuse : accusé >
+PublicationGouvernement "1" -- "0..*" PublicationMessage : commentaire >
+PublicationGouvernement "1" -- "0..*" PublicationLecture : lu par >
+
+@enduml

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FluxMin | Administration des Utilisateurs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet"/>
+<!-- Tailwind Config Verbatim -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#ffb59e",
+                    "primary-fixed": "#71f8e4",
+                    "on-error": "#690005",
+                    "on-tertiary": "#5e1800",
+                    "on-secondary-fixed-variant": "#004c6e",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-container": "#00344e",
+                    "surface-variant": "#2f3634",
+                    "surface-container-high": "#252b2a",
+                    "secondary-fixed-dim": "#89ceff",
+                    "on-surface-variant": "#bbcac6",
+                    "on-surface": "#dde4e1",
+                    "outline-variant": "#3c4947",
+                    "surface-container-lowest": "#090f0e",
+                    "on-tertiary-container": "#6c2106",
+                    "primary-container": "#14b8a6",
+                    "on-secondary": "#00344d",
+                    "error": "#ffb4ab",
+                    "primary-fixed-dim": "#4fdbc8",
+                    "outline": "#859490",
+                    "on-primary": "#003731",
+                    "surface-container-highest": "#2f3634",
+                    "on-primary-fixed": "#00201c",
+                    "secondary-fixed": "#c9e6ff",
+                    "on-tertiary-fixed-variant": "#7c2d11",
+                    "tertiary-container": "#f38764",
+                    "inverse-on-surface": "#2b3230",
+                    "background": "#0e1513",
+                    "surface-dim": "#0e1513",
+                    "on-secondary-fixed": "#001e2f",
+                    "on-primary-fixed-variant": "#005048",
+                    "tertiary-fixed": "#ffdbd0",
+                    "surface-container-low": "#161d1b",
+                    "surface-container": "#1a211f",
+                    "error-container": "#93000a",
+                    "surface-tint": "#4fdbc8",
+                    "primary": "#4fdbc8",
+                    "on-primary-container": "#00423b",
+                    "inverse-primary": "#006b5f",
+                    "secondary-container": "#00a2e6",
+                    "tertiary": "#ffb59e",
+                    "surface-bright": "#343b39",
+                    "surface": "#0e1513",
+                    "secondary": "#89ceff",
+                    "on-tertiary-fixed": "#3a0b00",
+                    "on-background": "#dde4e1",
+                    "inverse-surface": "#dde4e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sidebar-collapsed": "68px",
+                    "gutter": "1.5rem",
+                    "stack-sm": "0.5rem",
+                    "stack-md": "1rem",
+                    "stack-lg": "2rem",
+                    "sidebar-expanded": "260px",
+                    "container-padding": "2rem"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Geist"],
+                    "label-caps": ["Geist"],
+                    "body-sm": ["Geist"],
+                    "body-lg": ["Geist"],
+                    "display-lg": ["Geist"],
+                    "title-md": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "label-md": ["Geist"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "600"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "title-md": ["18px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #07110f;
+            color: #dde4e1;
+            font-family: 'Geist', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+            vertical-align: middle;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-hover:hover {
+            border-color: rgba(79, 219, 200, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .sidebar-item-active {
+            border-left: 2px solid #4fdbc8;
+            background: rgba(79, 219, 200, 0.05);
+            color: #4fdbc8;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(79, 219, 200, 0.2); }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-sidebar-expanded transition-all duration-300 border-r border-white/10 bg-surface/80 backdrop-blur-md flex flex-col py-stack-md z-50">
+<div class="px-6 mb-10 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mail</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary leading-tight">FluxMin</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60">Ministerial Mail</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1 px-3">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+<span class="font-body-lg text-body-lg">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="inbox">inbox</span>
+<span class="font-body-lg text-body-lg">Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="send">send</span>
+<span class="font-body-lg text-body-lg">Sent</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="drafts">drafts</span>
+<span class="font-body-lg text-body-lg">Drafts</span>
+</a>
+<div class="pt-4 pb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-outline">Analytics</div>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="analytics">analytics</span>
+<span class="font-body-lg text-body-lg">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="rule">rule</span>
+<span class="font-body-lg text-body-lg">Audit</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg border-l-2 border-primary bg-primary/5 text-primary scale-[0.98] transition-transform duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="admin_panel_settings" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+<span class="font-body-lg text-body-lg">Admin</span>
+</a>
+</nav>
+<div class="mt-auto px-3">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="account_circle">account_circle</span>
+<span class="font-body-lg text-body-lg">Profile Settings</span>
+</a>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 h-16 z-40 bg-surface/60 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-gutter w-[calc(100%-260px)] ml-auto">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full bg-white/5 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-body-sm font-body-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all" placeholder="Rechercher par nom, email ou direction..." type="text"/>
+<div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-40 group-focus-within:opacity-0 transition-opacity">
+<span class="border border-white/20 rounded px-1 text-[10px]">⌘</span>
+<span class="border border-white/20 rounded px-1 text-[10px]">K</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative p-2 rounded-full hover:bg-white/5 transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<div class="flex items-center gap-3 border-l border-white/10 pl-6">
+<div class="text-right">
+<p class="text-label-md font-label-md text-on-surface">Jean-Michel Dupont</p>
+<p class="text-[10px] text-primary uppercase font-bold tracking-tighter">Super Admin</p>
+</div>
+<div class="w-10 h-10 rounded-full border border-primary/20 p-0.5 overflow-hidden">
+<img class="w-full h-full object-cover rounded-full" data-alt="A professional studio portrait of a senior government official with short grey hair, wearing a dark navy suit and white shirt against a neutral professional background. High-quality corporate photography, soft side lighting, sophisticated aesthetic aligned with luxury enterprise software." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5lu6Io3F7-q6y34gaZUi3XJSJOLy9q9GC9nGQOTO7d4b9XTFTn6LjPotniAuwwxuUQ8wpthRkKRZqaOhY752L3VjFS2ZrFQNkNOreJ4t4EmNhWrzWBx2-7aA-yJFP4-TS92YNEOXvpVql5_fgrT76cDj48M-Ajfsrt8pb-KF85QnkC4I77rjyT_gaJ2PucKlXRB059WZ23p3GfNl_dBoRWGkW9Beo9sJ95SG8F7A7Gy1vhW9b8udu"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[260px] pt-16 min-h-screen p-stack-lg">
+<!-- Header Section -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-gutter mb-stack-lg">
+<div>
+<nav class="flex items-center gap-2 text-on-surface-variant text-[12px] mb-2">
+<span>Admin</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary/80">Utilisateurs</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Administration des Utilisateurs</h2>
+<div class="flex items-center gap-2 mt-1">
+<span class="inline-block w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+<p class="text-body-sm font-body-sm text-on-surface-variant">128 utilisateurs actifs sur la plateforme</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-body-sm font-body-sm hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                    Filtrer
+                </button>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-primary text-on-primary rounded-lg text-body-sm font-body-sm font-bold shadow-lg shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] transition-all" onclick="toggleModal('newUserModal')">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+                    Nouvel utilisateur
+                </button>
+</div>
+</section>
+<!-- Stats Overview Row -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-stack-lg">
+<div class="glass p-5 rounded-xl border border-white/10">
+<div class="flex justify-between items-start mb-2">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">group</span>
+</div>
+<span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">+12%</span>
+</div>
+<p class="text-on-surface-variant text-label-md font-label-md uppercase">Total Utilisateurs</p>
+<h3 class="text-headline-md font-headline-md">1,248</h3>
+</div>
+<div class="glass p-5 rounded-xl border border-white/10">
+<div class="flex justify-between items-start mb-2">
+<div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
+<span class="material-symbols-outlined">shield</span>
+</div>
+<span class="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">Stable</span>
+</div>
+<p class="text-on-surface-variant text-label-md font-label-md uppercase">Responsables</p>
+<h3 class="text-headline-md font-headline-md">42</h3>
+</div>
+<div class="glass p-5 rounded-xl border border-white/10">
+<div class="flex justify-between items-start mb-2">
+<div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+<span class="material-symbols-outlined">pending_actions</span>
+</div>
+<span class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">8 en attente</span>
+</div>
+<p class="text-on-surface-variant text-label-md font-label-md uppercase">Invitations</p>
+<h3 class="text-headline-md font-headline-md">156</h3>
+</div>
+<div class="glass p-5 rounded-xl border border-white/10">
+<div class="flex justify-between items-start mb-2">
+<div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400">
+<span class="material-symbols-outlined">gpp_maybe</span>
+</div>
+<span class="text-[10px] font-bold text-red-400 bg-red-500/10 px-2 py-0.5 rounded">Action requise</span>
+</div>
+<p class="text-on-surface-variant text-label-md font-label-md uppercase">Alertes Sécurité</p>
+<h3 class="text-headline-md font-headline-md">2</h3>
+</div>
+</div>
+<!-- User Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="userGrid">
+<!-- User Card 1: Super Admin -->
+<div class="glass glass-hover p-6 rounded-xl transition-all group relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-error opacity-60"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-full border-2 border-white/10 p-0.5 flex-shrink-0">
+<img class="w-full h-full object-cover rounded-full" data-alt="A medium close-up of a diverse female executive in her 40s, confident expression, minimalist office background with soft bokeh. She has styled hair, wearing a professional silk blouse in muted tones. High-fidelity photography for a premium ministerial SaaS platform, dark-mode aesthetic lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGsPqaxknyFBFPQGT483OcbzBXso4j5RodqNIOnblS2daZ3E5BKxUconEYK5gFl-MvoQq8x_whFgAVVaDcqnwrjRDg-ytXFEBs_TSpWQb3QEap05gy_uNUkErdeH-AlXpdpIyquyCffBykwt7dZmyDw9wODCrhzMMJO5sGbaior3Z8DK8ih6nO7vXE2iLyj4Eh6q18OyCqOZodCZdOxKgN1816qcj22ehHt_AyoI6VhBdT8Tzm-TW7"/>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Elena Vostrikova</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant opacity-70">elena.v@fluxmin.gouv.fr</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-error/15 text-error border border-error/20">Super Admin</span>
+</div>
+<div class="space-y-3 mb-6">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">domain</span>
+<span class="text-body-sm font-body-sm">Cabinet du Ministre</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-body-sm font-body-sm">Dernière connexion: il y a 5 min</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-white/5 pt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- User Card 2: Responsable -->
+<div class="glass glass-hover p-6 rounded-xl transition-all group relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary opacity-60"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-full border-2 border-white/10 flex items-center justify-center bg-secondary/10 text-secondary text-headline-md font-bold">
+                            AL
+                        </div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Arnaud Lefebvre</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant opacity-70">a.lefebvre@gouv.fr</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-secondary/15 text-secondary border border-secondary/20">Responsable</span>
+</div>
+<div class="space-y-3 mb-6">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">domain</span>
+<span class="text-body-sm font-body-sm">Direction du Numérique (DSI)</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-body-sm font-body-sm">Dernière connexion: Hier, 14:20</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-white/5 pt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- User Card 3: Agent Courrier -->
+<div class="glass glass-hover p-6 rounded-xl transition-all group relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-outline opacity-60"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-full border-2 border-white/10 p-0.5 flex-shrink-0">
+<img class="w-full h-full object-cover rounded-full" data-alt="A portrait of a young professional male in his 20s, friendly smile, urban workspace background with soft neon accent lighting. He is wearing a modern casual sweater. Crystal clear focus, professional portrait style for administrative software, moody dark atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD44xfXcnFfvwc03l-LAhvaPp7OUhb5PmgcQ5mcEspfxska9n8H83f9ngcZ0awpRUPPoEf6Dtd38PmXSC-H6YrTmpdR_6hx3qoFjfc3_GezRXFWbPVEs3-5p_ZNKY9sv_lAOF1p-NJI2c4GJAW4OnKSp66hqJBAI2E8hiE9-dWzTqKn_Klh8eBR_vzFb-63lgMss1SFtKF56jKUHwk6Ol9LV9i0Q2yEhaIw4X7v0meJdjyxbyMHcS5Q"/>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Lucas Martin</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant opacity-70">lucas.m@courrier.gouv.fr</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-outline/15 text-on-surface-variant border border-white/10">Agent Courrier</span>
+</div>
+<div class="space-y-3 mb-6">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">domain</span>
+<span class="text-body-sm font-body-sm">Pôle Administratif</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-body-sm font-body-sm">Dernière connexion: 2 heures</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-white/5 pt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Skeleton Loading Example (Visual Cue) -->
+<div class="glass p-6 rounded-xl animate-pulse flex flex-col">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-14 h-14 rounded-full bg-white/5"></div>
+<div class="flex-1 space-y-2">
+<div class="h-4 bg-white/5 rounded w-3/4"></div>
+<div class="h-3 bg-white/5 rounded w-1/2"></div>
+</div>
+</div>
+<div class="space-y-3 mb-6">
+<div class="h-3 bg-white/5 rounded w-full"></div>
+<div class="h-3 bg-white/5 rounded w-2/3"></div>
+</div>
+<div class="mt-auto pt-4 border-t border-white/5 h-8 w-1/4 self-end bg-white/5 rounded"></div>
+</div>
+<!-- User Card 4: Auditeur -->
+<div class="glass glass-hover p-6 rounded-xl transition-all group relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-tertiary-container opacity-60"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-full border-2 border-white/10 flex items-center justify-center bg-tertiary-container/10 text-tertiary-container text-headline-md font-bold">
+                            SB
+                        </div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Sarah Benali</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant opacity-70">s.benali@audit.gouv.fr</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-tertiary-container/15 text-tertiary-container border border-tertiary-container/20">Auditeur</span>
+</div>
+<div class="space-y-3 mb-6">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">domain</span>
+<span class="text-body-sm font-body-sm">Inspection Générale</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-body-sm font-body-sm">Dernière connexion: il y a 3j</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-white/5 pt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- User Card 5: Gouvernement -->
+<div class="glass glass-hover p-6 rounded-xl transition-all group relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary opacity-60"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-full border-2 border-white/10 p-0.5 flex-shrink-0">
+<img class="w-full h-full object-cover rounded-full" data-alt="A portrait of a distinguished man in his 50s, salt and pepper hair, glasses, wearing a tailored charcoal suit. Background shows a blurred high-end government architectural detail. Soft atmospheric lighting with cool teal shadows. Professional editorial style for high-stakes administrative dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuFG5nQCJRURSC39esp4dbL6zMJ-UOwGxuL9pG37gOhe_6tyf3rfxQ0MqIfAQqh32f3GWE6BDuA7hPmX5EXiQ7CjSLXA4CGfiHCL3XhC_sK-aijzzZ1nwE5-msUVN_1xH1H3n453Bw6azLzSXIAH0fZkp98XQk5BBJ7qQnT4Voa5M3yWOZjJ45YJo-C5dk0Kdz8trkhq42HOydszw3nKwBrU1nX_NOQSxcSeQVE_r1WDwtpJYl8sPm"/>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Jean-Luc Picard</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant opacity-70">picard@min.gouv.fr</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-primary/15 text-primary border border-primary/20">Gouvernement</span>
+</div>
+<div class="space-y-3 mb-6">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">domain</span>
+<span class="text-body-sm font-body-sm">Secrétariat d'Etat</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-body-sm font-body-sm">Dernière connexion: il y a 12 min</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 border-t border-white/5 pt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Empty State (Hidden by default) -->
+<div class="hidden flex-col items-center justify-center py-24 text-center" id="emptyState">
+<div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center text-on-surface-variant mb-6">
+<span class="material-symbols-outlined text-[40px]" data-icon="search_off">search_off</span>
+</div>
+<h3 class="text-headline-md font-headline-md mb-2">Aucun utilisateur trouvé</h3>
+<p class="text-on-surface-variant max-w-sm">Désolé, nous n'avons trouvé aucun utilisateur correspondant à vos critères de recherche. Veuillez réessayer.</p>
+<button class="mt-6 text-primary hover:underline font-bold">Réinitialiser les filtres</button>
+</div>
+<!-- Pagination -->
+<div class="mt-12 flex items-center justify-between border-t border-white/10 pt-8">
+<p class="text-body-sm text-on-surface-variant">Affichage de <span class="text-on-surface font-bold">1 - 10</span> sur <span class="text-on-surface font-bold">128</span></p>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-lg hover:bg-white/5 transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex items-center gap-1">
+<button class="w-10 h-10 rounded-lg bg-primary text-on-primary font-bold">1</button>
+<button class="w-10 h-10 rounded-lg hover:bg-white/5 transition-colors">2</button>
+<button class="w-10 h-10 rounded-lg hover:bg-white/5 transition-colors">3</button>
+<span class="px-2">...</span>
+<button class="w-10 h-10 rounded-lg hover:bg-white/5 transition-colors">13</button>
+</div>
+<button class="p-2 rounded-lg hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Modal: Nouvel Utilisateur -->
+<div class="fixed inset-0 z-[100] hidden items-center justify-center p-gutter backdrop-blur-sm bg-black/60" id="newUserModal">
+<div class="glass w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+<div class="flex items-center justify-between p-6 border-b border-white/10 bg-white/5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person_add</span>
+</div>
+<div>
+<h3 class="font-headline-md text-title-md leading-none">Nouvel Utilisateur</h3>
+<p class="text-[11px] text-on-surface-variant uppercase tracking-wider mt-1">Enregistrer un nouveau profil administratif</p>
+</div>
+</div>
+<button class="p-2 hover:bg-white/10 rounded-full transition-all" onclick="toggleModal('newUserModal')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form class="p-8 space-y-6">
+<div class="grid grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="block text-label-caps font-label-caps text-on-surface-variant">Prénom</label>
+<input class="w-full bg-white/5 border border-white/10 rounded-lg py-2.5 px-4 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="ex: Jean" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="block text-label-caps font-label-caps text-on-surface-variant">Nom</label>
+<input class="w-full bg-white/5 border border-white/10 rounded-lg py-2.5 px-4 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="ex: Dupont" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-label-caps font-label-caps text-on-surface-variant">Email Professionnel</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60 text-[18px]">mail</span>
+<input class="w-full bg-white/5 border border-white/10 rounded-lg py-2.5 pl-10 pr-4 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="nom.prenom@fluxmin.gouv.fr" type="email"/>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="block text-label-caps font-label-caps text-on-surface-variant">Rôle d'Accès</label>
+<select class="w-full bg-white/5 border border-white/10 rounded-lg py-2.5 px-4 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer">
+<option class="bg-surface">Agent Courrier</option>
+<option class="bg-surface">Responsable</option>
+<option class="bg-surface">Auditeur</option>
+<option class="bg-surface">Super Admin</option>
+<option class="bg-surface">Gouvernement</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="block text-label-caps font-label-caps text-on-surface-variant">Ministère / Direction</label>
+<select class="w-full bg-white/5 border border-white/10 rounded-lg py-2.5 px-4 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer">
+<option class="bg-surface">Direction du Numérique (DSI)</option>
+<option class="bg-surface">Cabinet du Ministre</option>
+<option class="bg-surface">Direction de la Logistique</option>
+<option class="bg-surface">Affaires Étrangères</option>
+</select>
+</div>
+</div>
+<div class="pt-6 flex items-center justify-end gap-4 border-t border-white/10">
+<button class="px-6 py-2.5 rounded-lg font-body-sm text-on-surface-variant hover:text-on-surface transition-colors" onclick="toggleModal('newUserModal')" type="button">Annuler</button>
+<button class="px-8 py-2.5 bg-primary text-on-primary rounded-lg font-bold hover:shadow-lg hover:shadow-primary/20 transition-all" type="submit">Créer le compte</button>
+</div>
+</form>
+</div>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Close modal on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const modals = ['newUserModal'];
+                modals.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el.classList.contains('hidden')) toggleModal(id);
+                });
+            }
+        });
+
+        // Simple search simulation
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('#userGrid > div:not(.animate-pulse)');
+            let found = 0;
+
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if (text.includes(value)) {
+                    card.style.display = 'block';
+                    found++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const emptyState = document.getElementById('emptyState');
+            if (found === 0 && value.length > 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+            } else {
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+            }
+        });
+    </script>
+</body></html>
