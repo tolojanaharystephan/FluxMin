@@ -22,6 +22,7 @@ import { ensureDemoUploadPdfs } from '../../common/files/demo-uploads.util';
 import { StorageService } from '../../infrastructure/storage/storage.service';
 import { StatutCourrier } from '../courrier/dto/courrier.dto';
 import { AuditService } from '../audit/audit.service';
+import { NotificationService } from '../notification/notification.service';
 import { AnalyzeTextDto, DraftDto } from './dto/ai.dto';
 
 const IA_URL = (process.env.IA_SERVICE_URL || 'http://localhost:8000').replace(/\/$/, '');
@@ -35,6 +36,7 @@ export class AiService implements OnModuleInit {
     @Inject(DATABASE_CONNECTION) private db: DrizzleDB,
     private auditService: AuditService,
     private storage: StorageService,
+    private notificationService: NotificationService,
   ) {}
 
   async onModuleInit() {
@@ -426,6 +428,143 @@ export class AiService implements OnModuleInit {
       pieces: details,
       analysis,
     };
+  }
+
+  /**
+   * Analyse automatique niveau 1 déclenchée à la réception d'un courrier.
+   * Fire-and-forget : ne lève jamais d'exception vers l'appelant.
+   * Stocke priorité + entités dans courriers.metadata et piecesJointes.metadataIa.
+   */
+  async autoAnalyzeOnReception(courrierId: number): Promise<void> {
+    const health = await this.health();
+    if (health.status !== 'ok') {
+      this.logger.warn(
+        `autoAnalyze #${courrierId} ignorée : service IA indisponible (${IA_URL})`,
+      );
+      return;
+    }
+
+    try {
+      const [courrier] = await this.db
+        .select()
+        .from(courriers)
+        .where(eq(courriers.id, courrierId))
+        .limit(1);
+
+      if (!courrier) return;
+
+      const pjs = await this.db
+        .select()
+        .from(piecesJointes)
+        .where(eq(piecesJointes.courrierId, courrierId));
+
+      let priorite: string = 'basse';
+      let prioriteScore: number = 0;
+      let objetPropose: string | null = null;
+      let entites: Record<string, any> = {};
+      let analyseSource: 'text' | 'pj' | 'none' = 'none';
+
+      if (pjs.length > 0) {
+        // Analyser chaque PJ analysable, stocker metadataIa
+        for (const pj of pjs) {
+          const nomFichier = pj.nomFichier?.trim() || `document-${pj.id}`;
+          const ext = require('path').extname(nomFichier).toLowerCase();
+          if (!ANALYZABLE_EXTS.has(ext)) continue;
+          try {
+            const buffer = await this.storage.readBuffer(pj.cheminMinio);
+            const analysis = await this.callIaAnalyzeFile(buffer, nomFichier);
+
+            // Sauvegarder dans la PJ
+            await this.db
+              .update(piecesJointes)
+              .set({ metadataIa: analysis })
+              .where(eq(piecesJointes.id, pj.id));
+
+            // Agréger la priorité maximale
+            const p = analysis?.prioriteDetecte;
+            if (p === 'haute' || (p === 'moyenne' && priorite === 'basse')) {
+              priorite = p;
+              prioriteScore = analysis?.prioriteScore ?? prioriteScore;
+            }
+            if (!objetPropose && analysis?.objetPropose) {
+              objetPropose = analysis.objetPropose;
+            }
+            if (analysis?.ocrResult?.resumeStructure?.entites) {
+              const e = analysis.ocrResult.resumeStructure.entites;
+              entites.references = [...(entites.references || []), ...(e.references || [])];
+              entites.dates = [...(entites.dates || []), ...(e.dates || [])];
+              entites.montants = [...(entites.montants || []), ...(e.montants || [])];
+            }
+            analyseSource = 'pj';
+          } catch (err: any) {
+            this.logger.warn(
+              `autoAnalyze PJ #${pj.id} du courrier #${courrierId} : ${err?.message || err}`,
+            );
+          }
+        }
+      }
+
+      // Fallback : analyser le corps/objet si aucune PJ analysée
+      if (analyseSource === 'none' && (courrier.objet || courrier.corps)) {
+        try {
+          const texte = [courrier.objet, courrier.corps].filter(Boolean).join('\n\n');
+          const analysis = await this.callIaAnalyzeText(texte, courrier.objet || undefined);
+          priorite = analysis?.prioriteDetecte ?? 'basse';
+          prioriteScore = analysis?.prioriteScore ?? 0;
+          if (!objetPropose && analysis?.objetPropose) objetPropose = analysis.objetPropose;
+          if (analysis?.ocrResult?.resumeStructure?.entites) {
+            entites = analysis.ocrResult.resumeStructure.entites;
+          }
+          analyseSource = 'text';
+        } catch (err: any) {
+          this.logger.warn(
+            `autoAnalyze text courrier #${courrierId} : ${err?.message || err}`,
+          );
+        }
+      }
+
+      // Stocker le résultat dans courriers.metadata
+      const existingMeta = (courrier.metadata as Record<string, any>) || {};
+      await this.db
+        .update(courriers)
+        .set({
+          metadata: {
+            ...existingMeta,
+            autoAnalyse: {
+              priorite,
+              prioriteScore,
+              objetPropose,
+              entites,
+              analyseSource,
+              analyzedAt: new Date().toISOString(),
+            },
+          },
+          // Pré-remplir l'objet si vide et IA propose quelque chose
+          ...(objetPropose && !courrier.objet ? { objet: objetPropose } : {}),
+          updatedAt: new Date(),
+        })
+        .where(eq(courriers.id, courrierId));
+
+      // Notification enrichie à la direction destinataire si priorité détectée
+      if (courrier.destinataireDirectionId && (priorite === 'haute' || priorite === 'moyenne')) {
+        const emoji = priorite === 'haute' ? '🔴' : '🟡';
+        const label = priorite === 'haute' ? 'URGENT' : 'Priorité moyenne';
+        await this.notificationService.createForDirection(courrier.destinataireDirectionId, {
+          type: 'courrier_priorite_ia',
+          titre: `${emoji} ${label} — ${courrier.objet || `Courrier #${courrierId}`}`,
+          message: `L'IA a détecté une priorité ${label.toLowerCase()} dans ce courrier${objetPropose ? `. Objet proposé : "${objetPropose}"` : ''}.`,
+          courrierId,
+        });
+      }
+
+      this.logger.log(
+        `autoAnalyze #${courrierId} OK — priorité: ${priorite}, source: ${analyseSource}`,
+      );
+    } catch (err: any) {
+      this.logger.error(
+        `autoAnalyze #${courrierId} échec inattendu : ${err?.message || err}`,
+      );
+    }
   }
 
   /** Suggestions opérationnelles à partir des données réelles + health IA */

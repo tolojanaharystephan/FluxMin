@@ -5,7 +5,7 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1784101568387,
+      "when": 1700000000000,
       "tag": "0000_worthless_zemo",
       "breakpoints": true
     },
@@ -14,6 +14,20 @@
       "version": "7",
       "when": 1752760000000,
       "tag": "0001_add_messaging_and_notifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1755510000000,
+      "tag": "0002_security_geo_logs",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1755680000000,
+      "tag": "0003_session_id",
       "breakpoints": true
     }
   ]

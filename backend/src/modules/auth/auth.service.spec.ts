@@ -18,6 +18,13 @@ describe('AuthService', () => {
     service = new AuthService(
       db as any,
       { sign: jest.fn().mockReturnValue('token') } as unknown as JwtService,
+      {
+        assertIpNotBlocked: jest.fn().mockResolvedValue(undefined),
+        recordLoginAttempt: jest.fn().mockResolvedValue({}),
+        clientFromRequest: jest.fn().mockReturnValue({ ip: '127.0.0.1', userAgent: 'test' }),
+        newSessionId: jest.fn().mockReturnValue('sess-test'),
+      } as any,
+      { log: jest.fn().mockResolvedValue(undefined) } as any,
     );
   });
 

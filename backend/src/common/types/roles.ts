@@ -46,6 +46,7 @@ export enum Permission {
   VIEW_ANALYTICS = 'view_analytics',
 
   VIEW_AUDIT_LOGS = 'view_audit_logs',
+  VIEW_SECURITY_LOGS = 'view_security_logs',
 
   USE_AI_FEATURES = 'use_ai_features',
 

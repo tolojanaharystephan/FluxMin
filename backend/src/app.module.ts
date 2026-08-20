@@ -17,6 +17,7 @@ import { MessagingModule } from './modules/messaging/messaging.module';
 import { StatsModule } from './modules/stats/stats.module';
 import { AiModule } from './modules/ai/ai.module';
 import { GouvernementModule } from './modules/gouvernement/gouvernement.module';
+import { SecurityModule } from './modules/security/security.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { AuditInterceptor } from './common/interceptors/audit.interceptor';
@@ -46,6 +47,7 @@ const throttleLimit = Number(process.env.THROTTLE_LIMIT) || 60;
     StatsModule,
     AiModule,
     GouvernementModule,
+    SecurityModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,4 +1,4 @@
-﻿import { Injectable, NotFoundException, ForbiddenException, Inject, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Inject, BadRequestException } from '@nestjs/common';
 import { DATABASE_CONNECTION } from '../../infrastructure/database/database.provider';
 import type { DrizzleDB } from '../../infrastructure/database/database.provider';
 import {
@@ -21,6 +21,7 @@ import {
 import { NotificationService } from '../notification/notification.service';
 import { StorageService } from '../../infrastructure/storage/storage.service';
 import { TemporalService } from '../../infrastructure/temporal/temporal.service';
+import { AiService } from '../ai/ai.service';
 
 @Injectable()
 export class CourrierService {
@@ -29,6 +30,7 @@ export class CourrierService {
     private notificationService: NotificationService,
     private storage: StorageService,
     private temporal: TemporalService,
+    private aiService: AiService,
   ) {}
 
   async create(dto: CreateCourrierDto, emetteurId: number) {
@@ -511,6 +513,9 @@ export class CourrierService {
         courrierId: id,
       });
     }
+
+    // Analyse automatique niveau 1 (fire-and-forget — ne bloque pas la réception)
+    void this.aiService.autoAnalyzeOnReception(id);
 
     await this.temporal.cancelCourrierSuivi(id);
     return updated;

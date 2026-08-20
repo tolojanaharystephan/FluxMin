@@ -7,15 +7,22 @@ import { eq } from 'drizzle-orm';
 import * as bcrypt from 'bcryptjs';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { ROLE_PERMISSIONS } from '../../common/types/roles';
+import { SecurityService, type LoginContext } from '../security/security.service';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @Inject(DATABASE_CONNECTION) private db: DrizzleDB,
     private jwtService: JwtService,
+    private security: SecurityService,
+    private audit: AuditService,
   ) {}
 
-  async login(dto: LoginDto) {
+  async login(dto: LoginDto, ctx?: LoginContext) {
+    const context = ctx || { ip: 'unknown', userAgent: '' };
+    await this.security.assertIpNotBlocked(context.ip);
+
     const [user] = await this.db
       .select()
       .from(utilisateurs)
@@ -23,15 +30,55 @@ export class AuthService {
       .limit(1);
 
     if (!user) {
+      await this.security.recordLoginAttempt({
+        email: dto.email,
+        succes: false,
+        ctx: context,
+        user: null,
+      });
       throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
     const isPasswordValid = await bcrypt.compare(dto.motDePasse, user.motDePasse);
     if (!isPasswordValid) {
+      await this.security.recordLoginAttempt({
+        email: dto.email,
+        succes: false,
+        ctx: context,
+        user: {
+          id: user.id,
+          role: user.role,
+          directionId: user.directionId,
+          ministereId: user.ministereId,
+        },
+      });
       throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
-    return this.generateTokens(user);
+    const sessionId = this.security.newSessionId();
+    await this.security.recordLoginAttempt({
+      email: dto.email,
+      succes: true,
+      ctx: context,
+      sessionId,
+      user: {
+        id: user.id,
+        role: user.role,
+        directionId: user.directionId,
+        ministereId: user.ministereId,
+      },
+    });
+
+    await this.audit.log({
+      utilisateurId: user.id,
+      sessionId,
+      action: 'LOGIN',
+      entiteType: 'auth',
+      details: { email: user.email },
+      ip: context.ip,
+    });
+
+    return this.generateTokens(user, sessionId);
   }
 
   async register(dto: RegisterDto) {
@@ -66,7 +113,7 @@ export class AuthService {
     try {
       const payload = this.jwtService.verify(refreshToken, {
         secret: process.env.JWT_REFRESH_SECRET,
-      });
+      }) as { sub: number; sid?: string };
 
       const [user] = await this.db
         .select()
@@ -78,8 +125,13 @@ export class AuthService {
         throw new UnauthorizedException('Utilisateur introuvable');
       }
 
-      return this.generateTokens(user);
-    } catch {
+      if (payload.sid) {
+        await this.security.assertSessionActive(payload.sid);
+      }
+
+      return this.generateTokens(user, payload.sid || this.security.newSessionId());
+    } catch (err) {
+      if (err instanceof UnauthorizedException) throw err;
       throw new UnauthorizedException('Refresh token invalide ou expiré');
     }
   }
@@ -271,7 +323,7 @@ export class AuthService {
     return { ...user, direction: null, ministere: null };
   }
 
-  private async generateTokens(user: any) {
+  private async generateTokens(user: any, sessionId?: string) {
     // Enrichir avec direction/ministere
     let directionNom: string | null = null;
     let ministereNom: string | null = null;
@@ -308,8 +360,10 @@ export class AuthService {
 
     const permissions = this.resolvePermissions(user.role || '', user.permissions);
 
+    const sid = sessionId || this.security.newSessionId();
     const payload = {
       sub: user.id,
+      sid,
       email: user.email,
       role: user.role,
       nom: user.nom,
@@ -327,7 +381,7 @@ export class AuthService {
     });
 
     const refreshToken = this.jwtService.sign(
-      { sub: user.id },
+      { sub: user.id, sid },
       {
         secret: process.env.JWT_REFRESH_SECRET,
         expiresIn: 604800,

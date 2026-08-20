@@ -25,6 +25,9 @@ const runSeed = async () => {
   await db.delete(schema.anomalyResolutions);
   await db.delete(schema.auditReports);
   await db.delete(schema.auditLogs);
+  await db.delete(schema.sessions);
+  await db.delete(schema.ipBlocks);
+  await db.delete(schema.securityLogs);
   await db.delete(schema.archives);
   await db.delete(schema.messagePiecesJointes);
   await db.delete(schema.messages);
@@ -206,19 +209,8 @@ const runSeed = async () => {
     },
   ]).returning();
 
-  // ── Auditeur + Super Admin (transversaux — pas rattachés à une direction métier) ──
-  const [auditeur] = await db.insert(schema.utilisateurs).values([
-    {
-      directionId: null,
-      email: 'auditeur@fluxmin.gouv.fr',
-      nom: 'Vidal',
-      prenom: 'François',
-      role: 'auditeur',
-      permissions: {},
-      motDePasse: hashedMdp,
-    },
-  ]).returning();
-
+  // ── Super Admin (transversal — pas rattaché à une direction métier) ──
+  // Rôle `auditeur` conservé en DB / RBAC pour plus tard, non seedé pour l'instant.
   const [superAdmin] = await db.insert(schema.utilisateurs).values([
     {
       directionId: null,
@@ -541,7 +533,7 @@ const runSeed = async () => {
   console.log('    Patrimoine  : agent.patrimoine.mcc@fluxmin.gouv.fr');
   console.log('    DAF Agent   : agent.daf.mcc@fluxmin.gouv.fr');
   console.log('');
-  console.log('  Auditeur     : auditeur@fluxmin.gouv.fr');
+  console.log('  Super Admin  : admin@fluxmin.gouv.fr');
   console.log('  Mot de passe : fluxmin2026');
   console.log('═══════════════════════════════════════════════');
 

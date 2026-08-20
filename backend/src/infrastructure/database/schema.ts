@@ -91,9 +91,59 @@ export const archives = pgTable('archives', {
   emplacement: varchar('emplacement', { length: 255 }),
 });
 
+/** Tentatives de connexion (succès / échec) + géolocalisation IP */
+export const securityLogs = pgTable('security_logs', {
+  id: serial('id').primaryKey(),
+  email: varchar('email', { length: 255 }),
+  utilisateurId: integer('utilisateur_id').references(() => utilisateurs.id),
+  ministereId: integer('ministere_id').references(() => ministeres.id),
+  /** UUID de session JWT — lie security_logs ↔ audit_logs ↔ sessions */
+  sessionId: varchar('session_id', { length: 36 }),
+  succes: boolean('succes').notNull(),
+  motif: varchar('motif', { length: 80 }),
+  risque: varchar('risque', { length: 20 }).notNull(), // faible, moyen, eleve, critique
+  ip: varchar('ip', { length: 45 }).notNull(),
+  userAgent: text('user_agent'),
+  pays: varchar('pays', { length: 80 }),
+  paysCode: varchar('pays_code', { length: 8 }),
+  ville: varchar('ville', { length: 120 }),
+  region: varchar('region', { length: 120 }),
+  isp: varchar('isp', { length: 255 }),
+  latitude: varchar('latitude', { length: 20 }),
+  longitude: varchar('longitude', { length: 20 }),
+  horsMadagascar: boolean('hors_madagascar').default(false).notNull(),
+  horsZoneMinistere: boolean('hors_zone_ministere').default(false).notNull(),
+  /** IP déjà utilisée par un compte d'un autre ministère */
+  ipAutreMinistere: boolean('ip_autre_ministere').default(false).notNull(),
+  details: jsonb('details'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+/** Blocage temporaire d'IP (anti brute-force) */
+export const ipBlocks = pgTable('ip_blocks', {
+  id: serial('id').primaryKey(),
+  ip: varchar('ip', { length: 45 }).notNull(),
+  raison: varchar('raison', { length: 255 }),
+  until: timestamp('until').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+/** Sessions authentifiées (révocation admin / lien audit) */
+export const sessions = pgTable('sessions', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  utilisateurId: integer('utilisateur_id').references(() => utilisateurs.id),
+  securityLogId: integer('security_log_id').references(() => securityLogs.id),
+  ip: varchar('ip', { length: 45 }),
+  userAgent: text('user_agent'),
+  revokedAt: timestamp('revoked_at'),
+  expiresAt: timestamp('expires_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 export const auditLogs = pgTable('audit_logs', {
   id: serial('id').primaryKey(),
   utilisateurId: integer('utilisateur_id'),
+  sessionId: varchar('session_id', { length: 36 }),
   action: text('action'),
   entiteType: varchar('entite_type', { length: 50 }), // 'courrier', 'utilisateur', ...
   entiteId: integer('entite_id'),

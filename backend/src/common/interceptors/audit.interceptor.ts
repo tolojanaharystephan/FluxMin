@@ -36,6 +36,7 @@ export class AuditInterceptor implements NestInterceptor {
         if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
           await this.auditService.log({
             utilisateurId: user?.id,
+            sessionId: user?.sessionId || null,
             action: `${method} ${url}`,
             entiteType: this.extractEntityType(url),
             entiteId: response?.id || null,

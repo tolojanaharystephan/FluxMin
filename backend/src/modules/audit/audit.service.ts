@@ -45,6 +45,7 @@ export class AuditService {
 
   async log(params: {
     utilisateurId?: number;
+    sessionId?: string | null;
     action: string;
     entiteType?: string;
     entiteId?: number;
@@ -53,6 +54,7 @@ export class AuditService {
   }) {
     await this.db.insert(auditLogs).values({
       utilisateurId: params.utilisateurId || null,
+      sessionId: params.sessionId || null,
       action: params.action,
       entiteType: params.entiteType || null,
       entiteId: params.entiteId || null,
