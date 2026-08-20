@@ -231,7 +231,6 @@ export class StatsService {
       courrierId: row.courrierId,
     }));
 
-    // Performance réelle (sans métriques inventées)
     const [closureBase] = await this.db
       .select({ value: count() })
       .from(courriers)
@@ -418,10 +417,6 @@ export class StatsService {
     };
   }
 
-  /**
-   * Process mining v1 : volumes d’actions, délais moyens entre envoi→réception / envoi→archivage,
-   * transitions les plus fréquentes.
-   */
   async getProcessMining(userId: number) {
     const scope = await this.resolveScope(userId);
     const scopeCond = this.scopeCondition(scope);

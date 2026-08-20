@@ -4,7 +4,6 @@ import * as schema from './schema';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
-// Charger les variables de la racine
 dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 
 export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
@@ -22,5 +21,4 @@ export const databaseProviders = [
 ];
 export type DrizzleDB = ReturnType<typeof drizzle<typeof schema>>;
 
-// Token pour l'injection
 export const DRIZZLE = 'DRIZZLE';

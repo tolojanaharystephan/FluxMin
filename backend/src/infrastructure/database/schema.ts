@@ -1,7 +1,6 @@
 import { pgTable, serial, varchar, timestamp, integer, text, jsonb, bigint, boolean } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
-// 1. Entités organisationnelles : Ministères
 export const ministeres = pgTable('ministeres', {
   id: serial('id').primaryKey(),
   nom: varchar('nom', { length: 255 }).notNull().unique(),
@@ -9,7 +8,6 @@ export const ministeres = pgTable('ministeres', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// 2. Entités organisationnelles : Directions
 export const directions = pgTable('directions', {
   id: serial('id').primaryKey(),
   ministereId: integer('ministere_id').references(() => ministeres.id),
@@ -23,7 +21,6 @@ export const directions = pgTable('directions', {
   };
 });
 
-// 3. Utilisateurs et rôles
 export const utilisateurs = pgTable('utilisateurs', {
   id: serial('id').primaryKey(),
   directionId: integer('direction_id').references(() => directions.id),
@@ -33,12 +30,11 @@ export const utilisateurs = pgTable('utilisateurs', {
   nom: varchar('nom', { length: 100 }),
   prenom: varchar('prenom', { length: 100 }),
   role: varchar('role', { length: 50 }), // responsable, agent_courrier, auditeur, super_admin, directeur_ministere, gouvernement, responsable_direction
-  permissions: jsonb('permissions'), // RBAC fin
-  motDePasse: varchar('mot_de_passe', { length: 255 }).notNull(), // INDISPENSABLE pour l'authentification
+  permissions: jsonb('permissions'),
+  motDePasse: varchar('mot_de_passe', { length: 255 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// 4. Courriers
 export const courriers = pgTable('courriers', {
   id: serial('id').primaryKey(),
   reference: varchar('reference', { length: 100 }).unique().notNull(), // ex: MINDEF-2026-000123
@@ -59,7 +55,6 @@ export const courriers = pgTable('courriers', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// 5. Pièces jointes
 export const piecesJointes = pgTable('pieces_jointes', {
   id: serial('id').primaryKey(),
   courrierId: integer('courrier_id').references(() => courriers.id),
@@ -71,7 +66,6 @@ export const piecesJointes = pgTable('pieces_jointes', {
   metadataIa: jsonb('metadata_ia'), // extraction OCR
 });
 
-// 6. Flux / Historique
 export const fluxEtapes = pgTable('flux_etapes', {
   id: serial('id').primaryKey(),
   courrierId: integer('courrier_id').references(() => courriers.id),
@@ -82,7 +76,6 @@ export const fluxEtapes = pgTable('flux_etapes', {
   dateAction: timestamp('date_action').defaultNow().notNull(),
 });
 
-// 7. Archivage & Audit
 export const archives = pgTable('archives', {
   id: serial('id').primaryKey(),
   courrierId: integer('courrier_id').references(() => courriers.id),
@@ -147,7 +140,6 @@ export const auditLogs = pgTable('audit_logs', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-/** Rapports d'audit générés (M4) */
 export const auditReports = pgTable('audit_reports', {
   id: serial('id').primaryKey(),
   titre: varchar('titre', { length: 255 }).notNull(),
@@ -158,7 +150,6 @@ export const auditReports = pgTable('audit_reports', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-/** Résolutions d'anomalies détectées (clé = type:courrierId) */
 export const anomalyResolutions = pgTable('anomaly_resolutions', {
   id: serial('id').primaryKey(),
   anomalyKey: varchar('anomaly_key', { length: 100 }).notNull().unique(),
@@ -167,7 +158,6 @@ export const anomalyResolutions = pgTable('anomaly_resolutions', {
   resolvedAt: timestamp('resolved_at').defaultNow().notNull(),
 });
 
-// 8. Messages (messagerie par courrier)
 export const messages = pgTable('messages', {
   id: serial('id').primaryKey(),
   courrierId: integer('courrier_id').references(() => courriers.id).notNull(),
@@ -187,7 +177,6 @@ export const messagePiecesJointes = pgTable('message_pieces_jointes', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// 9. Notifications
 export const notifications = pgTable('notifications', {
   id: serial('id').primaryKey(),
   utilisateurId: integer('utilisateur_id').references(() => utilisateurs.id),
@@ -200,7 +189,6 @@ export const notifications = pgTable('notifications', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// 10. Communications Gouvernement (MG)
 export const publicationsGouvernement = pgTable('publications_gouvernement', {
   id: serial('id').primaryKey(),
   titre: varchar('titre', { length: 255 }).notNull(),
@@ -259,9 +247,7 @@ export const publicationLectures = pgTable('publication_lectures', {
   luAt: timestamp('lu_at').defaultNow().notNull(),
 });
 
-// ==========================================
 // RELATIONS DRIZZLE ORM
-// ==========================================
 
 export const ministeresRelations = relations(ministeres, ({ many }) => ({
   directions: many(directions),

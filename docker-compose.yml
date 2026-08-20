@@ -1,18 +1,5 @@
-# ============================================
-# FluxMin – Docker Compose (Development)
-# ============================================
-# Usage: docker compose up -d
-# Access: http://localhost:3000 (Frontend)
-#         http://localhost:3001 (Backend API)
-#         http://localhost:8000 (IA Service)
-#         http://localhost:8001 (Geo Service)
-#         http://localhost:9001 (MinIO Console)
-#         http://localhost:7233 (Temporal UI)
 
 services:
-  # ──────────────────────────────────────────
-  # PostgreSQL 16
-  # ──────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
     container_name: fluxmin-postgres
@@ -33,9 +20,6 @@ services:
     networks:
       - fluxmin-network
 
-  # ──────────────────────────────────────────
-  # Redis 7
-  # ──────────────────────────────────────────
   redis:
     image: redis:7-alpine
     container_name: fluxmin-redis
@@ -52,9 +36,6 @@ services:
     networks:
       - fluxmin-network
 
-  # ──────────────────────────────────────────
-  # MinIO (S3-compatible file storage)
-  # ──────────────────────────────────────────
   minio:
     image: minio/minio:latest
     container_name: fluxmin-minio
@@ -76,9 +57,6 @@ services:
     networks:
       - fluxmin-network
 
-  # ──────────────────────────────────────────
-  # Temporal (Workflow Engine)
-  # ──────────────────────────────────────────
   temporal:
     image: temporalio/auto-setup:1.23
     container_name: fluxmin-temporal
@@ -98,9 +76,6 @@ services:
     networks:
       - fluxmin-network
 
-  # ──────────────────────────────────────────
-  # Backend NestJS
-  # ──────────────────────────────────────────
   backend:
     build:
       context: ./backend
@@ -139,9 +114,6 @@ services:
     networks:
       - fluxmin-network
 
-  # ──────────────────────────────────────────
-  # Frontend Next.js
-  # ──────────────────────────────────────────
   frontend:
     build:
       context: ./frontend
@@ -158,9 +130,6 @@ services:
     networks:
       - fluxmin-network
 
-  # ──────────────────────────────────────────
-  # Geo Service
-  # ──────────────────────────────────────────
   geo-service:
     build:
       context: ./geo-service
@@ -183,9 +152,6 @@ services:
     networks:
       - fluxmin-network
 
-  # ──────────────────────────────────────────
-  # IA Service (Python FastAPI)
-  # ──────────────────────────────────────────
   ia-service:
     build:
       context: ./ia-service
@@ -195,7 +161,6 @@ services:
     environment:
       - PROJECT_NAME=FluxMin AI Service
       - API_V1_STR=/api/v1
-      # Binaire du conteneur (identique pour tous les utilisateurs)
       - TESSERACT_CMD=/usr/bin/tesseract
       - TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
     ports:
@@ -203,9 +168,6 @@ services:
     networks:
       - fluxmin-network
 
-  # ──────────────────────────────────────────
-  # Temporal UI
-  # ──────────────────────────────────────────
   temporal-ui:
     image: temporalio/ui:latest
     container_name: fluxmin-temporal-ui

@@ -87,14 +87,12 @@ export class MessagingService {
 
     const participantIds = await this.getParticipantIds(courrierId);
 
-    // Temps réel pour tous les participants (discussion ouverte)
     for (const pid of participantIds) {
       if (pid !== userId) {
         this.gateway.emitToUser(pid, 'message:new', fullMessage);
       }
     }
 
-    // Notifications persistantes : émetteur ↔ direction destinataire
     const notifPayload = {
       type: 'message_discussion',
       titre: `Nouveau message — ${ref}`,
@@ -103,7 +101,6 @@ export class MessagingService {
     };
 
     if (courrier.emetteurId === userId) {
-      // L'émetteur écrit → prévenir la direction destinataire
       if (courrier.destinataireDirectionId) {
         await this.notificationService.createForDirection(courrier.destinataireDirectionId, {
           ...notifPayload,

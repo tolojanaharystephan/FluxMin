@@ -33,7 +33,6 @@ export default function SettingsPage() {
   const [savingProfile, setSavingProfile] = React.useState(false);
   const [profileMsg, setProfileMsg] = React.useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // Password state
   const [currentPassword, setCurrentPassword] = React.useState("");
   const [newPassword, setNewPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");

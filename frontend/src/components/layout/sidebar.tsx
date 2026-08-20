@@ -44,7 +44,7 @@ interface NavItem {
   icon: React.ElementType;
   badge?: number;
   roles?: string[];
-  /** Couleur icône (Tailwind) — style SaaS coloré */
+  
   iconColor?: string;
   iconBg?: string;
 }

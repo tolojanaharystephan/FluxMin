@@ -1,6 +1,5 @@
 import { IsString, IsOptional, IsNumber, IsObject, MinLength, MaxLength, IsEmail, ValidateIf } from 'class-validator';
 
-// ─── Ministeres ───
 export class CreateMinistereDto {
   @IsString()
   @MinLength(2)
@@ -26,7 +25,6 @@ export class UpdateMinistereDto {
   code?: string;
 }
 
-// ─── Directions ───
 export class CreateDirectionDto {
   @IsNumber()
   ministereId: number;
@@ -59,7 +57,6 @@ export class UpdateDirectionDto {
   type?: string;
 }
 
-// ─── Utilisateurs ───
 export class CreateUtilisateurDto {
   @IsEmail()
   email: string;
@@ -140,7 +137,6 @@ export class UpdateUtilisateurDto {
   permissions?: Record<string, boolean>;
 }
 
-// ─── Query Params ───
 export class PaginationDto {
   @IsNumber()
   @IsOptional()

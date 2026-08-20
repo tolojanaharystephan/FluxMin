@@ -38,13 +38,11 @@ SUPPORTED_EXTENSIONS = frozenset(
 IMAGE_EXTS = frozenset({".png", ".jpg", ".jpeg", ".gif", ".webp"})
 TEXT_EXTS = frozenset({".txt", ".csv"})
 
-
 def _ext(filename: str) -> str:
     name = (filename or "").lower()
     if "." not in name:
         return ""
     return "." + name.rsplit(".", 1)[-1]
-
 
 def _pages(text: str) -> Dict[str, Any]:
     cleaned = (text or "").strip()
@@ -53,7 +51,6 @@ def _pages(text: str) -> Dict[str, Any]:
         "texteBrut": cleaned,
     }
 
-
 def _decode_bytes(data: bytes) -> str:
     for enc in ("utf-8", "utf-16", "latin-1", "cp1252"):
         try:
@@ -61,7 +58,6 @@ def _decode_bytes(data: bytes) -> str:
         except UnicodeDecodeError:
             continue
     return data.decode("utf-8", errors="ignore")
-
 
 def _strip_rtf(data: bytes) -> str:
     raw = _decode_bytes(data)
@@ -74,7 +70,6 @@ def _strip_rtf(data: bytes) -> str:
         text = re.sub(r"\\[a-z]+\d* ?", " ", raw)
         text = re.sub(r"[{}]", " ", text)
         return re.sub(r"\s+", " ", text).strip()
-
 
 def _extract_pdf(data: bytes, filename: str) -> Tuple[str, float, str]:
     """Texte natif PDF si possible, sinon OCR."""
@@ -101,13 +96,11 @@ def _extract_pdf(data: bytes, filename: str) -> Tuple[str, float, str]:
     ocr = perform_ocr(data, filename if filename.lower().endswith(".pdf") else "document.pdf")
     return ocr["texteExtrait"]["texteBrut"], float(ocr.get("scoreConfiance") or 80.0), "pdf_ocr"
 
-
 def _extract_image(data: bytes, filename: str) -> Tuple[str, float, str]:
     from app.services.ocr_service import perform_ocr
 
     ocr = perform_ocr(data, filename)
     return ocr["texteExtrait"]["texteBrut"], float(ocr.get("scoreConfiance") or 85.0), "ocr"
-
 
 def _extract_docx(data: bytes) -> str:
     from docx import Document
@@ -124,7 +117,6 @@ def _extract_docx(data: bytes) -> str:
                 parts.append(" | ".join(cells))
     return "\n".join(parts)
 
-
 def _extract_xlsx(data: bytes) -> str:
     from openpyxl import load_workbook
 
@@ -138,7 +130,6 @@ def _extract_xlsx(data: bytes) -> str:
                 parts.append(" | ".join(cells))
     wb.close()
     return "\n".join(parts)
-
 
 def _extract_xls(data: bytes) -> str:
     import xlrd
@@ -154,7 +145,6 @@ def _extract_xls(data: bytes) -> str:
                 parts.append(" | ".join(cells))
     return "\n".join(parts)
 
-
 def _extract_pptx(data: bytes) -> str:
     from pptx import Presentation
 
@@ -168,7 +158,6 @@ def _extract_pptx(data: bytes) -> str:
         if slide_texts:
             parts.append(f"--- Diapositive {i} ---\n" + "\n".join(slide_texts))
     return "\n".join(parts)
-
 
 def _odf_text_from_zip(data: bytes, content_xml: str = "content.xml") -> str:
     with zipfile.ZipFile(io.BytesIO(data)) as zf:
@@ -188,7 +177,6 @@ def _odf_text_from_zip(data: bytes, content_xml: str = "content.xml") -> str:
             seen.add(t)
             out.append(t)
     return "\n".join(out)
-
 
 def _extract_ole_printable(data: bytes, min_len: int = 5) -> str:
     """Fallback pour .doc / .ppt binaires : chaînes imprimables."""
@@ -225,7 +213,6 @@ def _extract_ole_printable(data: bytes, min_len: int = 5) -> str:
             break
     return "\n".join(unique)
 
-
 def _extract_doc(data: bytes) -> str:
     # Tentative via antiword si disponible
     try:
@@ -252,10 +239,8 @@ def _extract_doc(data: bytes) -> str:
         pass
     return _extract_ole_printable(data)
 
-
 def _extract_ppt(data: bytes) -> str:
     return _extract_ole_printable(data)
-
 
 def extract_document(file_bytes: bytes, filename: str) -> Dict[str, Any]:
     """

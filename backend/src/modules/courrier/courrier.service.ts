@@ -514,7 +514,6 @@ export class CourrierService {
       });
     }
 
-    // Analyse automatique niveau 1 (fire-and-forget — ne bloque pas la réception)
     void this.aiService.autoAnalyzeOnReception(id);
 
     await this.temporal.cancelCourrierSuivi(id);

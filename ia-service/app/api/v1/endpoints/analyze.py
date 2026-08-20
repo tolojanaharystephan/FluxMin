@@ -30,7 +30,6 @@ from app.services.ocr_engine import ocr_backend_status
 
 router = APIRouter()
 
-
 def _build_analysis(
     extracted_text: str,
     langue: str,
@@ -208,7 +207,6 @@ def _build_analysis(
 def ocr_status():
     return {**ocr_backend_status(), "llm": llm_status()}
 
-
 @router.post("/", response_model=AnalysisResult)
 async def analyze_document(file: UploadFile = File(...)):
     """
@@ -249,10 +247,8 @@ async def analyze_document(file: UploadFile = File(...)):
             detail=f"Erreur interne lors du traitement du document : {str(err)}",
         )
 
-
 @router.post("/text", response_model=AnalysisResult)
 async def analyze_text(payload: TextAnalyzeRequest):
-    """Analyse un texte déjà disponible (sans OCR)."""
     text = (payload.texte or "").strip()
     if not text:
         raise HTTPException(status_code=400, detail="Le champ texte est requis.")
@@ -263,10 +259,8 @@ async def analyze_text(payload: TextAnalyzeRequest):
         result["objetPropose"] = payload.objet
     return result
 
-
 @router.post("/bundle", response_model=BundleAnalysisResult)
 async def analyze_bundle(payload: BundleAnalyzeRequest):
-    """Analyse croisée de plusieurs documents (textes déjà extraits)."""
     docs = payload.documents or []
     if not docs:
         raise HTTPException(status_code=400, detail="Au moins un document est requis.")
@@ -284,7 +278,6 @@ async def analyze_bundle(payload: BundleAnalyzeRequest):
         {"pages": [{"page": 1, "text": combined}], "texteBrut": combined},
         "bundle",
     )
-    # Remplacer le résumé par la synthèse dossier
     dossier = corr["resumeDossier"]
     base["ocrResult"]["resumeAI"] = dossier["texteAffichage"]
     base["ocrResult"]["resumeStructure"] = {
@@ -297,7 +290,6 @@ async def analyze_bundle(payload: BundleAnalyzeRequest):
     if payload.objetCourrier:
         base["objetPropose"] = payload.objetCourrier
 
-    # Action dédiée
     actions = list(base.get("actionsProposees") or [])
     actions.insert(
         0,
@@ -327,10 +319,8 @@ async def analyze_bundle(payload: BundleAnalyzeRequest):
         "avertissement": "Analyse multi-pièces indicative — validation humaine obligatoire.",
     }
 
-
 @router.post("/draft", response_model=DraftResult)
 async def generate_draft(payload: DraftRequest):
-    """Brouillon de réponse assisté (modèle local / gabarit)."""
     return draft_reply(
         objet=payload.objet or "",
         resume=payload.resume or "",

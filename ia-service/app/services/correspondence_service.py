@@ -9,11 +9,9 @@ from typing import Any, Dict, List, Set
 from app.services.nlp_service import clean_extracted_text, extract_entities, STOP_WORDS
 from app.services.llm_service import summarize_with_llm
 
-
 def _tokens(text: str) -> Set[str]:
     words = re.findall(r"\b[a-zA-Zà-ÿÀ-Ÿ]{4,}\b", (text or "").lower())
     return {w for w in words if w not in STOP_WORDS}
-
 
 def _jaccard(a: Set[str], b: Set[str]) -> float:
     if not a or not b:
@@ -21,7 +19,6 @@ def _jaccard(a: Set[str], b: Set[str]) -> float:
     inter = len(a & b)
     union = len(a | b)
     return inter / union if union else 0.0
-
 
 def _resume_for_piece(texte: str, analysis: Any) -> Dict[str, Any]:
     """Résumé LLM uniquement (réutilise l'analyse PJ si déjà présente)."""
@@ -41,7 +38,6 @@ def _resume_for_piece(texte: str, analysis: Any) -> Dict[str, Any]:
         "texteAffichage": "Résumé LLM indisponible pour cette pièce.",
         "texteCourt": "Résumé LLM indisponible pour cette pièce.",
     }
-
 
 def analyze_correspondences(pieces: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
@@ -98,7 +94,6 @@ def analyze_correspondences(pieces: List[Dict[str, Any]]) -> Dict[str, Any]:
                 }
             )
 
-    # Entités globales
     all_refs: List[str] = []
     all_dates: List[str] = []
     all_amounts: List[str] = []
@@ -134,7 +129,6 @@ def analyze_correspondences(pieces: List[Dict[str, Any]]) -> Dict[str, Any]:
     for name in empty_docs:
         alertes.append(f"Texte quasi vide pour « {name} » — OCR ou format à vérifier.")
 
-    # Score de cohérence global
     if not relations:
         coherence = 100.0 if len(normalized) <= 1 else 50.0
     else:
@@ -142,7 +136,6 @@ def analyze_correspondences(pieces: List[Dict[str, Any]]) -> Dict[str, Any]:
         if any(r["referencesCommunes"] for r in relations):
             coherence = min(100.0, coherence + 15)
 
-    # Synthèse dossier
     accroches = [n["resume"]["accroche"] for n in normalized if n["resume"]["accroche"]]
     points: List[str] = []
     for n in normalized:

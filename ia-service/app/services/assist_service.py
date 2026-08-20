@@ -1,7 +1,6 @@
 import re
 from typing import List, Dict, Any
 
-
 def detect_priority(text: str) -> Dict[str, Any]:
     """Détecte une priorité indicative à partir du vocabulaire administratif."""
     if not text:
@@ -22,7 +21,6 @@ def detect_priority(text: str) -> Dict[str, Any]:
     if hits_m:
         return {"priorite": "moyenne", "score": min(90.0, 40 + 10 * len(hits_m)), "signaux": hits_m}
     return {"priorite": "basse", "score": 25.0, "signaux": []}
-
 
 def suggest_actions(text: str, top_direction: str | None = None) -> List[Dict[str, Any]]:
     """Propose des actions métier — toujours à valider par l'agent."""
@@ -79,7 +77,6 @@ def suggest_actions(text: str, top_direction: str | None = None) -> List[Dict[st
 
     return actions
 
-
 def draft_reply(objet: str, resume: str, destinataire: str | None = None) -> Dict[str, Any]:
     """Brouillon de réponse administratif — modèle local, non génératif cloud."""
     dest = destinataire or "Madame, Monsieur,"
@@ -97,7 +94,6 @@ def draft_reply(objet: str, resume: str, destinataire: str | None = None) -> Dic
         "avertissement": "Brouillon assisté local — à relire et valider avant envoi.",
         "confiance": 55.0,
     }
-
 
 def extract_objet_candidate(text: str, resume: str) -> str:
     """Propose un objet court à partir du résumé (accroche) ou des premières lignes."""

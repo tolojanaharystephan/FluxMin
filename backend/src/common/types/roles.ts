@@ -7,7 +7,6 @@ export const PERMISSIONS_KEY = 'permissions';
 export const RequirePermissions = (...permissions: string[]) =>
   SetMetadata(PERMISSIONS_KEY, permissions);
 
-// Rôles prédéfinis
 export enum UserRole {
   RESPONSABLE = 'responsable',
   RESPONSABLE_DIRECTION = 'responsable_direction',
@@ -29,7 +28,6 @@ export function normalizeRole(role: string | null | undefined): string {
   return role;
 }
 
-// Permissions prédéfinies
 export enum Permission {
   CREATE_COURRIER = 'create_courrier',
   READ_COURRIER = 'read_courrier',

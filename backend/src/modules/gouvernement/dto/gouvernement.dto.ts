@@ -33,7 +33,6 @@ export class CreatePublicationDto {
   @IsInt()
   ministereId?: number;
 
-  /** Si true, publie immédiatement */
   @IsOptional()
   @IsBoolean()
   @Type(() => Boolean)

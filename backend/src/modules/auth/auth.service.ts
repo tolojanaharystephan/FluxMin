@@ -167,7 +167,6 @@ export class AuthService {
 
     const permissions = this.resolvePermissions(user.role || '', user.permissions as any);
 
-    // Enrichir avec les infos de direction et ministère
     if (user.directionId) {
       const [direction] = await this.db
         .select({

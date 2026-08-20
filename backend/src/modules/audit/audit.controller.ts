@@ -23,14 +23,12 @@ import {
 export class AuditController {
   constructor(private readonly auditService: AuditService) {}
 
-  /** Journal d'audit technique (logs HTTP) */
   @Get('logs')
   @RequirePermissions(Permission.VIEW_AUDIT_LOGS)
   findLogs(@Query() query: QueryAuditLogsDto) {
     return this.auditService.findLogs(query);
   }
 
-  /** Recherche avancée courriers (lecture seule audit) */
   @Get('search')
   @RequirePermissions(Permission.VIEW_AUDIT_LOGS)
   search(@CurrentUser('id') userId: number, @Query() query: QueryAuditSearchDto) {

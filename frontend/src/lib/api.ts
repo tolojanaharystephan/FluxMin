@@ -37,7 +37,6 @@ class ApiClient {
     return response.json();
   }
 
-  // ─── Auth ───
   async login(email: string, motDePasse: string) {
     return this.request('/auth/login', {
       method: 'POST',
@@ -79,7 +78,6 @@ class ApiClient {
     });
   }
 
-  // ─── Admin: Ministeres ───
   async getMinisteres(token: string, search?: string) {
     const params = search ? `?search=${encodeURIComponent(search)}` : '';
     return this.request(`/admin/ministeres${params}`, { token });
@@ -142,7 +140,6 @@ class ApiClient {
     });
   }
 
-  // ─── Admin: Directions ───
   async getDirections(token: string, ministereId?: number) {
     const params = ministereId ? `?ministereId=${ministereId}` : '';
     return this.request(`/admin/directions${params}`, { token });
@@ -171,7 +168,6 @@ class ApiClient {
     });
   }
 
-  // ─── Admin: Utilisateurs ───
   async getUtilisateurs(token: string, search?: string, directionId?: number) {
     const params = new URLSearchParams();
     if (search) params.set('search', search);
@@ -203,12 +199,10 @@ class ApiClient {
     });
   }
 
-  // ─── Admin: Stats ───
   async getAdminStats(token: string) {
     return this.request('/admin/stats', { token });
   }
 
-  // ─── Pilotage ───
   async getDashboardStats(token: string) {
     return this.request('/stats/dashboard', { token });
   }
@@ -222,7 +216,6 @@ class ApiClient {
     return this.request('/stats/process-mining', { token });
   }
 
-  // ─── Courriers ───
   async getCourriers(token: string, params?: {
     search?: string;
     statut?: string;
@@ -344,7 +337,6 @@ class ApiClient {
     });
   }
 
-  // ─── Audit (M4) ───
   async searchAuditCourriers(token: string, params?: {
     search?: string;
     statut?: string;
@@ -418,7 +410,6 @@ class ApiClient {
     });
   }
 
-  // ─── Notifications ───
   async getNotifications(
     token: string,
     page?: number,
@@ -448,7 +439,6 @@ class ApiClient {
     });
   }
 
-  // ─── IA (proxy Nest → service local) ───
   async getAiHealth(token: string) {
     return this.request('/ai/health', { token });
   }
@@ -498,7 +488,6 @@ class ApiClient {
     });
   }
 
-  // ─── Messages ───
   async getMessages(token: string, courrierId: number, page?: number, limit?: number) {
     const params = new URLSearchParams();
     if (page) params.set('page', String(page));
@@ -634,7 +623,6 @@ class ApiClient {
     document.body.removeChild(a);
   }
 
-  // ── Communications Gouvernement ──
   async listPublications(token: string, params?: { portee?: string; statut?: string }) {
     const q = new URLSearchParams();
     if (params?.portee) q.set('portee', params.portee);

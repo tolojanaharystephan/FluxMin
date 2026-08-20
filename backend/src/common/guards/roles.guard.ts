@@ -18,7 +18,6 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    // Si la route est marquée @Public(), ne rien vérifier
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -46,7 +45,6 @@ export class RolesGuard implements CanActivate {
 
     const userRole = normalizeRole(user.role);
 
-    // Vérification des rôles
     if (requiredRoles && requiredRoles.length > 0) {
       const hasRole = requiredRoles.some(
         (role) => userRole === normalizeRole(role) || user.role === role,
@@ -58,7 +56,6 @@ export class RolesGuard implements CanActivate {
       }
     }
 
-    // Vérification des permissions
     if (requiredPermissions && requiredPermissions.length > 0) {
       const userPermissions = ROLE_PERMISSIONS[userRole] || ROLE_PERMISSIONS[user.role] || [];
       const customPermissions = user.permissions

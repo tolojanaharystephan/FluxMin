@@ -44,9 +44,7 @@ export class AdminService {
     };
   }
 
-  // ═══════════════════════════════════════════
   // MINISTERES
-  // ═══════════════════════════════════════════
 
   async findAllMinisteres(search?: string) {
     if (search) {
@@ -100,9 +98,7 @@ export class AdminService {
     return { deleted: true };
   }
 
-  // ═══════════════════════════════════════════
   // DIRECTIONS
-  // ═══════════════════════════════════════════
 
   async findAllDirections(ministereId?: number) {
     if (ministereId) {
@@ -126,7 +122,6 @@ export class AdminService {
   }
 
   async createDirection(dto: CreateDirectionDto) {
-    // Vérifier que le ministère existe
     await this.findMinistereById(dto.ministereId);
 
     try {
@@ -159,9 +154,7 @@ export class AdminService {
     return { deleted: true };
   }
 
-  // ═══════════════════════════════════════════
   // UTILISATEURS
-  // ═══════════════════════════════════════════
 
   async findAllUtilisateurs(search?: string, directionId?: number) {
     let whereClause: any = undefined;
@@ -282,9 +275,7 @@ export class AdminService {
     return { deleted: true };
   }
 
-  // ═══════════════════════════════════════════
   // STATS
-  // ═══════════════════════════════════════════
 
   async getStats() {
     const [ministereCount] = await this.db

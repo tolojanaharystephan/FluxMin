@@ -118,7 +118,6 @@ export class GouvernementController {
     return this.service.archive(id, userId);
   }
 
-  /** Upload d’un fichier (champ `file`) */
   @Post('publications/:id/pieces-jointes')
   @Roles('gouvernement')
   @SkipAudit()
@@ -132,7 +131,6 @@ export class GouvernementController {
     return this.service.addPieceJointe(id, userId, file);
   }
 
-  /** Upload de plusieurs fichiers (champ `files`, max 20) */
   @Post('publications/:id/pieces-jointes/batch')
   @Roles('gouvernement')
   @SkipAudit()

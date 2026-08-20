@@ -298,8 +298,6 @@ export class AiService implements OnModuleInit {
       analysis,
     };
   }
-
-  /** Analyse toutes les PJ d'un courrier + correspondances croisées */
   async analyzeAllPiecesJointes(courrierId: number, userId: number) {
     const { courrier } = await this.assertCourrierAccess(courrierId, userId);
     await this.assertIaReady();
@@ -429,12 +427,6 @@ export class AiService implements OnModuleInit {
       analysis,
     };
   }
-
-  /**
-   * Analyse automatique niveau 1 déclenchée à la réception d'un courrier.
-   * Fire-and-forget : ne lève jamais d'exception vers l'appelant.
-   * Stocke priorité + entités dans courriers.metadata et piecesJointes.metadataIa.
-   */
   async autoAnalyzeOnReception(courrierId: number): Promise<void> {
     const health = await this.health();
     if (health.status !== 'ok') {
@@ -465,7 +457,6 @@ export class AiService implements OnModuleInit {
       let analyseSource: 'text' | 'pj' | 'none' = 'none';
 
       if (pjs.length > 0) {
-        // Analyser chaque PJ analysable, stocker metadataIa
         for (const pj of pjs) {
           const nomFichier = pj.nomFichier?.trim() || `document-${pj.id}`;
           const ext = require('path').extname(nomFichier).toLowerCase();
@@ -474,13 +465,11 @@ export class AiService implements OnModuleInit {
             const buffer = await this.storage.readBuffer(pj.cheminMinio);
             const analysis = await this.callIaAnalyzeFile(buffer, nomFichier);
 
-            // Sauvegarder dans la PJ
             await this.db
               .update(piecesJointes)
               .set({ metadataIa: analysis })
               .where(eq(piecesJointes.id, pj.id));
 
-            // Agréger la priorité maximale
             const p = analysis?.prioriteDetecte;
             if (p === 'haute' || (p === 'moyenne' && priorite === 'basse')) {
               priorite = p;
@@ -504,7 +493,6 @@ export class AiService implements OnModuleInit {
         }
       }
 
-      // Fallback : analyser le corps/objet si aucune PJ analysée
       if (analyseSource === 'none' && (courrier.objet || courrier.corps)) {
         try {
           const texte = [courrier.objet, courrier.corps].filter(Boolean).join('\n\n');
@@ -523,7 +511,6 @@ export class AiService implements OnModuleInit {
         }
       }
 
-      // Stocker le résultat dans courriers.metadata
       const existingMeta = (courrier.metadata as Record<string, any>) || {};
       await this.db
         .update(courriers)
@@ -539,13 +526,11 @@ export class AiService implements OnModuleInit {
               analyzedAt: new Date().toISOString(),
             },
           },
-          // Pré-remplir l'objet si vide et IA propose quelque chose
           ...(objetPropose && !courrier.objet ? { objet: objetPropose } : {}),
           updatedAt: new Date(),
         })
         .where(eq(courriers.id, courrierId));
 
-      // Notification enrichie à la direction destinataire si priorité détectée
       if (courrier.destinataireDirectionId && (priorite === 'haute' || priorite === 'moyenne')) {
         const emoji = priorite === 'haute' ? '🔴' : '🟡';
         const label = priorite === 'haute' ? 'URGENT' : 'Priorité moyenne';
@@ -566,8 +551,6 @@ export class AiService implements OnModuleInit {
       );
     }
   }
-
-  /** Suggestions opérationnelles à partir des données réelles + health IA */
   async getSuggestions(userId: number) {
     const [user] = await this.db
       .select()

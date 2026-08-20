@@ -17,7 +17,7 @@ export interface AppNotification {
   createdAt?: string;
 }
 
-/** Cible de navigation pour une notification (courrier ou publication gouv). */
+
 export function notificationHref(n: {
   courrierId?: number | null;
   publicationId?: number | null;

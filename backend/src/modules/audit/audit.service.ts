@@ -63,7 +63,6 @@ export class AuditService {
     });
   }
 
-  // ─── Logs ───
   async findLogs(query: QueryAuditLogsDto) {
     const { search, entiteType, action, utilisateurId, dateDebut, dateFin, page = 1, limit = 20 } = query;
     const offset = (page - 1) * limit;
@@ -131,7 +130,6 @@ export class AuditService {
     };
   }
 
-  // ─── Recherche courriers (lecture audit) ───
   async searchCourriers(userId: number, query: QueryAuditSearchDto) {
     const user = await this.db
       .select()
@@ -211,7 +209,6 @@ export class AuditService {
     };
   }
 
-  // ─── Rapports ───
   private async buildReportResume(periodeDebut: Date, periodeFin: Date) {
     const inPeriod = and(
       gte(courriers.createdAt, periodeDebut),
@@ -374,7 +371,6 @@ export class AuditService {
     };
   }
 
-  // ─── Anomalies (détection live) ───
   private async detectAnomaliesRaw() {
     const resolutions = await this.db.select().from(anomalyResolutions);
     const resolvedKeys = new Set(resolutions.map((r) => r.anomalyKey));

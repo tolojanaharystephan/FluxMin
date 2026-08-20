@@ -32,16 +32,13 @@ import { RequirePermissions } from '../../common/types/roles';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  // ─── Stats ───
   @Get('stats')
   @RequirePermissions(Permission.VIEW_DASHBOARD)
   async getStats() {
     return this.adminService.getStats();
   }
 
-  // ═══════════════════════════════════════════
   // MINISTERES
-  // ═══════════════════════════════════════════
 
   @Get('ministeres')
   async findAllMinisteres(@Query('search') search?: string) {
@@ -74,9 +71,7 @@ export class AdminController {
     return this.adminService.deleteMinistere(id);
   }
 
-  // ═══════════════════════════════════════════
   // DIRECTIONS
-  // ═══════════════════════════════════════════
 
   @Get('directions')
   async findAllDirections(@Query('ministereId') ministereId?: string) {
@@ -111,9 +106,7 @@ export class AdminController {
     return this.adminService.deleteDirection(id);
   }
 
-  // ═══════════════════════════════════════════
   // UTILISATEURS
-  // ═══════════════════════════════════════════
 
   @Get('utilisateurs')
   async findAllUtilisateurs(

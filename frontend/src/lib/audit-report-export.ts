@@ -1,5 +1,3 @@
-/** Export des rapports d'audit (PDF / XLSX / CSV / JSON) */
-
 export interface AuditReportExport {
   id: number;
   titre: string;

@@ -15,7 +15,6 @@ const runSeed = async () => {
   });
   const db = drizzle(pool, { schema });
 
-  // 1. Nettoyer les tables existantes (ordre FK)
   console.log('Cleaning existing tables...');
   await db.delete(schema.publicationLectures);
   await db.delete(schema.publicationMessages);
@@ -39,7 +38,6 @@ const runSeed = async () => {
   await db.delete(schema.directions);
   await db.delete(schema.ministeres);
 
-  // 2. Insérer les ministères
   console.log('Inserting ministeres...');
   const [mfa, minjus, mcc] = await db.insert(schema.ministeres).values([
     { nom: 'Ministère des Forces Armées', code: 'MFA' },
@@ -47,7 +45,6 @@ const runSeed = async () => {
     { nom: 'Ministère de la Culture et de la Communication', code: 'MCC' },
   ]).returning();
 
-  // 3. Insérer les directions — chaque ministère a une direction courrier + directions métier
   console.log('Inserting directions...');
 
   const [mfaCourrier, mfaDsi, mfaDrh, mfaDaf] = await db.insert(schema.directions).values([
@@ -70,11 +67,9 @@ const runSeed = async () => {
     { ministereId: mcc.id, nom: 'Direction Administrative et Financière MCC', type: 'daf' },
   ]).returning();
 
-  // 4. Insérer les utilisateurs — chaque direction a au moins un agent
   console.log('Inserting utilisateurs...');
   const hashedMdp = await bcrypt.hash('fluxmin2026', 10);
 
-  // ── MFA ──
   const [
     agentCourrierMfa,   // agent_courrier → Dir. Courrier MFA
     responsableDsiMfa,  // responsable → DSI MFA
@@ -129,7 +124,6 @@ const runSeed = async () => {
     },
   ]).returning();
 
-  // ── MINJUS ──
   const [
     agentCourrierMinjus,  // agent_courrier → Dir. Courrier MINJUS
     responsableDafMinjus, // responsable → DAF MINJUS
@@ -174,7 +168,6 @@ const runSeed = async () => {
     },
   ]).returning();
 
-  // ── MCC ──
   const [
     agentCourrierMcc,    // agent_courrier → Dir. Courrier MCC
     agentPatrimoineMcc,  // responsable → Patrimoine MCC
@@ -209,7 +202,6 @@ const runSeed = async () => {
     },
   ]).returning();
 
-  // Super admin
   const [superAdmin] = await db.insert(schema.utilisateurs).values([
     {
       directionId: null,
@@ -222,7 +214,6 @@ const runSeed = async () => {
     },
   ]).returning();
 
-  // Gouvernement
   const [userGouvernement] = await db.insert(schema.utilisateurs).values([
     {
       directionId: null,
@@ -235,7 +226,6 @@ const runSeed = async () => {
     },
   ]).returning();
 
-  // ── Directeurs de ministère (un par ministère) ──
   // Directeurs : rattachés au ministère uniquement (pas de direction)
   const [dirMfa, dirMinjus, dirMcc] = await db.insert(schema.utilisateurs).values([
     {
@@ -308,10 +298,8 @@ const runSeed = async () => {
   void dirMinjus;
   void dirMcc;
 
-  // 5. Insérer des courriers de démo illustrant les flux
   console.log('Inserting courriers...');
 
-  // Courrier 1 : Interne MFA — DSI → DRH (via Dir. Courrier MFA)
   const [courrier1] = await db.insert(schema.courriers).values([
     {
       reference: 'MFA-INT-2026-000001',
@@ -328,7 +316,6 @@ const runSeed = async () => {
     }
   ]).returning();
 
-  // Courrier 2 : Externe MINJUS → MFA — Dir. Courrier MINJUS → DSI MFA
   const [courrier2] = await db.insert(schema.courriers).values([
     {
       reference: 'MINJUS-EXT-2026-000002',
@@ -347,7 +334,6 @@ const runSeed = async () => {
     }
   ]).returning();
 
-  // Courrier 3 : Externe MCC → MINJUS — Dir. Courrier MCC → DAF MINJUS
   const [courrier3] = await db.insert(schema.courriers).values([
     {
       reference: 'MCC-EXT-2026-000003',
@@ -365,7 +351,6 @@ const runSeed = async () => {
     }
   ]).returning();
 
-  // Courrier 4 : Interne MINJUS — DAF → DAJ (via Dir. Courrier MINJUS)
   const [courrier4] = await db.insert(schema.courriers).values([
     {
       reference: 'MINJUS-INT-2026-000004',
@@ -381,7 +366,6 @@ const runSeed = async () => {
     }
   ]).returning();
 
-  // Courrier 5 : Interne MFA — DAF → DSI (via Dir. Courrier MFA)
   const [courrier5] = await db.insert(schema.courriers).values([
     {
       reference: 'MFA-INT-2026-000005',
@@ -399,10 +383,8 @@ const runSeed = async () => {
     }
   ]).returning();
 
-  // 6. Insérer des étapes de flux
   console.log('Inserting flux etapes...');
   await db.insert(schema.fluxEtapes).values([
-    // Courrier 1 — Interne MFA
     {
       courrierId: courrier1.id,
       directionId: mfaDsi.id,
@@ -427,7 +409,6 @@ const runSeed = async () => {
       commentaire: 'Transmis à la DRH pour traitement',
       dateAction: new Date(),
     },
-    // Courrier 2 — Externe MINJUS → MFA
     {
       courrierId: courrier2.id,
       directionId: minjusCourrier.id,
@@ -444,7 +425,6 @@ const runSeed = async () => {
       commentaire: 'Reçu et pris en charge par la DSI',
       dateAction: new Date(Date.now() - 3600000),
     },
-    // Courrier 5 — Interne MFA
     {
       courrierId: courrier5.id,
       directionId: mfaDaf.id,
@@ -471,7 +451,6 @@ const runSeed = async () => {
     },
   ]);
 
-  // 7. Pièces jointes de démo (fichiers réels dans uploads/)
   console.log('Inserting pieces jointes...');
   const demoFiles = ensureDemoUploadPdfs();
   if (demoFiles.created.length) {

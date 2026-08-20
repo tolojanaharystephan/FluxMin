@@ -79,7 +79,6 @@ interface PendingFilesZoneProps {
   className?: string;
 }
 
-/** Zone d'ajout de fichiers (création) — style SaaS drag & drop */
 export function PendingFilesZone({ files, onChange, disabled, className }: PendingFilesZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -200,7 +199,6 @@ interface AttachmentsPanelProps {
   className?: string;
 }
 
-/** Panneau PJ sur détail courrier — style SaaS */
 export function AttachmentsPanel({
   attachments,
   canUpload,

@@ -1,7 +1,6 @@
 import re
 from typing import List, Dict, Any
 
-# Définition des directions administratives avec leurs dictionnaires de mots-clés pondérés
 DIRECTIONS_KEYWORDS = {
     "Direction des Affaires Financières (DAF)": {
         "budget": 10,
@@ -70,10 +69,6 @@ DIRECTIONS_KEYWORDS = {
 }
 
 def get_routing_recommendations(text: str) -> List[Dict[str, Any]]:
-    """
-    Analyse le texte et calcule un score pour chaque direction cible.
-    Retourne la liste des recommandations d'orientation triées par score.
-    """
     if not text or len(text.strip()) == 0:
         return [
             {
@@ -86,13 +81,12 @@ def get_routing_recommendations(text: str) -> List[Dict[str, Any]]:
     normalized_text = text.lower()
     recommendations = []
     
-    # Calculer le score brut pour chaque direction
     for direction, keywords in DIRECTIONS_KEYWORDS.items():
         score = 0
         detected_keywords = []
         
         for kw, weight in keywords.items():
-            # Utilisation de regex avec frontière de mot pour éviter les correspondances partielles incorrectes
+            # \b évite les correspondances partielles
             pattern = rf'\b{re.escape(kw)}s?\b'
             matches = re.findall(pattern, normalized_text)
             if matches:
@@ -101,10 +95,8 @@ def get_routing_recommendations(text: str) -> List[Dict[str, Any]]:
                 detected_keywords.append(f"'{kw}' ({count}x)")
         
         if score > 0:
-            # Normalisation du score (plafond à 100, ajusté selon l'importance relative)
             normalized_score = min(round((score / 35.0) * 100.0, 2), 100.0)
             
-            # Ne proposer que si la pertinence est supérieure à 10%
             if normalized_score > 10.0:
                 justification = f"Recommandé en raison de la détection des termes : {', '.join(detected_keywords)}."
                 recommendations.append({
@@ -113,10 +105,8 @@ def get_routing_recommendations(text: str) -> List[Dict[str, Any]]:
                     "justification": justification
                 })
 
-    # Trier par score décroissant
     recommendations.sort(key=lambda x: x["score"], reverse=True)
 
-    # Si aucune direction spécifique n'atteint le seuil, proposer le Secrétariat Général par défaut
     if not recommendations:
         recommendations.append({
             "directionPropose": "Secrétariat Général (SG)",
@@ -124,7 +114,6 @@ def get_routing_recommendations(text: str) -> List[Dict[str, Any]]:
             "justification": "Aucun mot-clé thématique spécifique détecté. Orientation vers le Secrétariat Général par défaut."
         })
     elif recommendations[0]["score"] < 60.0:
-        # Si la recommandation principale est faible, ajouter le SG comme alternative
         recommendations.append({
             "directionPropose": "Secrétariat Général (SG)",
             "score": 50.0,

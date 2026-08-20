@@ -1,8 +1,3 @@
-"""
-Client LLM multi-fournisseurs pour résumé / infos clés.
-Véracité : grounding sur le texte source + validation post-réponse + fallback local.
-Failover : cascade auto entre OpenAI / OpenRouter / Claude / xAI / Gemini / Mistral.
-"""
 from __future__ import annotations
 
 import logging
@@ -44,13 +39,10 @@ Schéma JSON :
 }
 """
 
-# Dernier provider utilisé (pour UI / debug)
 _LAST_LLM_META: Dict[str, Any] = {}
-
 
 def llm_configured() -> bool:
     return bool(settings.LLM_ENABLED) and len(configured_providers()) > 0
-
 
 def llm_status() -> dict:
     status = providers_status()
@@ -62,13 +54,11 @@ def llm_status() -> dict:
         }
     return status
 
-
 def _normalize(s: str) -> str:
     s = (s or "").lower()
     s = re.sub(r"\s+", " ", s)
     s = re.sub(r"[^\wàâäéèêëïîôùûüç\s\-./@]", "", s, flags=re.I)
     return s.strip()
-
 
 def _grounded(claim: str, source: str, min_token_overlap: float = 0.45) -> bool:
     """Vérifie qu'une affirmation est ancrée dans le texte source."""
@@ -83,7 +73,6 @@ def _grounded(claim: str, source: str, min_token_overlap: float = 0.45) -> bool:
         return False
     hits = sum(1 for t in tokens if t in source_n)
     return (hits / len(tokens)) >= min_token_overlap
-
 
 def _validate_llm_payload(payload: dict, source: str) -> Dict[str, Any]:
     """Filtre les éléments non ancrés dans le texte (anti-hallucination)."""
@@ -162,7 +151,6 @@ def _validate_llm_payload(payload: dict, source: str) -> Dict[str, Any]:
         "verifie": True,
     }
 
-
 def _format_resume(data: dict, provider_meta: Optional[dict] = None) -> dict:
     """Aligné sur build_structured_summary / unusable_summary."""
     if not data.get("exploitable"):
@@ -221,7 +209,6 @@ def _format_resume(data: dict, provider_meta: Optional[dict] = None) -> dict:
         out["provider"] = provider_meta.get("id")
         out["model"] = provider_meta.get("model")
     return out
-
 
 def summarize_with_llm(text: str, timeout: float | None = None) -> Optional[dict]:
     """
