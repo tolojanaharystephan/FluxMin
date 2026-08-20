@@ -324,7 +324,6 @@ export class AuthService {
   }
 
   private async generateTokens(user: any, sessionId?: string) {
-    // Enrichir avec direction/ministere
     let directionNom: string | null = null;
     let ministereNom: string | null = null;
     let ministereId: number | null = null;

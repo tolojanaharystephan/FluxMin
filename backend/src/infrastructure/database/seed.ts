@@ -209,8 +209,7 @@ const runSeed = async () => {
     },
   ]).returning();
 
-  // ── Super Admin (transversal — pas rattaché à une direction métier) ──
-  // Rôle `auditeur` conservé en DB / RBAC pour plus tard, non seedé pour l'instant.
+  // Super admin
   const [superAdmin] = await db.insert(schema.utilisateurs).values([
     {
       directionId: null,
@@ -223,7 +222,7 @@ const runSeed = async () => {
     },
   ]).returning();
 
-  // ── Gouvernement (canal officiel) ──
+  // Gouvernement
   const [userGouvernement] = await db.insert(schema.utilisateurs).values([
     {
       directionId: null,

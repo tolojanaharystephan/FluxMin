@@ -12,7 +12,6 @@ export type GeoResult = {
 };
 
 const geoCache = new Map<string, { at: number; value: GeoResult }>();
-/** Court TTL local si le geo-service est indisponible (évite de marteler les providers). */
 const GEO_TTL_MS = 10 * 60 * 1000;
 const GEO_SERVICE_URL = (process.env.GEO_SERVICE_URL || 'http://localhost:8001').replace(/\/$/, '');
 
@@ -53,10 +52,6 @@ const emptyGeo = (provider: string | null = null): GeoResult => ({
   provider,
 });
 
-/**
- * Lookup via microservice geo-service (Go).
- * Repli local (IP privée / cache) si le service est down.
- */
 export async function geolocateIp(ip: string): Promise<GeoResult> {
   if (isPrivateIp(ip)) {
     return {

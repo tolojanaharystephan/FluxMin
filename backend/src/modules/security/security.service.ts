@@ -30,7 +30,6 @@ export type LoginContext = {
 @Injectable()
 export class SecurityService {
   private readonly logger = new Logger(SecurityService.name);
-  /** Cache court des sessions révoquées (évite un hit DB à chaque requête). */
   private revokedCache = new Map<string, number>();
 
   constructor(
@@ -76,7 +75,7 @@ export class SecurityService {
       .from(sessions)
       .where(eq(sessions.id, sessionId))
       .limit(1);
-    if (!row) return; // sessions legacy sans ligne
+    if (!row) return;
     if (row.revokedAt) {
       this.revokedCache.set(sessionId, Date.now() + 60_000);
       throw new HttpException('Session révoquée', HttpStatus.UNAUTHORIZED);
@@ -86,11 +85,6 @@ export class SecurityService {
     }
   }
 
-  /**
-   * Localisation = lookup dynamique de l'IP de CETTE connexion (pas de siège figé).
-   * - Hors Madagascar → critique
-   * - Même IP déjà utilisée en succès par un AUTRE ministère → suspect (autre enceinte)
-   */
   async recordLoginAttempt(params: {
     email: string;
     succes: boolean;
@@ -120,8 +114,6 @@ export class SecurityService {
         autreMinistereNom = other.nom;
       }
     }
-
-    const horsZoneMinistere = ipAutreMinistere;
 
     let risque: 'faible' | 'moyen' | 'eleve' | 'critique' = 'faible';
     let motif = succes ? 'connexion_ok' : 'identifiants_invalides';
@@ -159,7 +151,7 @@ export class SecurityService {
         latitude: geo.latitude,
         longitude: geo.longitude,
         horsMadagascar,
-        horsZoneMinistere,
+        horsZoneMinistere: ipAutreMinistere,
         ipAutreMinistere,
         details: {
           ministereNom: ministry?.nom || null,
@@ -397,7 +389,6 @@ export class SecurityService {
     return null;
   }
 
-  /** IP déjà vue en connexion réussie pour un autre ministère = probablement une autre enceinte */
   private async findOtherMinistryOnIp(ip: string, currentMinistereId: number) {
     const rows = await this.db
       .select({

@@ -91,17 +91,15 @@ export const archives = pgTable('archives', {
   emplacement: varchar('emplacement', { length: 255 }),
 });
 
-/** Tentatives de connexion (succès / échec) + géolocalisation IP */
 export const securityLogs = pgTable('security_logs', {
   id: serial('id').primaryKey(),
   email: varchar('email', { length: 255 }),
   utilisateurId: integer('utilisateur_id').references(() => utilisateurs.id),
   ministereId: integer('ministere_id').references(() => ministeres.id),
-  /** UUID de session JWT — lie security_logs ↔ audit_logs ↔ sessions */
   sessionId: varchar('session_id', { length: 36 }),
   succes: boolean('succes').notNull(),
   motif: varchar('motif', { length: 80 }),
-  risque: varchar('risque', { length: 20 }).notNull(), // faible, moyen, eleve, critique
+  risque: varchar('risque', { length: 20 }).notNull(),
   ip: varchar('ip', { length: 45 }).notNull(),
   userAgent: text('user_agent'),
   pays: varchar('pays', { length: 80 }),
@@ -113,13 +111,11 @@ export const securityLogs = pgTable('security_logs', {
   longitude: varchar('longitude', { length: 20 }),
   horsMadagascar: boolean('hors_madagascar').default(false).notNull(),
   horsZoneMinistere: boolean('hors_zone_ministere').default(false).notNull(),
-  /** IP déjà utilisée par un compte d'un autre ministère */
   ipAutreMinistere: boolean('ip_autre_ministere').default(false).notNull(),
   details: jsonb('details'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-/** Blocage temporaire d'IP (anti brute-force) */
 export const ipBlocks = pgTable('ip_blocks', {
   id: serial('id').primaryKey(),
   ip: varchar('ip', { length: 45 }).notNull(),
@@ -128,7 +124,6 @@ export const ipBlocks = pgTable('ip_blocks', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-/** Sessions authentifiées (révocation admin / lien audit) */
 export const sessions = pgTable('sessions', {
   id: varchar('id', { length: 36 }).primaryKey(),
   utilisateurId: integer('utilisateur_id').references(() => utilisateurs.id),
@@ -145,7 +140,7 @@ export const auditLogs = pgTable('audit_logs', {
   utilisateurId: integer('utilisateur_id'),
   sessionId: varchar('session_id', { length: 36 }),
   action: text('action'),
-  entiteType: varchar('entite_type', { length: 50 }), // 'courrier', 'utilisateur', ...
+  entiteType: varchar('entite_type', { length: 50 }),
   entiteId: integer('entite_id'),
   details: jsonb('details'),
   ip: varchar('ip', { length: 45 }),
