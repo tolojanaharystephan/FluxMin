@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { RBACGuard } from "@/components/auth/rbac-guard";
@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Send, Save } from "lucide-react";
+import { ArrowLeft, Send, Save, Reply } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
 import { PendingFilesZone } from "@/components/courrier/attachments-panel";
@@ -34,8 +34,9 @@ interface Ministere {
   code: string;
 }
 
-export default function NewCourrierPage() {
+function NewCourrierContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { accessToken, user } = useAuthStore();
 
   const [loading, setLoading] = useState(false);
@@ -44,11 +45,14 @@ export default function NewCourrierPage() {
 
   const [typeCourrier, setTypeCourrier] = useState("interne");
   const [selectedMinistereId, setSelectedMinistereId] = useState<number | null>(null);
-  const [objet, setObjet] = useState("");
+  const [objet, setObjet] = useState(searchParams.get("objet") || "");
   const [corps, setCorps] = useState("");
   const [destinataireDirectionId, setDestinataireDirectionId] = useState<number | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
+
+  // Pré-remplissage depuis une réponse (RE:)
+  const replyTo = searchParams.get("replyTo");
 
   useEffect(() => {
     if (!accessToken) return;
@@ -132,12 +136,19 @@ export default function NewCourrierPage() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Nouveau courrier</h1>
-              <p className="text-sm text-muted-foreground">Créer et envoyer un courrier</p>
+              <h1 className="text-2xl font-semibold tracking-[-0.02em]">Nouveau courrier</h1>
+              <p className="text-sm text-muted-foreground/80">Créer et envoyer un courrier</p>
             </div>
           </div>
 
-          <Card>
+          {replyTo && (
+            <div className="flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm text-primary">
+              <Reply className="h-4 w-4 shrink-0" />
+              <span>Réponse au courrier <span className="font-mono">#{replyTo}</span> — objet pré-rempli, modifiable</span>
+            </div>
+          )}
+
+          <Card className="border-white/10 bg-white/5">
             <CardHeader>
               <CardTitle>Informations du courrier</CardTitle>
             </CardHeader>
@@ -277,5 +288,21 @@ export default function NewCourrierPage() {
       </AppShell>
       </RBACGuard>
     </AuthGuard>
+  );
+}
+
+export default function NewCourrierPage() {
+  return (
+    <Suspense fallback={
+      <AuthGuard>
+        <AppShell>
+          <div className="flex items-center justify-center py-24">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          </div>
+        </AppShell>
+      </AuthGuard>
+    }>
+      <NewCourrierContent />
+    </Suspense>
   );
 }

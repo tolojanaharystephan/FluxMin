@@ -26,6 +26,10 @@ import {
   RefreshCw,
   Archive,
   Undo2,
+  AlertCircle,
+  AlertTriangle,
+  Sparkles,
+  Reply,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
@@ -79,6 +83,15 @@ interface CourrierDetail {
     typeMime: string;
     tailleBytes: number;
   }>;
+  metadata?: {
+    autoAnalyse?: {
+      priorite: "haute" | "moyenne" | "basse";
+      prioriteScore: number;
+      objetPropose: string | null;
+      analyseSource: "pj" | "text" | "none";
+      analyzedAt: string;
+    };
+  } | null;
   archive?: {
     id: number;
     dateArchivage: string | null;
@@ -117,6 +130,9 @@ export default function CourrierDetailPage() {
 
   const canArchive = user?.permissions?.includes("archive_courrier") ?? false;
   const canUseAi = user?.permissions?.includes("use_ai_features") ?? ["responsable", "responsable_direction", "agent_courrier", "admin_ministere", "super_admin"].includes(user?.role || "");
+  // L'émetteur ne voit pas les boutons d'analyse (courrier créé par lui)
+  const isEmetteur = courrier?.emetteur?.id === user?.id;
+  const isDestinataire = !isEmetteur && user?.directionId === courrier?.destinataireDirection?.id;
 
   const fetchCourrier = async () => {
     if (!accessToken || !id) return;
@@ -410,7 +426,7 @@ export default function CourrierDetailPage() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">{courrier.reference}</h1>
+                <h1 className="text-2xl font-semibold tracking-[-0.02em]">{courrier.reference}</h1>
                 <p className="text-sm text-muted-foreground">{courrier.objet}</p>
               </div>
             </div>
@@ -419,8 +435,77 @@ export default function CourrierDetailPage() {
             </Badge>
           </div>
 
-          <div className="grid grid-cols-3 gap-6">
-            <Card className="col-span-2">
+          {/* Bannière auto-analyse IA niveau 1 */}
+          {courrier.metadata?.autoAnalyse && (
+            <div className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-sm ${
+              courrier.metadata.autoAnalyse.priorite === "haute"
+                ? "border-destructive/30 bg-destructive/10 text-destructive"
+                : courrier.metadata.autoAnalyse.priorite === "moyenne"
+                ? "border-warning/30 bg-warning/10 text-warning"
+                : "border-primary/20 bg-primary/5 text-primary"
+            }`}>
+              {courrier.metadata.autoAnalyse.priorite === "haute" ? (
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              ) : courrier.metadata.autoAnalyse.priorite === "moyenne" ? (
+                <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+              ) : (
+                <Sparkles className="h-4 w-4 mt-0.5 shrink-0" />
+              )}
+              <div className="flex-1">
+                <p className="font-medium">
+                  Analyse automatique IA{" "}
+                  {courrier.metadata.autoAnalyse.priorite === "haute"
+                    ? "— URGENT"
+                    : courrier.metadata.autoAnalyse.priorite === "moyenne"
+                    ? "— Priorité moyenne"
+                    : "— Traitement normal"}
+                </p>
+                {courrier.metadata.autoAnalyse.objetPropose && (
+                  <p className="text-xs opacity-80 mt-0.5">
+                    Objet proposé : « {courrier.metadata.autoAnalyse.objetPropose} »
+                  </p>
+                )}
+                <p className="text-[10px] opacity-60 mt-0.5">
+                  Source : {courrier.metadata.autoAnalyse.analyseSource === "pj"
+                    ? "pièces jointes"
+                    : "corps du courrier"
+                  } · {new Date(courrier.metadata.autoAnalyse.analyzedAt).toLocaleString("fr-FR")}
+                  · Validation humaine obligatoire
+                </p>
+              </div>
+              {canUseAi && !isEmetteur && courrier.piecesJointes?.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="shrink-0 text-xs"
+                  onClick={handleAnalyzeAllPj}
+                  disabled={analyzingAll}
+                >
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  Analyse complète
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Bouton Répondre (destinataire uniquement, courrier non brouillon/archivé) */}
+          {isDestinataire && courrier.statut !== "brouillon" && courrier.statut !== "archive" && (
+            <div className="flex justify-end">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => router.push(
+                  `/courriers/new?replyTo=${courrier.id}&objet=${encodeURIComponent(`RE: ${courrier.objet}`)}`
+                )}
+              >
+                <Reply className="h-4 w-4 mr-2" />
+                Répondre
+              </Button>
+            </div>
+          )}
+
+            <div className="grid grid-cols-3 gap-6">
+            <Card className="col-span-2 border-white/10 bg-white/5">
               <CardHeader>
                 <CardTitle className="text-base">Détails du courrier</CardTitle>
               </CardHeader>
@@ -447,7 +532,7 @@ export default function CourrierDetailPage() {
                 {courrier.corps && (
                   <div className="border-t pt-4">
                     <p className="text-muted-foreground text-sm mb-2">Contenu</p>
-                    <div className="text-sm whitespace-pre-wrap bg-secondary/50 rounded-lg p-4">
+                    <div className="text-sm whitespace-pre-wrap bg-white/5 border border-white/10 rounded-lg p-4">
                       {courrier.corps}
                     </div>
                   </div>
@@ -456,7 +541,7 @@ export default function CourrierDetailPage() {
             </Card>
 
             <div className="flex flex-col gap-6">
-              <Card>
+              <Card className="border-white/10 bg-white/5">
                 <CardContent className="pt-6 space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <User className="h-4 w-4 text-muted-foreground" />
@@ -497,8 +582,8 @@ export default function CourrierDetailPage() {
                   onUpload={handleUploadPj}
                   onDownload={handleDownload}
                   onDelete={handleDeletePj}
-                  onAnalyze={canUseAi ? handleAnalyzePj : undefined}
-                  onAnalyzeAll={canUseAi ? handleAnalyzeAllPj : undefined}
+                  onAnalyze={canUseAi && !isEmetteur ? handleAnalyzePj : undefined}
+                  onAnalyzeAll={canUseAi && !isEmetteur ? handleAnalyzeAllPj : undefined}
                   analyzingId={analyzingId}
                   analyzingAll={analyzingAll}
                 />
@@ -511,7 +596,7 @@ export default function CourrierDetailPage() {
             </div>
           </div>
 
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Clock className="h-4 w-4" />
@@ -547,7 +632,7 @@ export default function CourrierDetailPage() {
 
           <MessagePanel courrierId={id} statut={courrier.statut} />
 
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Actions</CardTitle>
             </CardHeader>

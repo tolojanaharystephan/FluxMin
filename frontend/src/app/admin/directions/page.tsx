@@ -136,7 +136,7 @@ export default function DirectionsPage() {
         <div className="flex flex-col gap-6 animate-fade-in">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Directions</h1>
+              <h1 className="text-2xl font-semibold tracking-[-0.02em]">Directions</h1>
               <p className="text-sm text-muted-foreground">Gestion des directions ministérielles</p>
             </div>
             <Button onClick={() => { setEditItem(null); setFormNom(""); setFormType(""); setFormMinistereId(""); setDialogOpen(true); }}>
@@ -148,11 +148,11 @@ export default function DirectionsPage() {
           {loading ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i} className="animate-pulse"><CardContent className="p-6"><div className="h-16 rounded bg-secondary" /></CardContent></Card>
+                <Card key={i} className="animate-pulse border-white/10 bg-white/5"><CardContent className="p-6"><div className="h-16 rounded bg-secondary" /></CardContent></Card>
               ))}
             </div>
           ) : directions.length === 0 ? (
-            <Card>
+            <Card className="border-white/10 bg-white/5">
               <CardContent className="flex flex-col items-center justify-center py-16">
                 <FolderOpen className="h-12 w-12 text-muted-foreground/50" />
                 <p className="mt-4 text-sm text-muted-foreground">Aucune direction trouvée</p>
@@ -161,7 +161,7 @@ export default function DirectionsPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {directions.map((d) => (
-                <Card key={d.id} className="group">
+                <Card key={d.id} className="group border-white/10 bg-white/5 transition-colors hover:bg-white/5 hover:border-primary/30">
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-4">

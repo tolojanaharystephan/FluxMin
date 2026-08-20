@@ -51,7 +51,7 @@ export default function ActualitesGeneralesPage() {
       <AppShell>
         <div className="space-y-6 animate-fade-in">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+            <h1 className="text-2xl font-semibold tracking-[-0.02em] flex items-center gap-2">
               <Newspaper className="h-6 w-6 text-fuchsia-400" />
               Actualités générales
             </h1>
@@ -62,7 +62,7 @@ export default function ActualitesGeneralesPage() {
 
           {loading && <p className="text-sm text-muted-foreground">Chargement…</p>}
           {!loading && items.length === 0 && (
-            <Card>
+            <Card className="border-white/10 bg-white/5">
               <CardContent className="py-10 text-center text-sm text-muted-foreground">
                 Aucune actualité publique pour le moment.
               </CardContent>
@@ -72,7 +72,7 @@ export default function ActualitesGeneralesPage() {
           <div className="space-y-2">
             {items.map((p) => (
               <Link key={p.id} href={`/actualites/${p.id}`}>
-                <Card className="hover:bg-secondary/40 transition-colors cursor-pointer mb-2">
+                <Card className="cursor-pointer mb-2 border-white/10 bg-white/5 transition-colors hover:bg-white/5 hover:border-primary/30">
                   <CardContent className="py-4 flex items-center gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2 mb-1">

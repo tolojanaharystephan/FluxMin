@@ -113,7 +113,7 @@ export default function MinisteresPage() {
         <div className="flex flex-col gap-6 animate-fade-in">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Ministères</h1>
+              <h1 className="text-2xl font-semibold tracking-[-0.02em]">Ministères</h1>
               <p className="text-sm text-muted-foreground">Gestion des entités ministérielles</p>
             </div>
             <Button onClick={openCreate}>
@@ -124,13 +124,13 @@ export default function MinisteresPage() {
 
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Rechercher un ministère..." className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <Input placeholder="Rechercher un ministère..." className="pl-10 rounded-xl" value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {loading ? (
               Array.from({ length: 3 }).map((_, i) => (
-                <Card key={i} className="animate-pulse">
+                <Card key={i} className="animate-pulse border-white/10 bg-white/5">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-4">
                       <div className="h-12 w-12 rounded-xl bg-secondary" />
@@ -143,7 +143,7 @@ export default function MinisteresPage() {
                 </Card>
               ))
             ) : ministeres.length === 0 ? (
-              <Card className="col-span-full">
+              <Card className="col-span-full border-white/10 bg-white/5">
                 <CardContent className="flex flex-col items-center justify-center py-16">
                   <FolderOpen className="h-12 w-12 text-muted-foreground/50" />
                   <p className="mt-4 text-sm text-muted-foreground">Aucun ministère trouvé</p>
@@ -155,7 +155,7 @@ export default function MinisteresPage() {
               </Card>
             ) : (
               ministeres.map((m) => (
-                <Card key={m.id} className="group">
+                <Card key={m.id} className="group border-white/10 bg-white/5 transition-colors hover:bg-white/5 hover:border-primary/30">
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-4">

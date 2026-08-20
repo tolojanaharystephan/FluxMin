@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import { AppShell } from "@/components/layout/app-shell";
@@ -186,7 +186,7 @@ export default function UtilisateursPage() {
         <div className="flex flex-col gap-6 animate-fade-in">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Utilisateurs</h1>
+              <h1 className="text-2xl font-semibold tracking-[-0.02em]">Utilisateurs</h1>
               <p className="text-sm text-muted-foreground">Gestion des comptes utilisateurs</p>
             </div>
             <Button onClick={() => {
@@ -201,17 +201,17 @@ export default function UtilisateursPage() {
 
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Rechercher par nom, prénom ou email..." className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <Input placeholder="Rechercher par nom, prénom ou email..." className="pl-10 rounded-xl" value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
 
           {loading ? (
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Card key={i} className="animate-pulse"><CardContent className="p-4"><div className="h-12 rounded bg-secondary" /></CardContent></Card>
+                <Card key={i} className="animate-pulse border-white/10 bg-white/5"><CardContent className="p-4"><div className="h-12 rounded bg-secondary" /></CardContent></Card>
               ))}
             </div>
           ) : utilisateurs.length === 0 ? (
-            <Card>
+            <Card className="border-white/10 bg-white/5">
               <CardContent className="flex flex-col items-center justify-center py-16">
                 <FolderOpen className="h-12 w-12 text-muted-foreground/50" />
                 <p className="mt-4 text-sm text-muted-foreground">Aucun utilisateur trouvé</p>
@@ -220,7 +220,7 @@ export default function UtilisateursPage() {
           ) : (
             <div className="space-y-2">
               {utilisateurs.map((u) => (
-                <Card key={u.id} className="group transition-colors hover:bg-secondary/30">
+                <Card key={u.id} className="group border-white/10 bg-white/5 transition-colors hover:bg-white/5 hover:border-primary/30">
                   <CardContent className="flex items-center gap-4 p-4">
                     <Avatar className="h-10 w-10">
                       <AvatarFallback>
@@ -307,7 +307,6 @@ export default function UtilisateursPage() {
                   <SelectContent>
                     <SelectItem value="responsable">Responsable</SelectItem>
                     <SelectItem value="agent_courrier">Agent Courrier</SelectItem>
-                    <SelectItem value="auditeur">Auditeur</SelectItem>
                     <SelectItem value="super_admin">Super Admin</SelectItem>
                     <SelectItem value="directeur_ministere">Directeur de ministère</SelectItem>
                     <SelectItem value="gouvernement">Gouvernement</SelectItem>

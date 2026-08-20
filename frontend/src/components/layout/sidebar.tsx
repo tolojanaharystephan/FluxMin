@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -35,6 +35,7 @@ import {
   Newspaper,
   Landmark,
   PenSquare,
+  ShieldAlert,
 } from "lucide-react";
 
 interface NavItem {
@@ -171,6 +172,14 @@ const adminNav: NavItem[] = [
     roles: ["super_admin", "directeur_ministere"],
     iconColor: "text-rose-400",
     iconBg: "bg-rose-500/15",
+  },
+  {
+    label: "Sécurité",
+    href: "/admin/security",
+    icon: ShieldAlert,
+    roles: ["super_admin"],
+    iconColor: "text-red-400",
+    iconBg: "bg-red-500/15",
   },
   {
     label: "Analytics",

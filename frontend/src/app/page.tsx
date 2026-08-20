@@ -35,17 +35,17 @@ const features = [
   {
     icon: Sparkles,
     title: "IA locale assistive",
-    text: "OCR, résumé et routage — validation humaine obligatoire",
+    text: "Traitement sémantique et résumé automatique sans sortie de données.",
   },
   {
     icon: Shield,
-    title: "Souveraineté",
-    text: "Données dans le périmètre, sans cloud tiers sensible",
+    title: "Souveraineté des données",
+    text: "Infrastructure sécurisée répondant aux normes de la haute administration.",
   },
   {
     icon: Workflow,
     title: "Flux tracés",
-    text: "Interne, externe et transmission multi-directions",
+    text: "Audit complet et traçabilité en temps réel de chaque correspondance.",
   },
 ];
 
@@ -114,22 +114,27 @@ export default function LoginPage() {
         </motion.div>
 
         <div className="relative max-w-xl">
-          <motion.h1
+          <motion.h6
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1, ease: easeOut }}
             className="font-[family-name:var(--font-display)] text-5xl font-semibold leading-[1.05] tracking-tight text-white xl:text-6xl"
           >
-            FluxMin
-          </motion.h1>
+            {/* Gestion et automatisation
+            <br />
+            intelligente des courriers
+            <br />
+            ministériels */}
+            Fluxmin
+          </motion.h6>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, delay: 0.22, ease: easeOut }}
             className="mt-5 max-w-md text-lg leading-relaxed text-teal-50/70"
           >
-            Gestion et automatisation intelligente des courriers ministériels —
-            tracés, sécurisés, assistés localement.
+            Courriers ministériels, tracés et assistés localement. Fiabilité et
+            sécurité, sans compromis.
           </motion.p>
 
           <ul className="mt-10 space-y-3">
@@ -163,13 +168,13 @@ export default function LoginPage() {
             <div className="w-52 rounded-2xl border border-white/10 bg-[#0c1a17]/90 p-3 shadow-2xl shadow-teal-950/40 backdrop-blur-xl">
               <div className="mb-2 flex items-center gap-2 text-[10px] text-teal-200/70">
                 <Building2 className="h-3 w-3" />
-                Courrier entrant
+                ********
               </div>
               <div className="h-2 w-3/4 rounded-full bg-teal-400/25" />
               <div className="mt-2 h-2 w-1/2 rounded-full bg-white/10" />
               <div className="mt-3 flex gap-1.5">
-                <span className="rounded-md bg-amber-500/20 px-1.5 py-0.5 text-[9px] text-amber-200">Priorité</span>
-                <span className="rounded-md bg-teal-500/20 px-1.5 py-0.5 text-[9px] text-teal-200">DSI</span>
+                <span className="rounded-md bg-amber-500/20 px-1.5 py-0.5 text-[9px] text-amber-200">********</span>
+                <span className="rounded-md bg-teal-500/20 px-1.5 py-0.5 text-[9px] text-teal-200">***</span>
               </div>
             </div>
           </motion.div>
@@ -179,9 +184,9 @@ export default function LoginPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.5 }}
-          className="text-xs text-white/35"
+          className="text-[10px] uppercase tracking-[0.14em] text-white/35"
         >
-          Plateforme gouvernementale · v1.0
+          Plateforme gouvernementale
         </motion.p>
       </section>
 
@@ -205,10 +210,10 @@ export default function LoginPage() {
 
             <motion.div custom={0} variants={fadeUp} initial="hidden" animate="show" className="mb-8">
               <h2 className="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-tight text-white">
-                Bon retour
+                Espace Collaborateur
               </h2>
               <p className="mt-2 text-sm text-white/50">
-                Connectez-vous pour accéder à votre espace courrier
+                Identifiez-vous pour accéder à vos dossiers.
               </p>
             </motion.div>
 
@@ -225,14 +230,14 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               <motion.div custom={1} variants={fadeUp} initial="hidden" animate="show" className="flex flex-col gap-2">
                 <Label htmlFor="email" className="text-white/70">
-                  Adresse email
+                  Adresse mail professionnelle
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-teal-400/60" />
                   <Input
                     id="email"
                     type="email"
-                    placeholder="agent.courrier.mfa@fluxmin.gouv.fr"
+                    placeholder="agent.dupont@ministere.gouv.fr"
                     className="h-11 rounded-xl border-white/10 bg-white/[0.04] pl-10 transition-colors focus-visible:border-teal-500/50 focus-visible:ring-teal-500/30"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -246,7 +251,9 @@ export default function LoginPage() {
                   <Label htmlFor="password" className="text-white/70">
                     Mot de passe
                   </Label>
-                  <span className="text-xs text-teal-300/70">Mot de passe oublié ?</span>
+                  <span className="text-xs text-teal-300/70 underline underline-offset-2">
+                    Mot de passe oublié ?
+                  </span>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-teal-400/60" />

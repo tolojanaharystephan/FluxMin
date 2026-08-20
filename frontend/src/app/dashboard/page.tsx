@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import Link from "next/link";
@@ -28,6 +28,7 @@ import {
   AlertCircle,
   CheckCircle2,
   RefreshCw,
+  Timer,
 } from "lucide-react";
 
 const ROLE_LABELS: Record<string, string> = {
@@ -107,24 +108,20 @@ export default function DashboardPage() {
       >
         <AppShell>
           <div className="flex flex-col gap-6 animate-fade-in">
-            <div className="flex items-center justify-between">
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">
-                  {userRole === "super_admin" && "Vue globale multi-ministères"}
-                  {userRole === "directeur_ministere" && "Dashboard Directeur de ministère"}
-                  {userRole === "responsable" && "Dashboard Responsable"}
-                  {userRole === "responsable_direction" && "Dashboard Direction"}
-                  {userRole === "agent_courrier" && "Tableau de bord Agent"}
-                </h1>
+                <h1 className="text-2xl font-semibold tracking-[-0.02em]">Tableau de bord</h1>
                 <p className="text-sm text-muted-foreground">
-                  {user?.ministereNom
-                    ? `${roleLabel} · ${user.ministereNom}`
-                    : roleLabel}
+                  Bienvenue dans l&apos;espace d&apos;administration ministériel.
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground/80">
+                  {user?.ministereNom ? `${roleLabel} · ${user.ministereNom}` : roleLabel}
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="icon" onClick={() => refetch()} disabled={isFetching}>
+                <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
                   <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+                  Actualiser
                 </Button>
                 {userRole !== "super_admin" && (
                   <Button onClick={() => router.push("/courriers/new")}>
@@ -156,7 +153,11 @@ export default function DashboardPage() {
                   const meta = KPI_ICONS[kpi.key] || KPI_ICONS.total;
                   const Icon = meta.icon;
                   return (
-                    <Card key={kpi.key} className="animate-fade-in" style={{ animationDelay: `${i * 60}ms` }}>
+                    <Card
+                      key={kpi.key}
+                      className="animate-fade-in overflow-hidden border-white/10 bg-white/5"
+                      style={{ animationDelay: `${i * 60}ms` }}
+                    >
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                           <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${meta.bgColor}`}>
@@ -179,7 +180,7 @@ export default function DashboardPage() {
                           )}
                         </div>
                         <div className="mt-4">
-                          <p className="text-2xl font-bold">{formatNumber(kpi.value)}</p>
+                          <p className="text-2xl font-semibold tracking-tight">{formatNumber(kpi.value)}</p>
                           <p className="text-xs text-muted-foreground">{kpi.label}</p>
                         </div>
                       </CardContent>
@@ -189,7 +190,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              <Card className="lg:col-span-2">
+              <Card className="lg:col-span-2 border-white/10 bg-white/5">
                 <CardHeader className="flex flex-row items-center justify-between pb-4">
                   <CardTitle className="text-base">Courriers récents</CardTitle>
                   <Button variant="ghost" size="sm" onClick={() => router.push(userRole === "super_admin" ? "/analytics" : "/inbox")}>
@@ -212,9 +213,9 @@ export default function DashboardPage() {
                         key={courrier.id}
                         type="button"
                         onClick={() => router.push(`/courriers/${courrier.id}`)}
-                        className="flex w-full items-start gap-4 px-6 py-4 text-left transition-colors hover:bg-secondary/30"
+                        className="flex w-full items-start gap-4 px-6 py-4 text-left transition-colors hover:bg-white/5"
                       >
-                        <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary">
+                        <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/5">
                           <Mail className="h-4 w-4 text-muted-foreground" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -242,7 +243,7 @@ export default function DashboardPage() {
               </Card>
 
               <div className="flex flex-col gap-4">
-                <Card>
+                <Card className="border-white/10 bg-white/5">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base">Actions rapides</CardTitle>
                   </CardHeader>
@@ -293,7 +294,7 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-white/10 bg-white/5">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base">Activité récente</CardTitle>
                   </CardHeader>
@@ -321,10 +322,10 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-white/10 bg-white/5">
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2 text-base">
-                      <TrendingUp className="h-4 w-4 text-success" />
+                      <Timer className="h-4 w-4 text-success" />
                       Performance
                     </CardTitle>
                   </CardHeader>

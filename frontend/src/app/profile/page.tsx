@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import { AppShell } from "@/components/layout/app-shell";
@@ -72,7 +72,7 @@ export default function ProfilePage() {
         <div className="flex flex-col gap-6 animate-fade-in max-w-3xl">
           {/* Header */}
           <div>
-            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3">
+            <h1 className="text-2xl font-semibold tracking-[-0.02em] flex items-center gap-3">
               <User className="h-6 w-6 text-muted-foreground" />
               Mon profil
             </h1>
@@ -82,7 +82,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Profile Card */}
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <CardContent className="p-6">
               <div className="flex items-center gap-6">
                 <Avatar className="h-20 w-20">
@@ -116,7 +116,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Edit Profile */}
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <User className="h-4 w-4" />
@@ -152,7 +152,7 @@ export default function ProfilePage() {
                   <Input
                     id="email"
                     value={user?.email || ""}
-                    className="pl-10"
+                    className="pl-10 rounded-xl"
                     disabled
                   />
                 </div>
@@ -190,7 +190,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Account Info */}
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <Activity className="h-4 w-4" />
@@ -201,7 +201,7 @@ export default function ProfilePage() {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 ring-1 ring-white/10">
                       <Shield className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div>
@@ -216,7 +216,7 @@ export default function ProfilePage() {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 ring-1 ring-white/10">
                       <Building2 className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div>
@@ -232,7 +232,7 @@ export default function ProfilePage() {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 ring-1 ring-white/10">
                       <Building2 className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div>

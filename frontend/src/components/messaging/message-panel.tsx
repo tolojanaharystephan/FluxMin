@@ -144,7 +144,7 @@ export function MessagePanel({ courrierId, statut }: MessagePanelProps) {
   const isArchived = statut === "archive";
 
   return (
-    <Card>
+    <Card className="border-white/10 bg-white/5">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <MessageSquare className="h-4 w-4" />

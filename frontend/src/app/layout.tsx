@@ -27,6 +27,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="dark" suppressHydrationWarning>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap"
+        />
+      </head>
       <body className={`${display.variable} ${sans.variable} font-sans antialiased`}>
         <ClientLayout>{children}</ClientLayout>
       </body>

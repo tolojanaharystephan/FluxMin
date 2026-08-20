@@ -133,7 +133,7 @@ export default function ArchivesPage() {
         <div className="flex flex-col gap-6 animate-fade-in">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3">
+              <h1 className="text-2xl font-semibold tracking-[-0.02em] flex items-center gap-3">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/15">
                   <Archive className="h-5 w-5 text-orange-400" />
                 </span>
@@ -149,14 +149,14 @@ export default function ArchivesPage() {
             </Button>
           </div>
 
-          <Card>
-            <CardContent className="p-4">
+          <Card className="border-white/10 bg-white/5">
+            <CardContent className="p-5">
               <div className="flex flex-wrap items-center gap-3">
                 <div className="relative flex-1 min-w-[200px]">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     placeholder="Rechercher dans les archives..."
-                    className="pl-10"
+                    className="pl-10 rounded-xl"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && fetchArchives(1)}
@@ -192,7 +192,7 @@ export default function ArchivesPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <CardHeader className="pb-3">
               <CardTitle className="text-base">
                 Courriers archivés ({pagination.total})
@@ -217,9 +217,9 @@ export default function ArchivesPage() {
                     return (
                       <div
                         key={archive.id}
-                        className="flex items-start gap-4 px-6 py-4 transition-colors hover:bg-secondary/30"
+                        className="flex items-start gap-4 px-6 py-4 transition-colors hover:bg-white/5"
                       >
-                        <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500/15">
+                        <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500/15 ring-1 ring-white/10">
                           <Archive className="h-4 w-4 text-orange-400" />
                         </div>
                         <div className="flex-1 min-w-0">

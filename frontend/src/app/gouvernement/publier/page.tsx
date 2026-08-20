@@ -83,7 +83,7 @@ export default function PublierPage() {
       <AppShell>
         <div className="space-y-6 animate-fade-in max-w-2xl">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+            <h1 className="text-2xl font-semibold tracking-[-0.02em] flex items-center gap-2">
               <PenSquare className="h-6 w-6 text-rose-300" />
               Publier une actualité
             </h1>
@@ -92,7 +92,7 @@ export default function PublierPage() {
             </p>
           </div>
 
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <CardHeader>
               <CardTitle className="text-base">Nouvelle publication</CardTitle>
             </CardHeader>
@@ -111,7 +111,7 @@ export default function PublierPage() {
               <div className="space-y-2">
                 <Label>Contenu</Label>
                 <textarea
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm min-h-[140px]"
+                  className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm min-h-[140px]"
                   value={corps}
                   onChange={(e) => setCorps(e.target.value)}
                 />

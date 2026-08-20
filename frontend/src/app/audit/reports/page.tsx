@@ -164,7 +164,7 @@ export default function AuditReportsPage() {
           <div className="flex flex-col gap-6 animate-fade-in">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3">
+                <h1 className="text-2xl font-semibold tracking-[-0.02em] flex items-center gap-3">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/15">
                     <ClipboardList className="h-5 w-5 text-yellow-400" />
                   </span>
@@ -191,7 +191,7 @@ export default function AuditReportsPage() {
                 <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : error ? (
-              <Card>
+              <Card className="border-white/10 bg-white/5">
                 <CardContent className="py-12 text-center">
                   <p className="text-sm text-destructive">{error}</p>
                   <Button variant="outline" size="sm" className="mt-4" onClick={fetchReports}>
@@ -202,7 +202,7 @@ export default function AuditReportsPage() {
             ) : (
               <div className="flex flex-col gap-4">
                 {rapports.map((rapport) => (
-                  <Card key={rapport.id}>
+                  <Card key={rapport.id} className="border-white/10 bg-white/5">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex items-start gap-4">
@@ -285,7 +285,7 @@ export default function AuditReportsPage() {
                   </Card>
                 ))}
                 {rapports.length === 0 && (
-                  <Card>
+                  <Card className="border-white/10 bg-white/5">
                     <CardContent className="flex flex-col items-center justify-center py-12">
                       <ClipboardList className="h-12 w-12 text-muted-foreground/50 mb-4" />
                       <p className="text-sm text-muted-foreground mb-4">Aucun rapport généré</p>
@@ -356,7 +356,7 @@ export default function AuditReportsPage() {
               {selected?.resume && (
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {Object.entries(selected.resume).map(([k, v]) => (
-                    <div key={k} className="rounded-lg bg-secondary/40 px-3 py-2">
+                    <div key={k} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
                       <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
                         {RESUME_LABELS[k] || k}
                       </p>

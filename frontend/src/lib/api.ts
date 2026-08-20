@@ -108,6 +108,40 @@ class ApiClient {
     });
   }
 
+  async getSecurityLogs(
+    token: string,
+    params?: { page?: number; limit?: number; risque?: string; succes?: string; search?: string },
+  ) {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', String(params.page));
+    if (params?.limit) searchParams.set('limit', String(params.limit));
+    if (params?.risque && params.risque !== 'all') searchParams.set('risque', params.risque);
+    if (params?.succes && params.succes !== 'all') searchParams.set('succes', params.succes);
+    if (params?.search) searchParams.set('search', params.search);
+    const qs = searchParams.toString();
+    return this.request(`/admin/security/logs${qs ? `?${qs}` : ''}`, { token });
+  }
+
+  async getSecurityLogDetail(token: string, id: number) {
+    return this.request(`/admin/security/logs/${id}`, { token });
+  }
+
+  async revokeSecuritySession(token: string, sessionId: string, reason?: string) {
+    return this.request(`/admin/security/sessions/${encodeURIComponent(sessionId)}/revoke`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+      token,
+    });
+  }
+
+  async blockSecurityIp(token: string, ip: string, minutes = 60, raison?: string) {
+    return this.request('/admin/security/ips/block', {
+      method: 'POST',
+      body: JSON.stringify({ ip, minutes, raison }),
+      token,
+    });
+  }
+
   // ─── Admin: Directions ───
   async getDirections(token: string, ministereId?: number) {
     const params = ministereId ? `?ministereId=${ministereId}` : '';

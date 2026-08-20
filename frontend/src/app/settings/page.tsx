@@ -99,7 +99,7 @@ export default function SettingsPage() {
         <div className="flex flex-col gap-6 animate-fade-in max-w-3xl">
           {/* Header */}
           <div>
-            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3">
+            <h1 className="text-2xl font-semibold tracking-[-0.02em] flex items-center gap-3">
               <Settings className="h-6 w-6 text-muted-foreground" />
               Paramètres
             </h1>
@@ -109,7 +109,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Profile */}
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <User className="h-4 w-4" />
@@ -162,7 +162,7 @@ export default function SettingsPage() {
           </Card>
 
           {/* Appearance */}
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <Palette className="h-4 w-4" />
@@ -195,7 +195,7 @@ export default function SettingsPage() {
           </Card>
 
           {/* Notifications */}
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <Bell className="h-4 w-4" />
@@ -233,7 +233,7 @@ export default function SettingsPage() {
           </Card>
 
           {/* Security */}
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <Shield className="h-4 w-4" />

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useCallback, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -26,6 +26,9 @@ import {
   Plus,
   ChevronLeft,
   ChevronRight,
+  AlertCircle,
+  AlertTriangle,
+  Sparkles,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
@@ -38,6 +41,14 @@ const statusConfig: Record<string, { label: string; variant: "default" | "succes
   archive: { label: "Archivé", variant: "outline" },
 };
 
+interface AutoAnalyse {
+  priorite: "haute" | "moyenne" | "basse";
+  prioriteScore: number;
+  objetPropose: string | null;
+  analyseSource: "pj" | "text" | "none";
+  analyzedAt: string;
+}
+
 interface Courrier {
   id: number;
   reference: string;
@@ -49,6 +60,25 @@ interface Courrier {
   createdAt: string;
   emetteurNom: string | null;
   directionEmetteurNom: string | null;
+  metadata?: { autoAnalyse?: AutoAnalyse } | null;
+}
+
+function PrioriteBadge({ autoAnalyse }: { autoAnalyse?: AutoAnalyse }) {
+  if (!autoAnalyse || autoAnalyse.priorite === "basse") return null;
+  if (autoAnalyse.priorite === "haute") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-md bg-destructive/15 px-1.5 py-0.5 text-[10px] font-semibold text-destructive">
+        <AlertCircle className="h-3 w-3" />
+        URGENT
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-md bg-warning/15 px-1.5 py-0.5 text-[10px] font-semibold text-warning">
+      <AlertTriangle className="h-3 w-3" />
+      Priorité
+    </span>
+  );
 }
 
 function InboxContent() {
@@ -116,8 +146,8 @@ function InboxContent() {
         <div className="flex flex-col gap-6 animate-fade-in">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3">
-                <Inbox className="h-6 w-6 text-info" />
+              <h1 className="text-2xl font-semibold tracking-[-0.02em] flex items-center gap-3">
+                <Inbox className="h-6 w-6 text-primary" />
                 Boîte de réception
               </h1>
               <p className="text-sm text-muted-foreground">
@@ -136,15 +166,15 @@ function InboxContent() {
             </div>
           </div>
 
-          <Card>
-            <CardContent className="p-4">
+          <Card className="border-white/10 bg-white/5">
+            <CardContent className="p-5">
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-4">
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       placeholder="Rechercher par référence, objet, contenu..."
-                      className="pl-10"
+                      className="pl-10 rounded-xl"
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && applySearch()}
@@ -195,7 +225,7 @@ function InboxContent() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-white/10 bg-white/5">
             <CardHeader className="pb-3">
               <CardTitle className="text-base">
                 Courriers ({pagination.total})
@@ -218,14 +248,34 @@ function InboxContent() {
                   {courriers.map((courrier) => (
                     <div
                       key={courrier.id}
-                      className="flex items-start gap-4 px-6 py-4 transition-colors hover:bg-secondary/30 cursor-pointer"
+                      className="flex items-start gap-4 px-6 py-4 transition-colors hover:bg-white/5 cursor-pointer"
                       onClick={() => router.push(`/courriers/${courrier.id}`)}
                     >
-                      <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary">
-                        <Mail className="h-4 w-4 text-muted-foreground" />
+                      <div className={`mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ring-1 ${
+                        courrier.metadata?.autoAnalyse?.priorite === "haute"
+                          ? "bg-destructive/10 ring-destructive/30"
+                          : courrier.metadata?.autoAnalyse?.priorite === "moyenne"
+                          ? "bg-warning/10 ring-warning/30"
+                          : "bg-white/5 ring-white/10"
+                      }`}>
+                        <Mail className={`h-4 w-4 ${
+                          courrier.metadata?.autoAnalyse?.priorite === "haute"
+                            ? "text-destructive"
+                            : courrier.metadata?.autoAnalyse?.priorite === "moyenne"
+                            ? "text-warning"
+                            : "text-muted-foreground"
+                        }`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="truncate text-sm font-medium">{courrier.objet}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="truncate text-sm font-medium">{courrier.objet}</p>
+                          <PrioriteBadge autoAnalyse={courrier.metadata?.autoAnalyse} />
+                          {courrier.metadata?.autoAnalyse && (
+                            <span title="Analysé par IA">
+                              <Sparkles className="h-3 w-3 text-primary/60 shrink-0" />
+                            </span>
+                          )}
+                        </div>
                         <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                           <span className="font-mono">{courrier.reference}</span>
                           <span>·</span>

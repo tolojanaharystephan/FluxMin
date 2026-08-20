@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -130,7 +130,7 @@ export default function AISuggestionsPage() {
           <div className="flex flex-col gap-6 animate-fade-in">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3">
+                <h1 className="text-2xl font-semibold tracking-[-0.02em] flex items-center gap-3">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/15">
                     <Sparkles className="h-5 w-5 text-cyan-400" />
                   </span>
@@ -147,7 +147,7 @@ export default function AISuggestionsPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <Card>
+              <Card className="border-white/10 bg-white/5">
                 <CardContent className="p-4 flex items-center gap-3">
                   <Server className={`h-5 w-5 ${ia?.status === "ok" ? "text-emerald-400" : "text-red-400"}`} />
                   <div>
@@ -158,7 +158,7 @@ export default function AISuggestionsPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="border-white/10 bg-white/5">
                 <CardContent className="p-4 flex items-center gap-3">
                   <Zap className="h-5 w-5 text-amber-400" />
                   <div>
@@ -167,7 +167,7 @@ export default function AISuggestionsPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="border-white/10 bg-white/5">
                 <CardContent className="p-4 flex items-center gap-3">
                   <Clock className="h-5 w-5 text-sky-400" />
                   <div>
@@ -176,7 +176,7 @@ export default function AISuggestionsPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="border-white/10 bg-white/5">
                 <CardContent className="p-4 flex items-center gap-3">
                   <Target className="h-5 w-5 text-cyan-400" />
                   <div>
@@ -192,7 +192,7 @@ export default function AISuggestionsPage() {
                 <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : error ? (
-              <Card>
+              <Card className="border-white/10 bg-white/5">
                 <CardContent className="py-12 text-center">
                   <p className="text-sm text-destructive">{error}</p>
                   <Button variant="outline" size="sm" className="mt-4" onClick={fetchData}>
@@ -206,7 +206,7 @@ export default function AISuggestionsPage() {
                   const meta = typeMeta[s.type] || typeMeta.optimisation;
                   const Icon = meta.icon;
                   return (
-                    <Card key={s.id} className={`border ${meta.bg}`}>
+                    <Card key={s.id} className={`border-white/10 bg-white/5 ${meta.bg}`}>
                       <CardHeader className="pb-2">
                         <CardTitle className="text-base flex items-center gap-3">
                           <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${meta.bg}`}>
@@ -251,7 +251,7 @@ export default function AISuggestionsPage() {
                   );
                 })}
                 {suggestions.length === 0 && (
-                  <Card>
+                  <Card className="border-white/10 bg-white/5">
                     <CardContent className="py-12 text-center text-sm text-muted-foreground">
                       Aucune suggestion pour le moment
                     </CardContent>

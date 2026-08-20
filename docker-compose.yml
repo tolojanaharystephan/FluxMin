@@ -5,6 +5,7 @@
 # Access: http://localhost:3000 (Frontend)
 #         http://localhost:3001 (Backend API)
 #         http://localhost:8000 (IA Service)
+#         http://localhost:8001 (Geo Service)
 #         http://localhost:9001 (MinIO Console)
 #         http://localhost:7233 (Temporal UI)
 
@@ -122,6 +123,9 @@ services:
       MINIO_USE_SSL: "false"
       TEMPORAL_HOST: temporal:7233
       IA_SERVICE_URL: http://ia-service:8000
+      GEO_SERVICE_URL: http://geo-service:8001
+      APILAYER_API_KEY: ${APILAYER_API_KEY:-}
+      IPSTACK_ACCESS_KEY: ${IPSTACK_ACCESS_KEY:-}
       PORT: 3000
     ports:
       - "3001:3000"
@@ -130,6 +134,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      geo-service:
+        condition: service_started
     networks:
       - fluxmin-network
 
@@ -149,6 +155,31 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    networks:
+      - fluxmin-network
+
+  # ──────────────────────────────────────────
+  # Geo Service
+  # ──────────────────────────────────────────
+  geo-service:
+    build:
+      context: ./geo-service
+      dockerfile: Dockerfile
+    container_name: fluxmin-geo-service
+    restart: unless-stopped
+    environment:
+      PORT: "8001"
+      CACHE_TTL_SECONDS: "600"
+      REQUEST_TIMEOUT: "5"
+      APILAYER_API_KEY: ${APILAYER_API_KEY:-}
+      IPSTACK_ACCESS_KEY: ${IPSTACK_ACCESS_KEY:-}
+    ports:
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - fluxmin-network
 

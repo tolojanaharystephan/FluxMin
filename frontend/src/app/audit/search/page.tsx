@@ -121,7 +121,7 @@ function AuditSearchContent() {
           <div className="flex flex-col gap-6 animate-fade-in">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3">
+                <h1 className="text-2xl font-semibold tracking-[-0.02em] flex items-center gap-3">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-lime-500/15">
                     <FileSearch className="h-5 w-5 text-lime-400" />
                   </span>
@@ -143,14 +143,14 @@ function AuditSearchContent() {
               </div>
             </div>
 
-            <Card>
+            <Card className="border-white/10 bg-white/5">
               <CardContent className="p-4">
                 <div className="flex flex-col gap-4">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       placeholder="Rechercher par référence, objet, contenu..."
-                      className="pl-10"
+                      className="pl-10 rounded-xl"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && fetchResults(1)}
@@ -191,7 +191,7 @@ function AuditSearchContent() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-white/10 bg-white/5">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base">Résultats ({total})</CardTitle>
               </CardHeader>
@@ -212,7 +212,7 @@ function AuditSearchContent() {
                     {results.map((result) => (
                       <div
                         key={result.id}
-                        className="flex items-start gap-4 px-6 py-4 transition-colors hover:bg-secondary/30"
+                        className="flex items-start gap-4 px-6 py-4 transition-colors hover:bg-white/5"
                       >
                         <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-lime-500/15">
                           <FileSearch className="h-4 w-4 text-lime-400" />

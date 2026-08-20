@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -92,7 +92,7 @@ export default function AnalyticsPage() {
           <div className="flex flex-col gap-6 animate-fade-in">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3">
+                <h1 className="text-2xl font-semibold tracking-[-0.02em] flex items-center gap-3">
                   <BarChart3 className="h-6 w-6 text-info" />
                   Analytics
                 </h1>
@@ -125,15 +125,15 @@ export default function AnalyticsPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {stats.map((stat, i) => (
-                <Card key={stat.title} className="animate-fade-in" style={{ animationDelay: `${i * 60}ms` }}>
+                <Card key={stat.title} className="animate-fade-in border-white/10 bg-white/5" style={{ animationDelay: `${i * 60}ms` }}>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10">
                         <stat.icon className={`h-5 w-5 ${stat.color}`} />
                       </div>
                     </div>
                     <div className="mt-4">
-                      <p className="text-2xl font-bold">
+                      <p className="text-2xl font-semibold">
                         {isLoading ? "…" : formatNumber(stat.value)}
                       </p>
                       <p className="text-xs text-muted-foreground">{stat.title}</p>
@@ -144,7 +144,7 @@ export default function AnalyticsPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <Card>
+              <Card className="border-white/10 bg-white/5">
                 <CardHeader>
                   <CardTitle className="text-base">Évolution mensuelle</CardTitle>
                 </CardHeader>
@@ -191,7 +191,7 @@ export default function AnalyticsPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border-white/10 bg-white/5">
                 <CardHeader>
                   <CardTitle className="text-base">Top directions destinataires</CardTitle>
                 </CardHeader>
@@ -239,7 +239,7 @@ export default function AnalyticsPage() {
               </p>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-4">
-                <Card>
+                <Card className="border-white/10 bg-white/5">
                   <CardContent className="p-5 flex items-center gap-4">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500/15">
                       <Timer className="h-5 w-5 text-teal-400" />
@@ -261,7 +261,7 @@ export default function AnalyticsPage() {
                     </div>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="border-white/10 bg-white/5">
                   <CardContent className="p-5 flex items-center gap-4">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/15">
                       <Archive className="h-5 w-5 text-sky-400" />
@@ -286,7 +286,7 @@ export default function AnalyticsPage() {
               </div>
 
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <Card>
+                <Card className="border-white/10 bg-white/5">
                   <CardHeader>
                     <CardTitle className="text-base">Volume par étape</CardTitle>
                   </CardHeader>
@@ -316,7 +316,7 @@ export default function AnalyticsPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-white/10 bg-white/5">
                   <CardHeader>
                     <CardTitle className="text-base">Transitions fréquentes</CardTitle>
                   </CardHeader>
@@ -332,7 +332,7 @@ export default function AnalyticsPage() {
                     {transitions.map((t) => (
                       <div
                         key={t.transition}
-                        className="flex items-center justify-between rounded-lg bg-secondary/40 px-3 py-2 text-sm"
+                        className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm"
                       >
                         <span className="font-mono text-xs sm:text-sm">{t.transition}</span>
                         <span className="text-muted-foreground tabular-nums">{t.total}</span>

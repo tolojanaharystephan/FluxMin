@@ -122,10 +122,10 @@ export function PendingFilesZone({ files, onChange, disabled, className }: Pendi
         }}
         className={cn(
           "w-full rounded-2xl border border-dashed px-6 py-8 text-center transition-all duration-200",
-          "bg-gradient-to-b from-secondary/40 to-transparent",
+          "bg-white/5 backdrop-blur-sm",
           dragOver
             ? "border-primary bg-primary/5 scale-[1.01]"
-            : "border-border/80 hover:border-primary/40 hover:bg-secondary/30",
+            : "border-border/80 hover:border-primary/40 hover:bg-white/5",
           disabled && "opacity-50 pointer-events-none"
         )}
       >
@@ -151,9 +151,9 @@ export function PendingFilesZone({ files, onChange, disabled, className }: Pendi
             return (
               <li
                 key={`${file.name}-${idx}`}
-                className="flex items-center gap-3 rounded-xl border border-border/70 bg-card px-3 py-2.5 shadow-sm"
+                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 shadow-none"
               >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/5 ring-1 ring-white/10">
                   <Icon className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div className="min-w-0 flex-1">
